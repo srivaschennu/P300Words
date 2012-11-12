@@ -21,9 +21,9 @@ end
 
 fprintf('Epoching and baselining.\n');
 
-EEG = pop_epoch(EEG,eventlist,[-0.2 1]);
+EEG = pop_epoch(EEG,eventlist,[-0.2 0.8]);
 
-EEG = eeg_detrend(EEG);
+%EEG = eeg_detrend(EEG);
 
 EEG = pop_rmbase(EEG, [-200 0]);
 
