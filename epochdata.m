@@ -23,7 +23,10 @@ fprintf('Epoching and baselining.\n');
 
 EEG = pop_epoch(EEG,eventlist,[-0.2 1]);
 
+EEG = eeg_detrend(EEG);
+
 EEG = pop_rmbase(EEG, [-200 0]);
+
 EEG = eeg_checkset(EEG);
 
 if ischar(basename)
