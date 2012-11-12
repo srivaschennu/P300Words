@@ -1,4 +1,4 @@
-function ploterp(subjlist,condlist,varargin)
+function ploterp(subjinfo,condlist,varargin)
 
 loadpaths
 
@@ -6,21 +6,21 @@ timeshift = 0; %milliseconds
 
 param = finputcheck(varargin, { 'ylim', 'real', [], [-12 12]; ...
     'subcond', 'string', {'on','off'}, 'off'; ...
-    'topowin', 'real', [], []; ...
+    'topowin', 'real', [], [200 600]; ...
     });
 
 %% SELECTION OF SUBJECTS AND LOADING OF DATA
 
 loadsubj;
 
-if ischar(subjlist)
+if ischar(subjinfo)
     %%%% perform single-trial statistics
-    subjlist = {subjlist};
+    subjlist = {subjinfo};
     subjcond = condlist;
     
-elseif isnumeric(subjlist) && length(subjlist) == 1
+elseif isnumeric(subjinfo) && length(subjinfo) == 1
     %%%% perform within-subject statistics
-    subjlist = subjlists{subjlist};
+    subjlist = subjlists{subjinfo};
     subjcond = repmat(condlist,length(subjlist),1);
 end
 
@@ -33,6 +33,7 @@ conddata = cell(numsubj,numcond);
 
 for s = 1:numsubj
     EEG = pop_loadset('filename', sprintf('%s.set', subjlist{s}), 'filepath', filepath);
+    EEG = sortchan(EEG);
     
     % %     % rereference
     % EEG = rereference(EEG,1);

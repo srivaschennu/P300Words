@@ -3,7 +3,7 @@ function EEG = epochdata(basename,icamode)
 if ~exist('icamode','var') || isempty(icamode)
     icamode = false;
 end
-keepica = true;
+keepica = false;
 
 eventlist = {
     'TRG1'

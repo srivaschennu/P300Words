@@ -3,10 +3,10 @@ subjlists = {
     'subj01_p300words'
     'subj02_p300words'
     'subj03_p300words'
-    'subj04_p300words'
-    'subj05_p300words'
-    'subj06_p300words'
-    'subj07_p300words'
+    'subj04_p300words' %eye blinks
+    'subj05_p300words' %eye blinks
+    'subj06_p300words' %eye blinks
+    'subj07_p300words' %eye blinks
     };
     {
     'p0112_p300words'
