@@ -7,9 +7,9 @@ subjlist = subjlists{listnum};
 for s = 1:length(subjlist)
     basename = subjlist{s};
     
-    %     dataimport(basename);
-    % epochdata(basename);
+    dataimport(basename);
+    epochdata(basename);
     
-    rejartifacts2(basename,2,3);
+    %rejartifacts2(basename,2,3);
     
 end

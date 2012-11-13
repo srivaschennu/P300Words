@@ -13,9 +13,9 @@ subjlists = {
     'p0212_p300words'
     'p0312_p300words'
     'p0412_p300words'
-    'p0510V2_p300words' %bad
-    'p0710V2_p300words' %bad
-    'p0711_p300words' %bad
+%     'p0510V2_p300words' %bad
+%     'p0710V2_p300words' %bad
+%     'p0711_p300words' %bad
     'p0811_p300words'
     'p0911_p300words'
     'p0911_p300words'
@@ -26,7 +26,7 @@ subjlists = {
     'p1511_p300words'
     'p1611_p300words'
     'p1711_p300words'
-    'p66v4_p300words' %bad
+%     'p66v4_p300words' %bad
     
     'p1811_p300words'
     'p0411V2_p300words'

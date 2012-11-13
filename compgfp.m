@@ -4,9 +4,7 @@ global chanlocs
 
 loadpaths
 
-load conds.mat
-
-timeshift = 600; %milliseconds
+timeshift = 0; %milliseconds
 
 colorlist = {
     'local standard'    [0         0    1.0000]
@@ -22,7 +20,7 @@ colorlist = {
     'late glo. std.'    [0.2500    0.5000    0]
     };
 
-param = finputcheck(varargin, { 'ylim', 'real', [], [-5 30]; ...
+param = finputcheck(varargin, { 'ylim', 'real', [], [-5 20]; ...
     'alpha' , 'real' , [], 0.05; ...
     'numrand', 'integer', [], 1000; ...
     'corrp', 'string', {'none','fdr','cluster'}, 'cluster'; ...
@@ -92,9 +90,9 @@ for s = 1:numsubj
     end
     
     for c = 1:numcond
-        selectevents = conds.(subjcond{s,c}).events;
-        selectsnum = conds.(subjcond{s,c}).snum;
-        selectpred = conds.(subjcond{s,c}).pred;
+        selectevents = subjcond{s,c};
+        selectsnum = 3;
+        %selectpred = 1;
         
         typematches = false(1,length(EEG.epoch));
         snummatches = false(1,length(EEG.epoch));
@@ -138,15 +136,15 @@ for s = 1:numsubj
         
         conddata{s,c} = pop_select(EEG,'trial',selectepochs);
         
-        %                 if (strcmp(statmode,'trial') || strcmp(statmode,'cond')) && c == numcond
-        %                     if conddata{s,1}.trials > conddata{s,2}.trials
-        %                         fprintf('Equalising trials in condition %s.\n',subjcond{s,1});
-        %                         conddata{s,1} = pop_select(conddata{s,1},'trial',1:conddata{s,2}.trials);
-        %                     elseif conddata{s,2}.trials > conddata{s,1}.trials
-        %                         fprintf('Equalising trials in condition %s.\n',subjcond{s,2});
-        %                         conddata{s,2} = pop_select(conddata{s,2},'trial',1:conddata{s,1}.trials);
-        %                     end
-        %                 end
+%                         if (strcmp(statmode,'trial') || strcmp(statmode,'cond')) && c == numcond
+%                             if conddata{s,1}.trials > conddata{s,2}.trials
+%                                 fprintf('Equalising trials in condition %s.\n',subjcond{s,1});
+%                                 conddata{s,1} = pop_select(conddata{s,1},'trial',1:conddata{s,2}.trials);
+%                             elseif conddata{s,2}.trials > conddata{s,1}.trials
+%                                 fprintf('Equalising trials in condition %s.\n',subjcond{s,2});
+%                                 conddata{s,2} = pop_select(conddata{s,2},'trial',1:conddata{s,1}.trials);
+%                             end
+%                         end
     end
 end
 
@@ -340,7 +338,7 @@ end
 
 set(gca,'ColorOrder',cat(1,colororder,[0 0 0]));
 hold all;
-%plot((EEG.times(1):1000/EEG.srate:EEG.times(end))-timeshift,squeeze(stat.condgfp(1,:,:)),'LineWidth',linewidth*1.5);
+plot((EEG.times(1):1000/EEG.srate:EEG.times(end))-timeshift,squeeze(stat.condgfp(1,:,:)),'LineWidth',linewidth*1.5);
 plot((EEG.times(1):1000/EEG.srate:EEG.times(end))-timeshift,gfpdiff(1,:),'LineWidth',linewidth*1.5);
 param.legendstrings{end+1} = 'difference';
 
@@ -351,14 +349,14 @@ line([EEG.times(1) EEG.times(end)]-timeshift,[0 0],'Color','black','LineStyle','
 line([EEG.times(plotpnt) EEG.times(plotpnt)]-timeshift,param.ylim,'Color','black','LineWidth',linewidth,'LineStyle','--');
 xlabel('Time (ms) ','FontSize',param.fontsize,'FontName',fontname);
 ylabel('Global field power ','FontSize',param.fontsize,'FontName',fontname);
-%legend(param.legendstrings,'Location','NorthWest');
+legend(param.legendstrings,'Location','NorthWest');
 box on
 
 
 %% identfy and plot clusters
 
-pstart = 1; %nstart = 1;
-pclustidx = 0; %nclustidx = 0;
+pstart = 1; nstart = 1;
+pclustidx = 0; nclustidx = 0;
 for p = 2:EEG.pnts
     if stat.pprob(p) < param.alpha && stat.pprob(p-1) >= param.alpha
         pstart = p;
@@ -377,15 +375,22 @@ for p = 2:EEG.pnts
             'FontSize',param.fontsize,'FontName',fontname);
     end
     
-    % SRIVAS - don't plot negative clusters for now... don't know what they
-    % mean
-    %     if stat.nprob(p) < param.alpha && stat.nprob(p-1) >= param.alpha
-    %         nstart = p;
-    %     elseif stat.nprob(p) >= param.alpha && stat.nprob(p-1) < param.alpha
-    %         rectangle('Position',[EEG.times(nstart)-timeshift param.ylim(1) ...
-    %             EEG.times(p)-EEG.times(nstart) param.ylim(2)-param.ylim(1)],...
-    %             'EdgeColor','blue','LineWidth',2);
-    %     end
+    if stat.nprob(p) < param.alpha && stat.nprob(p-1) >= param.alpha
+        nstart = p;
+    elseif (stat.nprob(p) >= param.alpha || p == EEG.pnts) && stat.nprob(p-1) < param.alpha
+        nend = p;
+        
+        nclustidx = nclustidx+1;
+        stat.nclust(nclustidx).tstat = mean(stat.valu(nstart:nend-1));
+        stat.nclust(nclustidx).prob = mean(stat.pprob(nstart:nend-1));
+        stat.nclust(nclustidx).win = [EEG.times(nstart) EEG.times(nend-1)]-timeshift;
+        
+        rectangle('Position',[times(nstart) param.ylim(1) ...
+            times(nend)-times(nstart) param.ylim(2)-param.ylim(1)],...
+            'EdgeColor','blue','LineWidth',linewidth,'LineStyle','--');
+        title(sprintf('Cluster t = %.2f, p = %.3f', stat.nclust(nclustidx).tstat, stat.nclust(nclustidx).prob),...
+            'FontSize',param.fontsize,'FontName',fontname);
+    end
 end
 
 set(gcf,'Color','white');
