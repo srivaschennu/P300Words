@@ -16,6 +16,9 @@ for s = 1:length(subjlist)
 %    rejartifacts2([basename '_epochs'],1,4);
     
     computeic([basename '_epochs']);
+%     rejectic(basename);
+%     rejartifacts2(basename,2,3);
+    
 %     filenames = dir(sprintf('%s%s*', filepath, basename));
 %     mfffiles = filenames(logical(cell2mat({filenames.isdir})));
 %     filename = mfffiles.name;
