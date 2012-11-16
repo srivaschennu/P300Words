@@ -9,31 +9,37 @@ subjlists = {
     'subj07_p300words' %eye blinks
     };
     {
-    'p0112_p300words'
-    'p0212_p300words'
-    'p0312_p300words'
-%     'p0412_p300words' %too few trials
-%     'p0510V2_p300words' %bad
-%     'p0710V2_p300words' %bad
+    %READY
+%     'p0112_p300words'
+%     'p0212_p300words'
+%     'p0312_p300words'
+%     'p0811_p300words'
+
+% TODO
+%     'p0911_p300words'
+%     'p1011_p300words'
+%     'p1211_p300words'
+%     'p1311_p300words'
+%     'p1411_p300words'
+%     'p1511_p300words'
+%     'p1611_p300words' %clean
+%     'p1711_p300words'
+%     'p1811_p300words' %clean
+%     'p0411V2_p300words' %noisy
+%     'p2011_p300words' %noisy
+%     'p1911_p300words' %noisy
+%     'p0512_p300words' %noisy
+%     'p0511v2_p300words'
+%     'p211v2_p300words'
+
+    'p0311v2_p300words' %bad
+    'p0510V2_p300words' %bad
+    'p0710V2_p300words' %bad
+    
+    
 %     'p0711_p300words' %bad
-    'p0811_p300words'
-    'p0911_p300words'
-    'p1011_p300words'
-    'p1211_p300words'
-    'p1311_p300words'
-    'p1411_p300words'
-    'p1511_p300words'
-    'p1611_p300words' %clean
-    'p1711_p300words'
-%     'p66v4_p300words' %bad
-    'p1811_p300words' %clean
-    'p0411V2_p300words' %noisy
 %     'p2111_p300words' %too few trials
-    'p2011_p300words' %noisy
-    'p1911_p300words' %noisy
-    'p0512_p300words' %noisy
-    'p0511v2_p300words'
-%     'p0311v2_p300words' %bad
-    'p211v2_p300words'
+%     'p0412_p300words' %too few trials
+%     'p66v4_p300words' %too few trials
     };
     };
