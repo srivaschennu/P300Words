@@ -16,13 +16,15 @@ for s = 1:length(subjlist)
     
 %   rejartifacts2([basename '_epochs'],1,4);
     
-    computeic([basename '_epochs']);
+%     computeic([basename '_epochs']);
 
 %     rejectic(basename);
 %     rejartifacts2(basename,2,3);
     
-%     compgfp(basename,{'TRG1','DIST'},'latency',[300 800],'numrand',200);
-%     compgfp(basename,{'TRG2','DIST'},'latency',[200 400],'numrand',200);
+    batchres{s,2} = compgfp(basename,{'TRG1','DIST'},'latency',[300 700]);
+    close(gcf);
+    batchres{s,3} = compgfp(basename,{'TRG2','DIST'},'latency',[200 400]);
+    close(gcf);
 
 %     filenames = dir(sprintf('%s%s*', filepath, basename));
 %     mfffiles = filenames(logical(cell2mat({filenames.isdir})));
@@ -33,3 +35,5 @@ for s = 1:length(subjlist)
 end
 % [~,sortidx] = sort(batchres(:,2));
 % batchres(sortidx,:)
+
+save(sprintf('batch %s.mat',datestr(now)),'batchres');

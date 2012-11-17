@@ -136,15 +136,17 @@ for s = 1:numsubj
         
         conddata{s,c} = pop_select(EEG,'trial',selectepochs);
         
-%                         if (strcmp(statmode,'trial') || strcmp(statmode,'cond')) && c == numcond
-%                             if conddata{s,1}.trials > conddata{s,2}.trials
-%                                 fprintf('Equalising trials in condition %s.\n',subjcond{s,1});
-%                                 conddata{s,1} = pop_select(conddata{s,1},'trial',1:conddata{s,2}.trials);
-%                             elseif conddata{s,2}.trials > conddata{s,1}.trials
-%                                 fprintf('Equalising trials in condition %s.\n',subjcond{s,2});
-%                                 conddata{s,2} = pop_select(conddata{s,2},'trial',1:conddata{s,1}.trials);
-%                             end
-%                         end
+                        if (strcmp(statmode,'trial') || strcmp(statmode,'cond')) && c == numcond
+                            if conddata{s,1}.trials > conddata{s,2}.trials
+                                fprintf('Equalising trials in condition %s.\n',subjcond{s,1});
+                                randtrials = randperm(conddata{s,1}.trials);
+                                conddata{s,1} = pop_select(conddata{s,1},'trial',randtrials(1:conddata{s,2}.trials));
+                            elseif conddata{s,2}.trials > conddata{s,1}.trials
+                                fprintf('Equalising trials in condition %s.\n',subjcond{s,2});
+                                randtrials = randperm(conddata{s,2}.trials);
+                                conddata{s,2} = pop_select(conddata{s,2},'trial',randtrials(1:conddata{s,1}.trials));
+                            end
+                        end
     end
 end
 
@@ -375,22 +377,22 @@ for p = 2:EEG.pnts
             'FontSize',param.fontsize,'FontName',fontname);
     end
     
-    if stat.nprob(p) < param.alpha && stat.nprob(p-1) >= param.alpha
-        nstart = p;
-    elseif (stat.nprob(p) >= param.alpha || p == EEG.pnts) && stat.nprob(p-1) < param.alpha
-        nend = p;
-        
-        nclustidx = nclustidx+1;
-        stat.nclust(nclustidx).tstat = mean(stat.valu(nstart:nend-1));
-        stat.nclust(nclustidx).prob = mean(stat.pprob(nstart:nend-1));
-        stat.nclust(nclustidx).win = [EEG.times(nstart) EEG.times(nend-1)]-timeshift;
-        
-        rectangle('Position',[times(nstart) param.ylim(1) ...
-            times(nend)-times(nstart) param.ylim(2)-param.ylim(1)],...
-            'EdgeColor','blue','LineWidth',linewidth,'LineStyle','--');
-        title(sprintf('Cluster t = %.2f, p = %.3f', stat.nclust(nclustidx).tstat, stat.nclust(nclustidx).prob),...
-            'FontSize',param.fontsize,'FontName',fontname);
-    end
+%     if stat.nprob(p) < param.alpha && stat.nprob(p-1) >= param.alpha
+%         nstart = p;
+%     elseif (stat.nprob(p) >= param.alpha || p == EEG.pnts) && stat.nprob(p-1) < param.alpha
+%         nend = p;
+%         
+%         nclustidx = nclustidx+1;
+%         stat.nclust(nclustidx).tstat = mean(stat.valu(nstart:nend-1));
+%         stat.nclust(nclustidx).prob = mean(stat.pprob(nstart:nend-1));
+%         stat.nclust(nclustidx).win = [EEG.times(nstart) EEG.times(nend-1)]-timeshift;
+%         
+%         rectangle('Position',[times(nstart) param.ylim(1) ...
+%             times(nend)-times(nstart) param.ylim(2)-param.ylim(1)],...
+%             'EdgeColor','blue','LineWidth',linewidth,'LineStyle','--');
+%         title(sprintf('Cluster t = %.2f, p = %.3f', stat.nclust(nclustidx).tstat, stat.nclust(nclustidx).prob),...
+%             'FontSize',param.fontsize,'FontName',fontname);
+%     end
 end
 
 set(gcf,'Color','white');
