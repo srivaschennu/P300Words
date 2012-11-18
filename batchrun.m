@@ -21,9 +21,9 @@ for s = 1:length(subjlist)
 %     rejectic(basename);
 %     rejartifacts2(basename,2,3);
     
-    batchres{s,2} = compgfp(basename,{'TRG1','DIST'},'latency',[300 700]);
+    batchres{s,2} = compgfp(basename,{'TRG1','DIST'},'latency',[200 700]);
     close(gcf);
-    batchres{s,3} = compgfp(basename,{'TRG2','DIST'},'latency',[200 400]);
+    batchres{s,3} = compgfp(basename,{'TRG2','DIST'},'latency',[150 400]);
     close(gcf);
 
 %     filenames = dir(sprintf('%s%s*', filepath, basename));
