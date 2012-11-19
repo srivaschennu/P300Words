@@ -9,7 +9,7 @@ subjlists = {
     'subj07_p300words' %eye blinks
     };
     {
-    'p0112_p300words' %TRG1 TRG2
+    'p0112_p300words' %TRG1 
     'p1011_p300words' %TRG1 TRG2
     'p1611_p300words' %clean %TRG1 TRG2
     'p1811_p300words' %clean %TRG1
