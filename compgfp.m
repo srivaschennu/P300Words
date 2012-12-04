@@ -2,6 +2,8 @@ function stat = compgfp(subjinfo,condlist,varargin)
 
 loadpaths
 
+global chanlocs
+
 timeshift = 0; %milliseconds
 
 param = finputcheck(varargin, {
@@ -330,14 +332,14 @@ end
 
 function gfp = calcgfp(data,times)
 %data in channels x timepoints
-[~,gfp] = evalc('eeg_gfp(data'')''');
-gfp = rmbase(gfp,[],1:find(times == 0));
+% [~,gfp] = evalc('eeg_gfp(data'')''');
+% gfp = rmbase(gfp,[],1:find(times == 0));
 
-% global chanlocs
-% 
-% chanlist = {'E10'};
-% chanidx = zeros(size(chanlist));
-% for c = 1:length(chanlist)
-%     chanidx(c) = find(strcmp(chanlist{c},{chanlocs.labels}));
-% end
-% gfp = mean(data(chanidx,:),1);
+global chanlocs
+
+chanlist = {'E62', 'E75', 'E52', 'E92'};
+chanidx = zeros(size(chanlist));
+for c = 1:length(chanlist)
+    chanidx(c) = find(strcmp(chanlist{c},{chanlocs.labels}));
+end
+gfp = mean(data(chanidx,:),1);

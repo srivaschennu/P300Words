@@ -38,7 +38,17 @@ subjlists = {
 %     'p1011_p300words' %only 10 blcoks TRG1 TRG2
 %     'p0811_p300words' %only 12 blocks
 %     'p0911_p300words' %only 12 blocks
+%     'p0712_p300words' %noisy 
 
 
+    };
+
+    {
+    'p1311v2_p300words'
+    'p0812_p300words'
+    'p1012_p300words'
+    'p0912_p300words'
+    'p1511v2_p300words'
+    'p1811v2_p300words'
     };
     };
