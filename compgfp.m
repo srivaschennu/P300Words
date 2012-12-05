@@ -2,7 +2,7 @@ function stat = compgfp(subjinfo,condlist,varargin)
 
 loadpaths
 
-global chanlocs
+global chanidx
 
 timeshift = 0; %milliseconds
 
@@ -12,6 +12,7 @@ param = finputcheck(varargin, {
     'corrp', 'string', {'none','fdr','cluster'}, 'cluster'; ...
     'latency', 'real', [], []; ...
     'clustsize', 'integer', [], 10; ...
+    'chanlist', 'cell', {}, {}; ...
     });
 
 %% SELECTION OF SUBJECTS AND LOADING OF DATA
@@ -119,20 +120,29 @@ for s = 1:numsubj
         fprintf('Condition %s: found %d matching epochs.\n',subjcond{s,c},length(selectepochs));
         
         conddata{s,c} = pop_select(EEG,'trial',selectepochs);
-%         
-%                         if (strcmp(statmode,'trial') || strcmp(statmode,'cond')) && c == numcond
-%                             if conddata{s,1}.trials > conddata{s,2}.trials
-%                                 fprintf('Equalising trials in condition %s.\n',subjcond{s,1});
-%                                 randtrials = randperm(conddata{s,1}.trials);
-%                                 conddata{s,1} = pop_select(conddata{s,1},'trial',randtrials(1:conddata{s,2}.trials));
-%                             elseif conddata{s,2}.trials > conddata{s,1}.trials
-%                                 fprintf('Equalising trials in condition %s.\n',subjcond{s,2});
-%                                 randtrials = randperm(conddata{s,2}.trials);
-%                                 conddata{s,2} = pop_select(conddata{s,2},'trial',randtrials(1:conddata{s,1}.trials));
-%                             end
-%                         end
+        %
+        %                         if (strcmp(statmode,'trial') || strcmp(statmode,'cond')) && c == numcond
+        %                             if conddata{s,1}.trials > conddata{s,2}.trials
+        %                                 fprintf('Equalising trials in condition %s.\n',subjcond{s,1});
+        %                                 randtrials = randperm(conddata{s,1}.trials);
+        %                                 conddata{s,1} = pop_select(conddata{s,1},'trial',randtrials(1:conddata{s,2}.trials));
+        %                             elseif conddata{s,2}.trials > conddata{s,1}.trials
+        %                                 fprintf('Equalising trials in condition %s.\n',subjcond{s,2});
+        %                                 randtrials = randperm(conddata{s,2}.trials);
+        %                                 conddata{s,2} = pop_select(conddata{s,2},'trial',randtrials(1:conddata{s,1}.trials));
+        %                             end
+        %                         end
     end
 end
+
+if isempty(param.chanlist)
+    chanidx = [];
+else
+    for c = 1:length(param.chanlist)
+        chanidx(c) = find(param.chanlist{c},{chanlocs.labels});
+    end
+end
+
 
 if strcmp(statmode,'trial')
     cond1data = conddata{1}.data;
@@ -144,54 +154,56 @@ if strcmp(statmode,'trial')
 elseif strcmp(statmode,'cond')
     cond1data = zeros(conddata{1,1}.pnts,numsubj);
     cond2data = zeros(conddata{1,2}.pnts,numsubj);
-    diffcond = zeros(conddata{1,1}.nbchan,conddata{1,1}.pnts,numcond,numsubj);
+    condavg = zeros(conddata{1,1}.nbchan,conddata{1,1}.pnts,numcond,numsubj);
     
     for s = 1:numsubj
         cond1data(:,s) = calcgfp(mean(conddata{s,1}.data,3),EEG.times);
         cond2data(:,s) = calcgfp(mean(conddata{s,2}.data,3),EEG.times);
-        diffcond(:,:,1,s) = mean(conddata{s,1}.data,3);
-        diffcond(:,:,2,s) = mean(conddata{s,2}.data,3);
+        condavg(:,:,1,s) = mean(conddata{s,1}.data,3);
+        condavg(:,:,2,s) = mean(conddata{s,2}.data,3);
         
         if size(conddata,2) > 2
             condsub = calcgfp(mean(conddata{s,3}.data,3),EEG.times);
             cond1data(:,s) = cond1data(:,s) - condsub';
             cond2data(:,s) = cond2data(:,s) - condsub';
-            diffcond(:,:,1,s) = diffcond(:,:,1,s) - mean(conddata{s,3}.data,3);
-            diffcond(:,:,2,s) = diffcond(:,:,2,s) - mean(conddata{s,3}.data,3);
+            condavg(:,:,1,s) = condavg(:,:,1,s) - mean(conddata{s,3}.data,3);
+            condavg(:,:,2,s) = condavg(:,:,2,s) - mean(conddata{s,3}.data,3);
         end
     end
     mergedata = cat(2,cond1data,cond2data);
-    diffcond = diffcond(:,:,1,:) - diffcond(:,:,2,:);
+    diffcond = condavg(:,:,1,:) - condavg(:,:,2,:);
+    condavg = mean(condavg,4);
     diffcond = mean(diffcond,4);
     
 elseif strcmp(statmode,'subj')
-    diffcond = zeros(conddata{1,1}.nbchan,conddata{1,1}.pnts,numsubj);
+    condavg = zeros(conddata{1,1}.nbchan,conddata{1,1}.pnts,numsubj);
     cond1data = zeros(conddata{1,1}.pnts,numsubj1);
     for s = 1:numsubj1
         cond1data(:,s) = calcgfp(mean(conddata{s,1}.data,3),EEG.times);
-        diffcond(:,:,s) = mean(conddata{s,1}.data,3);
+        condavg(:,:,s) = mean(conddata{s,1}.data,3);
         
         if size(conddata,2) > 1
             cond1sub = calcgfp(mean(conddata{s,2}.data,3),EEG.times);
             cond1data(:,s) = cond1data(:,s) - cond1sub';
-            diffcond(:,:,s) = diffcond(:,:,s) - mean(conddata{s,2}.data,3);
+            condavg(:,:,s) = condavg(:,:,s) - mean(conddata{s,2}.data,3);
         end
     end
     
     cond2data = zeros(conddata{numsubj1+1,1}.pnts,numsubj2);
     for s = 1:numsubj2
         cond2data(:,s) = calcgfp(mean(conddata{numsubj1+s,1}.data,3),EEG.times);
-        diffcond(:,:,numsubj1+s) = mean(conddata{numsubj1+s,1}.data,3);
+        condavg(:,:,numsubj1+s) = mean(conddata{numsubj1+s,1}.data,3);
         
         if size(conddata,2) > 1
             cond2sub = calcgfp(mean(conddata{numsubj1+s,2}.data,3),EEG.times);
             cond2data(:,s) = cond2data(:,s) - cond2sub';
-            diffcond(:,:,numsubj1+s) = diffcond(:,:,numsubj1+s) - mean(conddata{numsubj1+s,2}.data,3);
+            condavg(:,:,numsubj1+s) = condavg(:,:,numsubj1+s) - mean(conddata{numsubj1+s,2}.data,3);
         end
     end
     
     mergedata = cat(2,cond1data,cond2data);
-    diffcond = mean(diffcond(:,:,1:numsubj1),3) - mean(diffcond(:,:,numsubj1+1:end),3);
+    diffcond = mean(condavg(:,:,1:numsubj1),3) - mean(condavg(:,:,numsubj1+1:end),3);
+    condavg = cat(3,mean(condavg(:,:,1:numsubj1),3),mean(condavg(:,:,numsubj1+1:end),3));
 end
 
 gfpdiff = zeros(param.numrand+1,conddata{1,1}.pnts);
@@ -301,16 +313,16 @@ for p = 2:EEG.pnts
         stat.pclust(pclustidx).win = [EEG.times(pstart) EEG.times(pend-1)]-timeshift;
     end
     
-%     if stat.nprob(p) < param.alpha && stat.nprob(p-1) >= param.alpha
-%         nstart = p;
-%     elseif (stat.nprob(p) >= param.alpha || p == EEG.pnts) && stat.nprob(p-1) < param.alpha
-%         nend = p;
-%         
-%         nclustidx = nclustidx+1;
-%         stat.nclust(nclustidx).tstat = mean(stat.valu(nstart:nend-1));
-%         stat.nclust(nclustidx).prob = mean(stat.pprob(nstart:nend-1));
-%         stat.nclust(nclustidx).win = [EEG.times(nstart) EEG.times(nend-1)]-timeshift;
-%     end
+    %     if stat.nprob(p) < param.alpha && stat.nprob(p-1) >= param.alpha
+    %         nstart = p;
+    %     elseif (stat.nprob(p) >= param.alpha || p == EEG.pnts) && stat.nprob(p-1) < param.alpha
+    %         nend = p;
+    %
+    %         nclustidx = nclustidx+1;
+    %         stat.nclust(nclustidx).tstat = mean(stat.valu(nstart:nend-1));
+    %         stat.nclust(nclustidx).prob = mean(stat.pprob(nstart:nend-1));
+    %         stat.nclust(nclustidx).win = [EEG.times(nstart) EEG.times(nend-1)]-timeshift;
+    %     end
 end
 
 stat.gfpdiff = gfpdiff;
@@ -332,14 +344,11 @@ end
 
 function gfp = calcgfp(data,times)
 %data in channels x timepoints
-% [~,gfp] = evalc('eeg_gfp(data'')''');
-% gfp = rmbase(gfp,[],1:find(times == 0));
 
-global chanlocs
-
-chanlist = {'E62', 'E75', 'E52', 'E92'};
-chanidx = zeros(size(chanlist));
-for c = 1:length(chanlist)
-    chanidx(c) = find(strcmp(chanlist{c},{chanlocs.labels}));
+global chanidx
+if isempty(chanidx)
+    [~,gfp] = evalc('eeg_gfp(data'')''');
+    gfp = rmbase(gfp,[],1:find(times == 0));
+else
+    gfp = mean(data(chanidx,:),1);
 end
-gfp = mean(data(chanidx,:),1);

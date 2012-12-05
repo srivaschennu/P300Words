@@ -30,10 +30,13 @@ figure('Name',sprintf('%s-%s',stat.condlist{1},stat.condlist{2}),'Color','white'
 figpos = get(gcf,'Position');
 set(gcf,'Position',[figpos(1) figpos(2) figpos(3) figpos(3)]);
 
-latpnt = find(stat.times-stat.timeshift >= stat.param.latency(1) & stat.times-stat.timeshift <= stat.param.latency(2));
-[maxval, maxidx] = max(stat.condgfp(1,latpnt,1),[],2);
-[~, maxmaxidx] = max(maxval);
-plotpnt = latpnt(1)-1+maxidx(maxmaxidx);
+if isfield(stat,'pclust')
+    latpnt = find(stat.times-stat.timeshift >= stat.pclust(1).win(1) & stat.times-stat.timeshift <= stat.pclust(end).win(2));
+else
+    latpnt = find(stat.times-stat.timeshift >= stat.param.latency(1) & stat.times-stat.timeshift <= stat.param.latency(2));
+end
+[~, maxidx] = max(stat.condgfp(1,latpnt,1),[],2);
+plotpnt = latpnt(1)-1+maxidx;
 
 for c = 1:length(stat.condlist)
     subplot(2,2,c);

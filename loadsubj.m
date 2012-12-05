@@ -30,6 +30,10 @@ subjlists = {
     'p0710V2_p300words'
     'p211v2_p300words'
     'p0112_p300words' %TRG1 
+    'p1511v2_p300words' %noisy
+    'p1811v2_p300words'
+    'p0812_p300words'
+    'p1012_p300words'
     
 %     'p0711_p300words' %bad
 %     'p2111_p300words' %too few trials
@@ -44,11 +48,8 @@ subjlists = {
     };
 
     {
-    'p1311v2_p300words'
-    'p0812_p300words'
-    'p1012_p300words'
-    'p0912_p300words'
-    'p1511v2_p300words'
-    'p1811v2_p300words'
+    'p1311v2_p300words' %clean
+    'p0912_p300words' 
+
     };
     };
