@@ -20,7 +20,7 @@ for s = 1:length(subjlist)
 %       rejartifacts2([basename '_epochs'],1,4);
     
 %         computeic([basename '_epochs']);
-    
+%     
 %             rejectic(basename);
 %             rejartifacts2(basename,2,3);
     
@@ -28,7 +28,7 @@ for s = 1:length(subjlist)
         load(['trial_' basename '_TRG1-DIST.mat']);
         plotclusters(stat);
     
-        compgfp(basename,{'TRG2','DIST'},'latency',[150 400],'numrand',200);
+        compgfp(basename,{'TRG2','DIST'},'latency',[200 400],'numrand',200);
         load(['trial_' basename '_TRG2-DIST.mat']);
         plotclusters(stat);
     
