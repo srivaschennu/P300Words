@@ -1,17 +1,9 @@
 function plotclusters(stat,varargin)
 
 colorlist = {
-    'local standard'    [0         0    1.0000]
-    'local deviant'     [0    0.5000         0]
-    'global standard'   [1.0000    0         0]
-    'global deviant'    [0    0.7500    0.7500]
-    'inter-aural dev.'  [0.7500    0    0.7500]
-    'inter-aural ctrl.' [0.7500    0.7500    0]
-    'attend tones'      [0    0.5000    0.5000]
-    'attend sequences'  [0.5000    0    0.5000]
-    'attend visual'     [0    0.2500    0.7500]
-    'early glo. std.'   [0.5000    0.5000    0]
-    'late glo. std.'    [0.2500    0.5000    0]
+    'trg1'    [0         0    1.0000]
+    'trg2'     [0    0.5000         0]
+    'dist'   [1.0000    0         0]
     };
 
 param = finputcheck(varargin, { 'ylim', 'real', [], [-5 20]; ...
@@ -47,7 +39,8 @@ for c = 1:length(stat.condlist)
     else
         caxis(cscale);
     end
-    title(stat.condlist{c},'FontSize',param.fontsize,'FontName',fontname);
+    colorbar('FontSize',param.fontsize);    
+    title(param.legendstrings{c},'FontSize',param.fontsize,'FontName',fontname);
 end
 
 
@@ -85,7 +78,7 @@ box on
 if isfield(stat,'pclust')
     for p = 1:length(stat.pclust)
         line([stat.pclust(p).win(1) stat.pclust(p).win(2)],[0 0],'Color','blue','LineWidth',8);
-        title(sprintf('Cluster t = %.2f, p = %.3f', stat.pclust(p).tstat, stat.pclust(p).prob),...
+        title(sprintf('%dms\nCluster t = %.2f, p = %.3f', round(stat.times(plotpnt)), stat.pclust(p).tstat, stat.pclust(p).prob),...
             'FontSize',param.fontsize,'FontName',fontname);
     end
 else

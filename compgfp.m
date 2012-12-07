@@ -60,8 +60,8 @@ for s = 1:numsubj
     EEG = pop_loadset('filename', sprintf('%s.set', subjlist{s}), 'filepath', filepath);
     EEG = sortchan(EEG);
     
-    % %     % rereference
-    % EEG = rereference(EEG,1);
+    % rereference
+    EEG = rereference(EEG,1);
     %
     %     %%%%% baseline correction relative to 5th tone
     %     bcwin = [-200 0];
@@ -76,7 +76,7 @@ for s = 1:numsubj
     
     for c = 1:numcond
         selectevents = subjcond{s,c};
-        selectsnum = 3;
+        selectsnum = 1;
         %selectpred = 1;
         
         typematches = false(1,length(EEG.epoch));
@@ -120,18 +120,18 @@ for s = 1:numsubj
         fprintf('Condition %s: found %d matching epochs.\n',subjcond{s,c},length(selectepochs));
         
         conddata{s,c} = pop_select(EEG,'trial',selectepochs);
-        %
-        %                         if (strcmp(statmode,'trial') || strcmp(statmode,'cond')) && c == numcond
-        %                             if conddata{s,1}.trials > conddata{s,2}.trials
-        %                                 fprintf('Equalising trials in condition %s.\n',subjcond{s,1});
-        %                                 randtrials = randperm(conddata{s,1}.trials);
-        %                                 conddata{s,1} = pop_select(conddata{s,1},'trial',randtrials(1:conddata{s,2}.trials));
-        %                             elseif conddata{s,2}.trials > conddata{s,1}.trials
-        %                                 fprintf('Equalising trials in condition %s.\n',subjcond{s,2});
-        %                                 randtrials = randperm(conddata{s,2}.trials);
-        %                                 conddata{s,2} = pop_select(conddata{s,2},'trial',randtrials(1:conddata{s,1}.trials));
-        %                             end
-        %                         end
+        
+        if (strcmp(statmode,'trial') || strcmp(statmode,'cond')) && c == numcond
+            if conddata{s,1}.trials > conddata{s,2}.trials
+                fprintf('Equalising trials in condition %s.\n',subjcond{s,1});
+                randtrials = 1:conddata{s,1}.trials;%randperm(conddata{s,1}.trials);
+                conddata{s,1} = pop_select(conddata{s,1},'trial',randtrials(1:conddata{s,2}.trials));
+            elseif conddata{s,2}.trials > conddata{s,1}.trials
+                fprintf('Equalising trials in condition %s.\n',subjcond{s,2});
+                randtrials = 1:conddata{s,2}.trials;%randperm(conddata{s,2}.trials);
+                conddata{s,2} = pop_select(conddata{s,2},'trial',randtrials(1:conddata{s,1}.trials));
+            end
+        end
     end
 end
 
@@ -347,7 +347,7 @@ function gfp = calcgfp(data,times)
 
 global chanidx
 if isempty(chanidx)
-    [~,gfp] = evalc('eeg_gfp(data'')''');
+    [~,gfp] = evalc('eeg_gfp(data'',0)''');
     gfp = rmbase(gfp,[],1:find(times == 0));
 else
     gfp = mean(data(chanidx,:),1);

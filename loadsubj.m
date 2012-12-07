@@ -9,13 +9,8 @@ subjlists = {
     'subj07_p300words' %eye blinks
     };
     {
-%     'p1611_p300words' %clean %TRG1 TRG2
-%     'p1811_p300words' %clean %TRG1
-%     'p0912_p300words' %TRG1 TRG2
-%     'p0112_p300words' %TRG1
-    'p1211_p300words' %%
-    'p0511v2_p300words' %%noisy
-    'p0512_p300words' % %%
+    'p1611_p300words' %clean %TRG1 TRG2
+    'p0912_p300words' %TRG1 TRG2
     };
     {
     'p0212_p300words'
@@ -36,6 +31,11 @@ subjlists = {
     'p1012_p300words'
     'p1911_p300words' %noisy %TRG1
     'p1311v2_p300words' %clean TRG1 TRG2
+    'p0511v2_p300words' %%noisy
+    'p1811_p300words' %clean %TRG1
+    'p0512_p300words' % %%    
+    'p0112_p300words' %TRG1?
+    'p1211_p300words' % flipped TRG1 AND TRG2
 
     %     'p0711_p300words' %bad
     %     'p2111_p300words' %too few trials
@@ -45,7 +45,5 @@ subjlists = {
     %     'p0811_p300words' %only 12 blocks
     %     'p0911_p300words' %only 12 blocks
     %     'p0712_p300words' %noisy
-    
-    
     };
     };

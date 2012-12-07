@@ -35,9 +35,9 @@ for s = 1:numsubj
     EEG = pop_loadset('filename', sprintf('%s.set', subjlist{s}), 'filepath', filepath);
     EEG = sortchan(EEG);
     
-    % %     % rereference
-    % EEG = rereference(EEG,1);
-    %
+    %rereference
+    EEG = rereference(EEG,1);
+    
     %     %%%%% baseline correction relative to 5th tone
     %     bcwin = [-200 0];
     %     bcwin = bcwin+(timeshift*1000);
@@ -52,7 +52,7 @@ for s = 1:numsubj
     
     for c = 1:numcond
         selectevents = subjcond{s,c};
-        selectsnum = 3;
+        selectsnum = 1;
         %selectpred = 1;
         
         typematches = false(1,length(EEG.epoch));
