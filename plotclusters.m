@@ -1,9 +1,9 @@
 function plotclusters(stat,varargin)
 
 colorlist = {
-    'trg1'    [0         0    1.0000]
-    'trg2'     [0    0.5000         0]
-    'dist'   [1.0000    0         0]
+    'explicit'    [0         0    1.0000]
+    'implicit'     [0    0.5000         0]
+    'distractor'   [1.0000    0         0]
     };
 
 param = finputcheck(varargin, { 'ylim', 'real', [], [-5 20]; ...
