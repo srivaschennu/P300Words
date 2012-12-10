@@ -24,24 +24,24 @@ for s = 1:length(subjlist)
     %             rejectic(basename);
     %             rejartifacts2(basename,2,3);
     
-%     compgfp(basename,{'TRG1','DIST'},'latency',[300 600],'numrand',1000);
-%     load(['trial_' basename '_TRG1-DIST.mat']);
-%     plotclusters(stat);
-%     
-%     compgfp(basename,{'TRG2','DIST'},'latency',[150 400],'numrand',1000);
-%     load(['trial_' basename '_TRG2-DIST.mat']);
-%     plotclusters(stat);
-%     
-%     compgfp(basename,{'TRG1','TRG2'},'latency',[300 600],'numrand',1000);
-%     load(['trial_' basename '_TRG1-TRG2.mat']);
-%     plotclusters(stat);
+    compgfp(basename,{'TRG1','DIST'},'latency',[300 600],'numrand',200);
+    load(['trial_' basename '_TRG1-DIST.mat']);
+    plotclusters(stat);
     
-        filenames = dir(sprintf('%s%s*', filepath, basename));
-        mfffiles = filenames(logical(cell2mat({filenames.isdir})));
-        filename = mfffiles.name;
-        info = read_mff_info([filepath filename]);
+    compgfp(basename,{'TRG2','DIST'},'latency',[150 400],'numrand',200);
+    load(['trial_' basename '_TRG2-DIST.mat']);
+    plotclusters(stat);
     
-        batchres{s,2} = info.date
+    compgfp(basename,{'TRG1','TRG2'},'latency',[300 600],'numrand',200);
+    load(['trial_' basename '_TRG1-TRG2.mat']);
+    plotclusters(stat);
+%     
+%         filenames = dir(sprintf('%s%s*', filepath, basename));
+%         mfffiles = filenames(logical(cell2mat({filenames.isdir})));
+%         filename = mfffiles.name;
+%         info = read_mff_info([filepath filename]);
+%     
+%         batchres{s,2} = info.date
     
     %    EEG = pop_loadset('filepath',filepath,'filename',[basename '_epochs.set'],'loadmode','info');
     %     prevblocknum = 0;
