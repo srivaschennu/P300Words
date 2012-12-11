@@ -21,8 +21,8 @@ for s = 1:length(subjlist)
     
     %         computeic([basename '_epochs']);
     %
-    %             rejectic(basename);
-    %             rejartifacts2(basename,2,3);
+%                 rejectic(basename);
+%                 rejartifacts2(basename,2,3);
     
     compgfp(basename,{'TRG1','DIST'},'latency',[300 600],'numrand',200);
     load(['trial_' basename '_TRG1-DIST.mat']);
@@ -35,7 +35,7 @@ for s = 1:length(subjlist)
     compgfp(basename,{'TRG1','TRG2'},'latency',[300 600],'numrand',200);
     load(['trial_' basename '_TRG1-TRG2.mat']);
     plotclusters(stat);
-%     
+    
 %         filenames = dir(sprintf('%s%s*', filepath, basename));
 %         mfffiles = filenames(logical(cell2mat({filenames.isdir})));
 %         filename = mfffiles.name;
