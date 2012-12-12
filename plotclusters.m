@@ -71,7 +71,7 @@ xlabel('Time (ms) ','FontSize',param.fontsize,'FontName',fontname);
 ylabel('Global field power ','FontSize',param.fontsize,'FontName',fontname);
 legend(param.legendstrings,'Location','NorthWest');
 box on
-
+title(sprintf('%dms', round(stat.times(plotpnt))),'FontSize',param.fontsize,'FontName',fontname);
 
 %% plot clusters
 

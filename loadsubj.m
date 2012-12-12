@@ -9,13 +9,11 @@ subjlists = {
     'subj07_p300words' %eye blinks
     };
     {
-%     'p1611_p300words' %clean %TRG1 TRG2
-%     'p0912_p300words' %TRG2
-    'p1511_p300words'
-    'p1711_p300words'
-    'p0311v2_p300words'
-    'p1511v2_p300words' %noisy
-    'p0512_p300words'
+    'p1611_p300words' %clean %TRG1 TRG2
+    'p0912_p300words' %weak TRG1, TRG2
+    'p1511_p300words' %TRG1 = TRG2
+    'p1711_p300words' %DIST > TRG1, TRG2
+    'p0512_p300words' %TRG1 = TRG2
     };
     {
 %     'p0212_p300words'
@@ -32,11 +30,13 @@ subjlists = {
 %     'p1012_p300words'
 
 %     'p1911_p300words' %noisy %TRG1
-%     'p1311v2_p300words' %clean TRG1 TRG2
+%     'p1311v2_p300words' %clean
 %     'p0511v2_p300words' %%noisy
 %     'p1811_p300words' %clean %TRG1
 %     'p0112_p300words' %TRG1?
 %     'p1211_p300words' % flipped TRG1 AND TRG2
+%     'p0311v2_p300words'
+%     'p1511v2_p300words' %noisy
 
     %     'p0711_p300words' %bad
     %     'p2111_p300words' %too few trials
