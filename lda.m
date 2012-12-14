@@ -2,7 +2,7 @@ function result = lda(EEG,condlist,clsfyrtype,clsfyrmode,varargin)
 
 %condlist = {'TRG1','TRG2','DIST'};
 %condlist = {'TRG1','TRG2'};
-condlist = {'TRG1','DIST'};
+%condlist = {'TRG1','DIST'};
 numcond = size(condlist,2);
 
 conddata = cell(1,numcond);
@@ -10,7 +10,7 @@ conddata = cell(1,numcond);
 s = 1;
 for c = 1:numcond
     selectevents = condlist{c};
-    selectsnum = 3;
+    %selectsnum = 1:8;
     %selectpred = 1;
     
     typematches = false(1,length(EEG.epoch));
@@ -68,14 +68,20 @@ end
 EEG = pop_mergeset(conddata{s,1},conddata{s,2});
 
 %trainchan = {'E11' 'E24'  'E62'   'E65'   'E75'   'E90'  'E124' 'Cz'};
-trainchan = {EEG.chanlocs.labels};
+%trainchan = {EEG.chanlocs.labels};
+
+load /Users/chennu/Work/EGI/GSN-HydroCel-129.mat
+for c = 1:length(idx1020)
+    trainchan{c} = sprintf('E%d',idx1020(c));
+end
+
 for t = 1:length(trainchan)
     trainchan{t} = find(strcmp(trainchan{t},{EEG.chanlocs.labels}));
 end
 trainchan = cell2mat(trainchan);
 
 dsfactor = 5;
-trainwin = [0 700];
+trainwin = [0 EEG.times(end)];
 trainwin = find(EEG.times <= trainwin(1),1,'last'):find(EEG.times >= trainwin(2),1,'first');
 
 fprintf('Extracting features from %s.\n',EEG.setname);
@@ -94,9 +100,9 @@ for t = 1:EEG.trials
     bnumidx = strcmp('BNUM',EEG.epoch(1,t).eventcodes{epochidx}(:,1));
     trialbnums(t) = EEG.epoch(1,t).eventcodes{epochidx}{bnumidx,2};
     
-    if strcmp(condlist{1},trialtype)
+    if sum(strcmp(condlist{1},trialtype)) > 0
         labels(t) = 1;
-    elseif strcmp(condlist{2},trialtype)
+    elseif sum(strcmp(condlist{2},trialtype)) > 0
         labels(t) = 0;
     else
         error('Unknown trial type: %s',trialtype);
@@ -111,22 +117,23 @@ switch clsfyrmode
         numfeatures = size(features,2);
         
         uniqblocks = unique(trialbnums);
-        traintrials = find(ismember(trialbnums,uniqblocks(1:round(length(uniqblocks)/2))));
-        testtrials = find(ismember(trialbnums,uniqblocks(round(length(uniqblocks)/2):end)));
+        traintrials = find(ismember(trialbnums,uniqblocks( 1:round(length(uniqblocks)*(1/2)) )));
+        testtrials = find(ismember(trialbnums,uniqblocks( round(length(uniqblocks)*(1/2))+1:end )));
         
-        class1trials = find(labels == 1);
-        class0trials = find(labels == 0);
-        class1trials = intersect(class1trials,traintrials);
-        class0trials = intersect(class0trials,traintrials);
-        
-        if length(class1trials) > length(class0trials)
-            randtrials = randperm(length(class1trials));
-            class1trials = class1trials(randtrials(1:length(class0trials)));
-        elseif length(class0trials) > length(class1trials)
-            randtrials = randperm(length(class0trials));
-            class0trials = class0trials(randtrials(1:length(class1trials)));
-        end
-        traintrials = union(class1trials,class0trials);
+%         %equalise number of trials in each class
+%         class1trials = find(labels == 1);
+%         class0trials = find(labels == 0);
+%         class1trials = intersect(class1trials,traintrials);
+%         class0trials = intersect(class0trials,traintrials);
+%         
+%         if length(class1trials) > length(class0trials)
+%             randtrials = randperm(length(class1trials));
+%             class1trials = class1trials(randtrials(1:length(class0trials)));
+%         elseif length(class0trials) > length(class1trials)
+%             randtrials = randperm(length(class0trials));
+%             class0trials = class0trials(randtrials(1:length(class1trials)));
+%         end
+%         traintrials = union(class1trials,class0trials);
         
         fprintf('50:50 train-test over %d (%d+%d) trials with %d features.\n', ...
             length(traintrials)+length(testtrials), length(traintrials), length(testtrials), numfeatures);
@@ -146,13 +153,12 @@ switch clsfyrmode
         
         switch clsfyrtype
             case 'stepwise'
-                chancelevel = 0.5;
                 trainlabels(trainlabels == 0) = -1;
                 testlabels(testlabels == 0) = -1;
                 
-                [trainweights,~,pval,inmodel] = stepwisefit(trainfeatures,trainlabels,'display','off');
+                [trainweights,~,pval,inmodel] = stepwisefit(trainfeatures,trainlabels,'display','off','penter',0.1,'premove',0.15);
                 [~, sortidx] = sort(pval);
-                keepfeatures = intersect(sortidx(1:maxfeatures),find(inmodel));
+                keepfeatures = intersect(sortidx(1:min(length(sortidx),maxfeatures)),find(inmodel));
                 fprintf('stepwisefit: keeping %d features\n', length(keepfeatures));
                 trainresults = trainfeatures(:,keepfeatures) * trainweights(keepfeatures);
                 testresults = testfeatures(:,keepfeatures) * trainweights(keepfeatures);
@@ -161,16 +167,20 @@ switch clsfyrmode
                 testlabels(testlabels == -1) = 0;
                 
             case 'logistic'
-                chancelevel = 0.5;
-                %trainweights = glmfit(trainfeatures,trainlabels,'binomial','link','logit');
-                %testresults(cvfolds(f):cvfolds(f+1)-1) = glmval(trainweights,testfeatures,'logit');
+                trainweights = glmfit(trainfeatures,trainlabels,'binomial','link','logit');
+                trainresults = glmval(trainweights,trainfeatures,'logit');
+                testresults = glmval(trainweights,testfeatures,'logit');
+                
+            case 'sparselogistic'
                 trainweights = sbmlr(trainfeatures,cat(2,trainlabels,~trainlabels));
+                res = exp(trainfeatures*trainweights);
+                res = res ./ repmat(sum(res,2),1,size(res,2));
+                trainresults = res(:,1);
                 res = exp(testfeatures*trainweights);
                 res = res ./ repmat(sum(res,2),1,size(res,2));
                 testresults = res(:,1);
                 
             case 'naivebayes'
-                chancelevel = 0.5;
                 trainweights = NaiveBayes.fit(trainfeatures,trainlabels);
                 trainresults = posterior(trainweights,trainfeatures);
                 trainresults = trainresults(:,1);
@@ -180,11 +190,12 @@ switch clsfyrmode
 %                 testresults = classify(testfeatures,trainfeatures,trainlabels,'diaglinear');
                 
             case 'svm'
-                chancelevel = 0.5;
                 trainweights = svmtrain(trainfeatures,trainlabels);
                 trainresults = svmclassify(trainweights,trainfeatures);
                 testresults = svmclassify(trainweights,testfeatures);
         end
+        
+        chancelevel = 0.5;
         [~,rocdata] = evalc('rocanalysis([trainresults trainlabels])');
         close all
         hidx = (testresults(testlabels > chancelevel) > rocdata.co);
@@ -251,7 +262,7 @@ switch clsfyrmode
                     testlabels(testlabels == 0) = -1;
                     chancelevel = 0;
                     
-                    [trainweights,~,~,keepfeatures] = stepwisefit(trainfeatures,trainlabels,'display','off');
+                    [trainweights,~,~,keepfeatures] = stepwisefit(trainfeatures,trainlabels,'display','off','penter',0.1,'premove',0.15);
                     %fprintf('stepwisefit: keeping %d features\n', sum(keepfeatures));
                     cvresults(cvtrials:cvtrials+size(testfeatures,1)-1) = testfeatures(:,keepfeatures) * trainweights(keepfeatures);
                     
@@ -311,7 +322,7 @@ switch clsfyrmode
                 labels(labels == 0) = -1;
                 chancelevel = 0;
                 
-                [trainweights,~,~,keepfeatures] = stepwisefit(features,labels,'display','off');
+                [trainweights,~,~,keepfeatures] = stepwisefit(features,labels,'display','off','penter',0.1,'premove',0.15);
                 fprintf('stepwisefit: keeping %d features\n', sum(keepfeatures));
                 result.keepfeatures = keepfeatures;
                 trainresults = features(:,keepfeatures) * trainweights(keepfeatures);

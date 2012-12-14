@@ -33,7 +33,7 @@ plotpnt = latpnt(1)-1+maxidx;
 for c = 1:length(stat.condlist)
     subplot(2,2,c);
     plotvals = stat.condavg(:,plotpnt,c);
-    topoplot(plotvals,stat.chanlocs);
+    topoplot(plotvals,stat.chanlocs,'electrodes','labels');
     if c == 1
         cscale = caxis;
     else
