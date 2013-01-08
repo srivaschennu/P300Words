@@ -13,6 +13,7 @@ end
 for s = 1:length(subjlist)
     basename = subjlist{s};
     batchres{s,1} = basename;
+    ploterp(basename,{'DIST'},'ylim',[-7 7]);
     
     %     dataimport(basename);
     %     epochdata(basename,1);
@@ -36,9 +37,9 @@ for s = 1:length(subjlist)
 %     load(['trial_' basename '_TRG1-TRG2.mat']);
 %     plotclusters(stat);
 
-   EEG = pop_loadset('filepath',filepath,'filename',[basename '.set']);
-   batchres{s,2} = lda(EEG,{'TRG1','DIST'},'stepwise','50:50');
-   batchres{s,3} = lda(EEG,{'TRG2','DIST'},'stepwise','50:50');
+%    EEG = pop_loadset('filepath',filepath,'filename',[basename '.set']);
+%    batchres{s,2} = lda(EEG,{'TRG1','DIST'},'stepwise','50:50');
+%    batchres{s,3} = lda(EEG,{'TRG2','DIST'},'stepwise','50:50');
 
 %         filenames = dir(sprintf('%s%s*', filepath, basename));
 %         mfffiles = filenames(logical(cell2mat({filenames.isdir})));
@@ -69,4 +70,4 @@ end
 % [~,sortidx] = sort(batchres(:,2));
 % batchres(sortidx,:)
 
-save(sprintf('batch %s.mat',datestr(now)),'batchres');
+%save(sprintf('batch %s.mat',datestr(now)),'batchres');

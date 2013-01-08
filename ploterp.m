@@ -17,11 +17,13 @@ if ischar(subjinfo)
     %%%% perform single-trial statistics
     subjlist = {subjinfo};
     subjcond = condlist;
+    statmode = 'trial';
     
 elseif isnumeric(subjinfo) && length(subjinfo) == 1
     %%%% perform within-subject statistics
     subjlist = subjlists{subjinfo};
     subjcond = repmat(condlist,length(subjlist),1);
+    statmode = 'cond';
 end
 
 numsubj = length(subjlist);
@@ -131,6 +133,17 @@ for c = 1:size(erpdata,3)
     timtopo(plotdata,chanlocs,...
         'limits',[EEG.times(1)-timeshift EEG.times(end)-timeshift, param.ylim],...
         'plottimes',plottime-timeshift);
+    
+    saveEEG = EEG;
+    saveEEG.data = plotdata;
+    saveEEG.setname = sprintf('%s_%s_%s',statmode,num2str(subjinfo),condlist{c});
+    saveEEG.filename = [saveEEG.setname '.set'];
+    saveEEG.trials = 1;
+    saveEEG.event = saveEEG.event(1);
+    saveEEG.event(1).type = saveEEG.setname;
+    saveEEG.epoch = saveEEG.epoch(1);
+    saveEEG.epoch(1).eventtype = saveEEG.setname;
+    pop_saveset(saveEEG,'filepath',filepath,'filename',saveEEG.filename);    
 end
 
 % gadiff = diffdata{1};
