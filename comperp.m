@@ -1,47 +1,34 @@
-function comperp(statmode,subjlist,condlist,latency,varargin)
+function stat = comperp(statmode,subjinfo,condlist,latency,varargin)
 
 loadpaths
 
-if ~isempty(varargin) && ~isempty(varargin{1})
-    alpha = varargin{1};
-else
-    alpha = 0.05;
-end
-
-if length(varargin) > 1 && ~isempty(varargin{2})
-    ttesttail = varargin{2};
-else
-    ttesttail = 0;
-end
+param = finputcheck(varargin, {
+    'alpha' , 'real' , [], 0.05; ...
+    'numrand', 'integer', [], 1000; ...
+    'ttesttail', 'integer', [-1 0 1], 0; ...
+    'testgfp', 'string', {'on' 'off'}, 'off';...
+    'testcnv', 'string', {'on' 'off'}, 'off';...
+    'testlat', 'string', {'on' 'off'}, 'off';...
+    });
 
 timeshift = 0; %seconds
 
-subjlists = {
-    {
-    'subj01_p300words'
-    'subj02_p300words'
-    'subj03_p300words'
-    'subj04_p300words'
-    'subj05_p300words'
-    'subj06_p300words'
-    'subj07_p300words'
-    }
-    };
+loadsubj
 
-if strcmp(statmode,'trial') && ischar(subjlist)
+if strcmp(statmode,'trial') && ischar(subjinfo)
     %%%% perform single-trial statistics
-    subjlist = {subjlist};
+    subjlist = {subjinfo};
     subjcond = condlist;
     
-elseif strcmp(statmode,'cond') && isnumeric(subjlist) && length(subjlist) == 1
+elseif strcmp(statmode,'cond') && isnumeric(subjinfo) && length(subjinfo) == 1
     %%%% perform within-subject statistics
-    subjlist = subjlists{subjlist};
+    subjlist = subjlists{subjinfo};
     subjcond = repmat(condlist,length(subjlist),1);
     
-elseif strcmp(statmode,'subj') && isnumeric(subjlist) && length(subjlist) == 2
+elseif strcmp(statmode,'subj') && isnumeric(subjinfo) && length(subjinfo) == 2
     %%%% perform across-subject statistics
-    subjlist1 = subjlists{subjlist(1)};
-    subjlist2 = subjlists{subjlist(2)};
+    subjlist1 = subjlists{subjinfo(1)};
+    subjlist2 = subjlists{subjinfo(2)};
     
     numsubj1 = length(subjlist1);
     numsubj2 = length(subjlist2);
@@ -63,15 +50,11 @@ tldata = cell(numsubj,numcond);
 %% load and prepare individual subject datasets
 for s = 1:numsubj
     EEG = pop_loadset('filename', sprintf('%s.set', subjlist{s}), 'filepath', filepath);
+    EEG = sortchan(EEG);
     
-    % %     % rereference
+    % rereference
     % EEG = rereference(EEG,1);
     %
-    %     %%%%% baseline correction relative to 5th tone
-    %     bcwin = [-200 0];
-    %     bcwin = bcwin+(timeshift*1000);
-    %     EEG = pop_rmbase(EEG,bcwin);
-    %     %%%%%
     
     % THIS ASSUMES THAT ALL DATASETS HAVE SAME NUMBER OF ELECTRODES
     if s == 1
@@ -79,9 +62,13 @@ for s = 1:numsubj
     end
     
     for c = 1:numcond
-        selectevents = condlist{c};
+        selectevents = subjcond{s,c};
+        selectsnum = 3;
+        %selectpred = 1;
         
         typematches = false(1,length(EEG.epoch));
+        snummatches = false(1,length(EEG.epoch));
+        predmatches = false(1,length(EEG.epoch));
         for ep = 1:length(EEG.epoch)
             
             epochtype = EEG.epoch(ep).eventtype;
@@ -91,13 +78,47 @@ for s = 1:numsubj
             if sum(strcmp(epochtype,selectevents)) > 0
                 typematches(ep) = true;
             end
+            
+            epochcodes = EEG.epoch(ep).eventcodes;
+            if iscell(epochcodes{1,1})
+                epochcodes = epochcodes{cell2mat(EEG.epoch(ep).eventlatency) == 0};
+            end
+            
+            snumidx = strcmp('SNUM',epochcodes(:,1)');
+            if exist('selectsnum','var') && ~isempty(selectsnum) && sum(snumidx) > 0
+                if sum(epochcodes{snumidx,2} == selectsnum) > 0
+                    snummatches(ep) = true;
+                end
+            else
+                snummatches(ep) = true;
+            end
+            
+            predidx = strcmp('PRED',epochcodes(:,1)');
+            if exist('selectpred','var') && ~isempty(selectpred) && sum(predidx) > 0
+                if sum(epochcodes{predidx,2} == selectpred) > 0
+                    predmatches(ep) = true;
+                end
+            else
+                predmatches(ep) = true;
+            end
         end
         
-        selectepochs = find(typematches);
+        selectepochs = find(typematches & snummatches & predmatches);
         fprintf('Condition %s: found %d matching epochs.\n',subjcond{s,c},length(selectepochs));
         
-        %convert to fieldtrip format
         conddata{s,c} = pop_select(EEG,'trial',selectepochs);
+        
+        %         if (strcmp(statmode,'trial') || strcmp(statmode,'cond')) && c == numcond
+        %             if conddata{s,1}.trials > conddata{s,2}.trials
+        %                 fprintf('Equalising trials in condition %s.\n',subjcond{s,1});
+        %                 randtrials = randperm(conddata{s,1}.trials);
+        %                 conddata{s,1} = pop_select(conddata{s,1},'trial',randtrials(1:conddata{s,2}.trials));
+        %             elseif conddata{s,2}.trials > conddata{s,1}.trials
+        %                 fprintf('Equalising trials in condition %s.\n',subjcond{s,2});
+        %                 randtrials = randperm(conddata{s,2}.trials);
+        %                 conddata{s,2} = pop_select(conddata{s,2},'trial',randtrials(1:conddata{s,1}.trials));
+        %             end
+        %         end
     end
 end
 
@@ -107,7 +128,12 @@ cfg.keeptrials = 'yes';
 cfg.feedback = 'textbar';
 for s = 1:size(conddata,1)
     for c = 1:size(conddata,2)
-        tldata{s,c} = ft_timelockanalysis(cfg, convertoft(conddata{s,c}));
+        if strcmp(param.testgfp,'on') && (strcmp(statmode, 'cond') || strcmp(statmode,'subj'))
+            tldata{s,c} = ft_timelockanalysis(cfg, convertoft(convertogfp(conddata{s,c})));
+        else
+            ftdata = convertoft(conddata{s,c});
+            tldata{s,c} = ft_timelockanalysis(cfg, ftdata);
+        end
     end
 end
 
@@ -117,23 +143,28 @@ cfg.method = 'montecarlo';       % use the Monte Carlo Method to calculate the s
 cfg.correctm = 'cluster';
 cfg.clusterstatistic = 'maxsum'; % test statistic that will be evaluated under the permutation distribution.
 
-cfg.tail = ttesttail;                    % -1, 1 or 0 (default = 0); one-sided or two-sided test
-cfg.clustertail = ttesttail;
-if ttesttail == 0
-    cfg.alpha = alpha/2;               % alpha level of the permutation test
+cfg.tail = param.ttesttail;                    % -1, 1 or 0 (default = 0); one-sided or two-sided test
+cfg.clustertail = param.ttesttail;
+if param.ttesttail == 0
+    cfg.alpha = param.alpha/2;               % alpha level of the permutation test
 else
-    cfg.alpha = alpha;
+    cfg.alpha = param.alpha;
 end
-cfg.clusteralpha = alpha;         % alpha level of the sample-specific test statistic that will be used for thresholding
+cfg.clusteralpha = param.alpha;         % alpha level of the sample-specific test statistic that will be used for thresholding
 
-cfg.numrandomization = 200;      % number of draws from the permutation distribution
+cfg.numrandomization = param.numrand;      % number of draws from the permutation distribution
 
-cfg.minnbchan = 2;               % minimum number of neighborhood channels that is required for a selected
-
-% prepare_neighbours determines what sensors may form clusters
-cfg_neighb.method    = 'distance';
-cfg_neighb.neighbourdist = 4;
-cfg.neighbours       = ft_prepare_neighbours(cfg_neighb,convertoft(conddata{1,1}));
+if strcmp(param.testgfp,'off')
+    % prepare_neighbours determines what sensors may form clusters
+    cfg_neighb.method    = 'distance';
+    cfg_neighb.neighbourdist = 4;
+    cfg.neighbours       = ft_prepare_neighbours(cfg_neighb,convertoft(conddata{1,1}));
+    cfg.minnbchan = 2;               % minimum number of neighborhood channels that is required for a selected
+    
+else
+    cfg.neighbours = [];
+    cfg.minnbchan = 0;               % minimum number of neighborhood channels that is required for a selected
+end
 
 if strcmp(statmode,'trial')
     
@@ -195,13 +226,48 @@ elseif strcmp(statmode,'subj')
     cfg.ivar  = 1;                   % number or list with indices, independent variable(s)
 end
 
+if (strcmp(statmode,'cond') || strcmp(statmode,'subj')) && (strcmp(param.testcnv,'on') || strcmp(param.testlat,'on'))
+    timeidx = cond1data.time >= latency(1)+timeshift & cond1data.time <= latency(2)+timeshift;
+    for ind = 1:size(cond1data.individual,1)
+        for chan = 1:length(cond1data.label)
+            if strcmp(param.testcnv,'on')
+                summinfo = polyfit(cond1data.time(timeidx),squeeze(cond1data.individual(ind,chan,timeidx))',1);
+            elseif strcmp(param.testlat,'on')
+                summinfo = calclat(cond1data.time(timeidx),squeeze(cond1data.individual(ind,chan,timeidx))',50);
+            end
+            cond1data.individual(ind,chan,1) = summinfo(1);
+        end
+    end
+    cond1data.time = 0;
+    cond1data.individual = cond1data.individual(:,:,1);
+    cond1data.avg = squeeze(mean(cond1data.individual,1))';
+    
+    timeidx = cond2data.time >= latency(1)+timeshift & cond2data.time <= latency(2)+timeshift;
+    for ind = 1:size(cond2data.individual,1)
+        for chan = 1:length(cond2data.label)
+            if strcmp(param.testcnv,'on')
+                summinfo = polyfit(cond2data.time(timeidx),squeeze(cond2data.individual(ind,chan,timeidx))',1);
+            elseif strcmp(param.testlat,'on')
+                summinfo = calclat(cond2data.time(timeidx),squeeze(cond2data.individual(ind,chan,timeidx))',50);
+            end
+            cond2data.individual(ind,chan,1) = summinfo(1);
+        end
+    end
+    cond2data.time = 0;
+    cond2data.individual = cond2data.individual(:,:,1);
+    cond2data.avg = squeeze(mean(cond2data.individual,1))';
+end
+
 cfg.design = design;             % design matrix
 cfg.statistic = ttesttype;
 
 diffcond = cond1data;
+diffcond.cond1avg = cond1data.avg;
+diffcond.cond2avg = cond2data.avg;
 diffcond.avg = cond1data.avg - cond2data.avg;
 
-fprintf('\nComparing conditions using %d-tailed %s test\nat alpha of %.2f between %.2f-%.2f sec.\n\n', ttesttail, ttesttype, alpha, latency);
+
+fprintf('\nComparing conditions using %d-tailed %s test\nat alpha of %.2f between %.2f-%.2f sec.\n\n', param.ttesttail, ttesttype, param.alpha, latency);
 cfg.latency = latency + timeshift;            % time interval over which the experimental conditions must be compared (in seconds)
 
 cfg.feedback = 'textbar';
@@ -209,103 +275,43 @@ cfg.feedback = 'textbar';
 [stat] = ft_timelockstatistics(cfg, cond1data, cond2data);
 stat.chanlocs = chanlocs;
 
-%% plot significant clusters
-if isfield(stat,'posclusters') && ~isempty(stat.posclusters)
-    posclustidx = find(cell2mat({stat.posclusters.prob}) <= stat.cfg.alpha);
-else
-    posclustidx = [];
+save2file = sprintf('%s_%s_%s-%s',statmode,num2str(subjinfo),condlist{1},condlist{2});
+if strcmp(param.testgfp,'on')
+    save2file = [save2file '_gfp'];
 end
 
-if isfield(stat,'negclusters') && ~isempty(stat.negclusters)
-    negclustidx = find(cell2mat({stat.negclusters.prob}) <= stat.cfg.alpha);
-else
-    negclustidx = [];
+stat.cfg = cfg;
+stat.condlist = condlist;
+stat.diffcond = diffcond;
+stat.timeshift = timeshift;
+stat.statmode = statmode;
+stat.subjinfo = subjinfo;
+
+if nargout == 0
+    save(save2file, 'stat');
 end
 
-if ~isempty(posclustidx)
-    fprintf('Plotting positive clusters.\n');
-    figure('Name','Positive Clusters','Color','white');
-    figpos = get(gcf,'Position');
-    figpos(3) = figpos(3)*length(posclustidx);
-    figpos(4) = figpos(4)*2;
-    set(gcf,'Position',figpos);
-    
-    for p = 1:length(posclustidx)
-        clust_t = stat.stat;
-        clust_t(~(stat.posclusterslabelmat == posclustidx(p))) = 0;
-        [maxval,maxidx] = max(clust_t);
-        [~,maxmaxidx] = max(maxval);
-        maxchan = maxidx(maxmaxidx);
-        maxtime = find(stat.time(maxmaxidx) == diffcond.time);
-        
-        subplot(2,length(posclustidx),p);
-        plotvals = diffcond.avg(:,maxtime);
-        topoplot(plotvals,stat.chanlocs, 'maplimits', 'absmax', 'electrodes','labels',...
-            'pmask',stat.posclusterslabelmat(:,maxmaxidx)==posclustidx(p));
-        colorbar
-        title(sprintf('%s - %s @ %d ms (p = %.3f)',condlist{1},condlist{2},...
-            round((diffcond.time(maxtime)-timeshift)*1000),stat.posclusters(posclustidx(p)).prob));
-        
-        subplot(2,length(posclustidx),length(posclustidx)+p);
-        plot(diffcond.time-timeshift,diffcond.avg(maxchan,:),'LineWidth',1.5);
-        ylim = get(gca,'YLim');
-        ylim = ylim*2;
-        set(gca,'YLim',ylim);
-        set(gca,'XLim',[conddata{1,1}.xmin conddata{1,1}.xmax]-timeshift);
-        
-        line([diffcond.time(1) diffcond.time(end)]-timeshift,[0 0],'LineWidth',1,'Color','black','LineStyle',':');
-        line([0 0],ylim,'LineWidth',1,'Color','black','LineStyle',':');
-        line([diffcond.time(maxtime) diffcond.time(maxtime)]-timeshift,ylim,'LineWidth',1.5,'LineStyle','--','Color','black');
-        clustwinidx = find(stat.posclusterslabelmat(maxchan,:)==posclustidx(p));
-        rectangle('Position',[stat.time(clustwinidx(1))-timeshift ylim(1) ...
-            stat.time(clustwinidx(end))-stat.time(clustwinidx(1)) ylim(2)-ylim(1)],'EdgeColor','red','LineWidth',2);
-        title(sprintf('%s - %s @ %s',condlist{1},condlist{2},stat.chanlocs(maxchan).labels));
-        box on
+function EEG = convertogfp(EEG)
+
+EEG.nbchan = 1;
+EEG.trials = 1;
+EEG.chanlocs = EEG.chanlocs(find(strcmp('Cz',{EEG.chanlocs.labels})));
+EEG.chanlocs.labels = 'GFP';
+EEG.icachansind = 1;
+[~, EEG.data] = evalc('eeg_gfp(mean(EEG.data,3)'')''');
+EEG = pop_rmbase(EEG,[-200 0]);
+function estlat = calclat(times,data,pcarea)
+%estlat = sum(abs(data));
+
+totalarea = sum(abs(data));
+pcarea = totalarea * (pcarea/100);
+
+curarea = 0;
+for t = 1:length(data)
+    curarea = curarea + abs(data(t));
+    if curarea >= pcarea
+        estlat = times(t);
+        return
     end
-else
-    fprintf('No significant positive clusters found.\n');
 end
-
-if ~isempty(negclustidx)
-    fprintf('Plotting negative clusters.\n');
-    figure('Name','Negative Clusters','Color','white');
-    figpos = get(gcf,'Position');
-    figpos(3) = figpos(3)*length(negclustidx);
-    figpos(4) = figpos(4)*2;
-    set(gcf,'Position',figpos);
-    
-    for p = 1:length(negclustidx)
-        clust_t = stat.stat;
-        clust_t(~(stat.negclusterslabelmat == negclustidx(p))) = 0;
-        [minval,minidx] = min(clust_t);
-        [~,minminidx] = min(minval);
-        minchan = minidx(minminidx);
-        mintime = find(stat.time(minminidx) == diffcond.time);
-        
-        subplot(2,length(negclustidx),p);
-        plotvals = diffcond.avg(:,mintime);
-        topoplot(plotvals,stat.chanlocs, 'maplimits', 'absmax', 'electrodes','labels',...
-            'pmask',stat.negclusterslabelmat(:,minminidx)==negclustidx(p));
-        colorbar
-        title(sprintf('%s - %s @ %d ms (p = %.3f)',condlist{1},condlist{2},...
-            round((diffcond.time(mintime)-timeshift)*1000),stat.negclusters(negclustidx(p)).prob));
-        
-        subplot(2,length(negclustidx),length(negclustidx)+p);
-        plot(diffcond.time-timeshift,diffcond.avg(minchan,:),'LineWidth',1.5);
-        ylim = get(gca,'YLim');
-        ylim = ylim*2;
-        set(gca,'YLim',ylim);
-        set(gca,'XLim',[conddata{1,1}.xmin conddata{1,1}.xmax]-timeshift);
-        
-        line([diffcond.time(1) diffcond.time(end)]-timeshift,[0 0],'LineWidth',1,'Color','black','LineStyle',':');
-        line([0 0],ylim,'LineWidth',1,'Color','black','LineStyle',':');
-        line([diffcond.time(mintime) diffcond.time(mintime)]-timeshift,ylim,'LineWidth',1.5,'LineStyle','--','Color','black');
-        clustwinidx = find(stat.negclusterslabelmat(minchan,:)==negclustidx(p));
-        rectangle('Position',[stat.time(clustwinidx(1))-timeshift ylim(1) ...
-            stat.time(clustwinidx(end))-stat.time(clustwinidx(1)) ylim(2)-ylim(1)],'EdgeColor','red','LineWidth',2);
-        title(sprintf('%s - %s @ %s',condlist{1},condlist{2},stat.chanlocs(minchan).labels));
-        box on
-    end
-else
-    fprintf('No significant negative clusters found.\n');
-end
+estlat = times(end);

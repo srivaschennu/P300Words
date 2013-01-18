@@ -6,93 +6,199 @@ colorlist = {
     'distractor'   [1.0000    0         0]
     };
 
-param = finputcheck(varargin, { 'ylim', 'real', [], [-5 20]; ...
-    'fontsize','integer', [], 20; ...
+param = finputcheck(varargin, {
     'legendstrings', 'cell', {}, stat.condlist; ...
+    'legendposition', 'string', {}, 'NorthWest'; ...
+    'ylim', 'real', [], [-10 10]; ...
+    'title','string', {}, ' '; ...
     });
 
-%% figure plotting
 
 fontname = 'Helvetica';
+fontsize = 20;
 linewidth = 2;
 
-figfile = sprintf('figures/%s_%s_%s-%s_gfp',stat.statmode,num2str(stat.subjinfo),stat.condlist{1},stat.condlist{2});
+%% plot significant clusters
 
-figure('Name',sprintf('%s-%s',stat.condlist{1},stat.condlist{2}),'Color','white','FileName',[figfile '.fig']);
-figpos = get(gcf,'Position');
-set(gcf,'Position',[figpos(1) figpos(2) figpos(3) figpos(3)]);
-
-if isfield(stat,'pclust')
-    latpnt = find(stat.times-stat.timeshift >= stat.pclust(1).win(1) & stat.times-stat.timeshift <= stat.pclust(end).win(2));
-else
-    latpnt = find(stat.times-stat.timeshift >= stat.param.latency(1) & stat.times-stat.timeshift <= stat.param.latency(2));
+posclustidx = [];
+if isfield(stat,'posclusters') && ~isempty(stat.posclusters)
+    for cidx = 1:length(stat.posclusters)
+        if stat.posclusters(cidx).prob < stat.cfg.alpha && isempty(posclustidx) ...
+                || (~isempty(posclustidx) && stat.posclusters(cidx).prob < stat.posclusters(posclustidx).prob)
+            posclustidx = cidx;
+        end
+    end
 end
-[~, maxidx] = max(stat.condgfp(1,latpnt,1),[],2);
-plotpnt = latpnt(1)-1+maxidx;
 
-for c = 1:length(stat.condlist)
-    subplot(2,2,c);
-    plotvals = stat.condavg(:,plotpnt,c);
-    topoplot(plotvals,stat.chanlocs);
-    if c == 1
-        cscale = caxis;
+negclustidx = [];
+if isfield(stat,'negclusters') && ~isempty(stat.negclusters)
+    for cidx = 1:length(stat.negclusters)
+        if stat.negclusters(cidx).prob < stat.cfg.alpha && isempty(negclustidx) ...
+                || (~isempty(negclustidx) && stat.negclusters(cidx).prob < stat.negclusters(negclustidx).prob)
+            negclustidx = cidx;
+        end
+    end
+end
+
+if stat.cfg.tail >= 0
+    fprintf('Plotting positive clusters.\n');
+    
+    figfile = sprintf('figures/%s_%s_%s-%s_pos',stat.statmode,num2str(stat.subjinfo),stat.condlist{1},stat.condlist{2});
+    figure('Name',sprintf('%s-%s: Positive Clusters',stat.condlist{1},stat.condlist{2}),'Color','white','FileName',[figfile '.fig']);
+    figpos = get(gcf,'Position');
+    figpos(4) = figpos(3);
+    set(gcf,'Position',figpos);
+    
+    curcolororder = get(gca,'ColorOrder');
+    colororder = zeros(length(param.legendstrings),3);
+    for str = 1:length(param.legendstrings)
+        cidx = strcmp(param.legendstrings{str},colorlist(:,1));
+        if sum(cidx) == 1
+            colororder(str,:) = colorlist{cidx,2};
+        else
+            colororder(str,:) = curcolororder(str,:);
+        end
+    end
+    
+    clust_t = stat.diffcond.avg(:,find(min(abs(stat.diffcond.time-stat.cfg.latency(1))) == abs(stat.diffcond.time-stat.cfg.latency(1))):...
+        find(min(abs(stat.diffcond.time-stat.cfg.latency(2))) == abs(stat.diffcond.time-stat.cfg.latency(2))));
+    if ~isempty(posclustidx)
+        clust_t(~(stat.posclusterslabelmat == posclustidx)) = 0;
+    end
+    [maxval,maxidx] = max(clust_t);
+    [~,maxmaxidx] = max(maxval);
+    maxchan = maxidx(maxmaxidx);
+    maxtime = find(stat.time(maxmaxidx) == stat.diffcond.time);
+    
+    subplot(2,1,1);
+    plotvals = stat.diffcond.avg(:,maxtime);
+    
+    %         % plot cluster with mask
+    topoplot(plotvals,stat.chanlocs, 'maplimits', 'absmax', 'electrodes','off', 'emarker2',{maxchan,'o','green',14,1},...
+    'pmask',stat.posclusterslabelmat(:,maxmaxidx)==posclustidx);
+    
+    colorbar('FontName',fontname,'FontSize',fontsize);
+    title(param.title,'FontName',fontname,'FontSize',fontsize);
+    
+    subplot(2,1,2);
+    set(gca,'ColorOrder',cat(1,colororder,[0 0 0]));
+    hold all;
+    
+    plot(stat.diffcond.time-stat.timeshift,[stat.diffcond.cond1avg(maxchan,:); stat.diffcond.cond2avg(maxchan,:)]','LineWidth',linewidth*1.5);
+    %ylim = get(gca,'YLim');
+    %ylim = ylim*2;
+    ylim = param.ylim;
+    set(gca,'YLim',ylim,'XLim',[stat.diffcond.time(1) stat.diffcond.time(end)]-stat.timeshift,'XTick',stat.diffcond.time(1)-stat.timeshift:0.2:stat.diffcond.time(end)-stat.timeshift,...
+        'FontName',fontname,'FontSize',fontsize);
+    legend(param.legendstrings,'Location',param.legendposition);
+    
+    line([stat.diffcond.time(1) stat.diffcond.time(end)]-stat.timeshift,[0 0],'LineWidth',linewidth,'Color','black','LineStyle',':');
+    line([-0.60 -0.60],ylim,'LineWidth',linewidth,'Color','black','LineStyle',':');
+    line([-0.45 -0.45],ylim,'LineWidth',linewidth,'Color','black','LineStyle',':');
+    line([-0.30 -0.30],ylim,'LineWidth',linewidth,'Color','black','LineStyle',':');
+    line([-0.15 -0.15],ylim,'LineWidth',linewidth,'Color','black','LineStyle',':');
+    line([    0     0],ylim,'LineWidth',linewidth,'Color','black','LineStyle',':');
+    line([stat.diffcond.time(maxtime) stat.diffcond.time(maxtime)]-stat.timeshift,ylim,'LineWidth',linewidth,'LineStyle','--','Color','red');
+    xlabel('Time relative to 5th tone (sec) ','FontName',fontname,'FontSize',fontsize);
+    ylabel('Amplitude (uV)','FontName',fontname,'FontSize',fontsize);
+    box on
+    if ~isempty(posclustidx)
+        clustwinidx = find(maxval);
+        %         rectangle('Position',[stat.time(clustwinidx(1))-stat.timeshift ylim(1) ...
+        %             stat.time(clustwinidx(end))-stat.time(clustwinidx(1)) ylim(2)-ylim(1)],'LineStyle','--','EdgeColor','black','LineWidth',linewidth);
+        line([stat.time(clustwinidx(1)) stat.time(clustwinidx(end))]-stat.timeshift,[0 0],'Color','blue','LineWidth',8);
+        title(sprintf('Cluster @ %.3f sec (t = %.2f, p = %.3f)', stat.diffcond.time(maxtime)-stat.timeshift, stat.posclusters(posclustidx).clusterstat,stat.posclusters(posclustidx).prob),...
+            'FontName',fontname,'FontSize',fontsize);
     else
-        caxis(cscale);
+        title(sprintf('%.3f sec', stat.diffcond.time(maxtime)-stat.timeshift),'FontName',fontname,'FontSize',fontsize);
     end
-    colorbar('FontSize',param.fontsize);    
-    title(param.legendstrings{c},'FontSize',param.fontsize,'FontName',fontname);
-end
-
-
-subplot(2,2,3:4);
-curcolororder = get(gca,'ColorOrder');
-colororder = zeros(length(param.legendstrings),3);
-for str = 1:length(param.legendstrings)
-    cidx = strcmp(param.legendstrings{str},colorlist(:,1));
-    if sum(cidx) == 1
-        colororder(str,:) = colorlist{cidx,2};
-    else
-        colororder(str,:) = curcolororder(str,:);
-    end
-end
-
-set(gca,'ColorOrder',cat(1,colororder,[0 0 0]));
-hold all;
-plot((stat.times(1):1000/stat.srate:stat.times(end))-stat.timeshift,squeeze(stat.condgfp(1,:,:)),'LineWidth',linewidth*1.5);
-%plot((stat.times(1):1000/stat.srate:stat.times(end))-stat.timeshift,stat.gfpdiff(1,:),'LineWidth',linewidth*1.5);
-%param.legendstrings{end+1} = 'difference';
-
-set(gca,'XLim',[stat.times(1) stat.times(end)]-stat.timeshift,'XTick',stat.times(1)-stat.timeshift:200:stat.times(end)-stat.timeshift,'YLim',param.ylim,...
-    'FontSize',param.fontsize,'FontName',fontname);
-line([0 0],param.ylim,'Color','black','LineStyle',':','LineWidth',linewidth);
-line([stat.times(1) stat.times(end)]-stat.timeshift,[0 0],'Color','black','LineStyle',':','LineWidth',linewidth);
-line([stat.times(plotpnt) stat.times(plotpnt)]-stat.timeshift,param.ylim,'Color','red','LineWidth',linewidth,'LineStyle','--');
-xlabel('Time (ms) ','FontSize',param.fontsize,'FontName',fontname);
-ylabel('Global field power ','FontSize',param.fontsize,'FontName',fontname);
-legend(param.legendstrings,'Location','NorthWest');
-box on
-title(sprintf('%dms', round(stat.times(plotpnt))),'FontSize',param.fontsize,'FontName',fontname);
-
-%% plot clusters
-
-if isfield(stat,'pclust')
-    for p = 1:length(stat.pclust)
-        line([stat.pclust(p).win(1) stat.pclust(p).win(2)],[0 0],'Color','blue','LineWidth',8);
-        title(sprintf('%dms\nCluster t = %.2f, p = %.3f', round(stat.times(plotpnt)), stat.pclust(p).tstat, stat.pclust(p).prob),...
-            'FontSize',param.fontsize,'FontName',fontname);
-    end
+    set(gcf,'Color','white');
+    export_fig(gcf,[figfile '.eps']);
 else
-    fprintf('No positive clusters found.\n');
+    fprintf('No significant positive clusters found.\n');
 end
 
-% for n = 1:length(stat.nclust)
-%     rectangle('Position',[stat.nclust(n).win(1) param.ylim(1) ...
-%         stat.nclust(n).win(2)-stat.nclust(n).win(1) param.ylim(2)-param.ylim(1)],...
-%         'EdgeColor','blue','LineWidth',linewidth,'LineStyle','--');
-%     title(sprintf('Cluster t = %.2f, p = %.3f', stat.nclust(n).tstat, stat.nclust(n).prob),...
-%         'FontSize',param.fontsize,'FontName',fontname);
-% end
-
-set(gcf,'Color','white');
-%saveas(gcf,[figfile '.fig']);
-export_fig(gcf,[figfile '.eps']);
+if stat.cfg.tail <= 0
+    fprintf('Plotting negative clusters.\n');
+    
+    figfile = sprintf('figures/%s_%s_%s-%s_neg',stat.statmode,num2str(stat.subjinfo),stat.condlist{1},stat.condlist{2});
+    figure('Name',sprintf('%s-%s: Negative Clusters',stat.condlist{1},stat.condlist{2}),'Color','white','FileName',[figfile '.fig']);
+    figpos = get(gcf,'Position');
+    figpos(4) = figpos(3);
+    set(gcf,'Position',figpos);
+    
+    curcolororder = get(gca,'ColorOrder');
+    colororder = zeros(length(param.legendstrings),3);
+    for str = 1:length(param.legendstrings)
+        cidx = strcmp(param.legendstrings{str},colorlist(:,1));
+        if sum(cidx) == 1
+            colororder(str,:) = colorlist{cidx,2};
+        else
+            colororder(str,:) = curcolororder(str,:);
+        end
+    end
+    
+    set(gca,'ColorOrder',cat(1,colororder,[0 0 0]));
+    hold all;
+    
+    clust_t = stat.diffcond.avg(:,find(min(abs(stat.diffcond.time-stat.cfg.latency(1))) == abs(stat.diffcond.time-stat.cfg.latency(1))):...
+        find(min(abs(stat.diffcond.time-stat.cfg.latency(2))) == abs(stat.diffcond.time-stat.cfg.latency(2))));
+    if ~isempty(negclustidx)
+        clust_t(~(stat.negclusterslabelmat == negclustidx)) = 0;
+    end
+    [minval,minidx] = min(clust_t);
+    [~,minminidx] = min(minval);
+    minchan = minidx(minminidx);
+    mintime = find(stat.time(minminidx) == stat.diffcond.time);
+    
+    subplot(2,1,1);
+    plotvals = stat.diffcond.avg(:,mintime);
+    
+    %plot cluster with mask
+    if ~isempty(negclustidx)
+        topoplot(plotvals,stat.chanlocs, 'maplimits', 'absmax', 'electrodes','off', 'emarker2',{minchan,'o','green',14,1},...
+            'pmask',stat.negclusterslabelmat(:,minminidx)==negclustidx);
+    else
+        topoplot(plotvals,stat.chanlocs, 'maplimits', 'absmax', 'electrodes','off', 'emarker2',{minchan,'o','green',14,1},...
+            'numcontour',0);
+    end
+    
+    colorbar('FontName',fontname,'FontSize',fontsize);
+    title(param.title,'FontName',fontname,'FontSize',fontsize);
+    
+    subplot(2,1,2);
+    set(gca,'ColorOrder',cat(1,colororder,[0 0 0]));
+    hold all;
+    
+    plot(stat.diffcond.time-stat.timeshift,[stat.diffcond.cond1avg(minchan,:); stat.diffcond.cond2avg(minchan,:)]','LineWidth',linewidth*1.5);
+    %ylim = get(gca,'YLim');
+    %ylim = ylim*2;
+    ylim = param.ylim;
+    set(gca,'YLim',ylim,'XLim',[stat.diffcond.time(1) stat.diffcond.time(end)]-stat.timeshift,'XTick',stat.diffcond.time(1)-stat.timeshift:0.2:stat.diffcond.time(end)-stat.timeshift,...
+        'FontName',fontname,'FontSize',fontsize);
+    legend(param.legendstrings,'Location',param.legendposition);
+    line([stat.diffcond.time(1) stat.diffcond.time(end)]-stat.timeshift,[0 0],'LineWidth',linewidth,'Color','black','LineStyle',':');
+    line([-0.60 -0.60],ylim,'LineWidth',linewidth,'Color','black','LineStyle',':');
+    line([-0.45 -0.45],ylim,'LineWidth',linewidth,'Color','black','LineStyle',':');
+    line([-0.30 -0.30],ylim,'LineWidth',linewidth,'Color','black','LineStyle',':');
+    line([-0.15 -0.15],ylim,'LineWidth',linewidth,'Color','black','LineStyle',':');
+    line([    0     0],ylim,'LineWidth',linewidth,'Color','black','LineStyle',':');
+    line([stat.diffcond.time(mintime) stat.diffcond.time(mintime)]-stat.timeshift,ylim,'LineWidth',linewidth,'LineStyle','--','Color','red');
+    xlabel('Time relative to 5th tone (sec) ','FontName',fontname,'FontSize',fontsize);
+    ylabel('Amplitude (uV)','FontName',fontname,'FontSize',fontsize);
+    box on
+    if ~isempty(negclustidx)
+        clustwinidx = find(minval);
+        %         rectangle('Position',[stat.time(clustwinidx(1))-stat.timeshift ylim(1) ...
+        %             stat.time(clustwinidx(end))-stat.time(clustwinidx(1)) ylim(2)-ylim(1)],'EdgeColor','black','LineStyle','--','LineWidth',linewidth);
+        line([stat.time(clustwinidx(1)) stat.time(clustwinidx(end))]-stat.timeshift,[0 0],'Color','blue','LineWidth',8);
+        title(sprintf('Cluster @ %.3f sec (t = %.2f, p = %.3f)', stat.diffcond.time(mintime)-stat.timeshift, stat.negclusters(negclustidx).clusterstat,stat.negclusters(negclustidx).prob),...
+            'FontName',fontname,'FontSize',fontsize);
+    else
+        title(sprintf('%.3f sec', stat.diffcond.time(mintime)-stat.timeshift),'FontName',fontname,'FontSize',fontsize);
+    end
+    set(gcf,'Color','white');
+    export_fig(gcf,[figfile '.eps']);
+else
+    fprintf('No significant negative clusters found.\n');
+end
