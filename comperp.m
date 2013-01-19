@@ -128,7 +128,7 @@ cfg.keeptrials = 'yes';
 cfg.feedback = 'textbar';
 for s = 1:size(conddata,1)
     for c = 1:size(conddata,2)
-        if strcmp(param.testgfp,'on') && (strcmp(statmode, 'cond') || strcmp(statmode,'subj'))
+        if strcmp(param.testgfp,'on')% && (strcmp(statmode, 'cond') || strcmp(statmode,'subj'))
             tldata{s,c} = ft_timelockanalysis(cfg, convertoft(convertogfp(conddata{s,c})));
         else
             ftdata = convertoft(conddata{s,c});
@@ -291,15 +291,28 @@ if nargout == 0
     save(save2file, 'stat');
 end
 
+
 function EEG = convertogfp(EEG)
 
+% EEG.nbchan = 1;
+% EEG.trials = 1;
+% EEG.chanlocs = EEG.chanlocs(find(strcmp('Cz',{EEG.chanlocs.labels})));
+% EEG.chanlocs.labels = 'GFP';
+% EEG.icachansind = 1;
+% [~, EEG.data] = evalc('eeg_gfp(mean(EEG.data,3)'')''');
+% EEG = pop_rmbase(EEG,[-200 0]);
+
 EEG.nbchan = 1;
-EEG.trials = 1;
 EEG.chanlocs = EEG.chanlocs(find(strcmp('Cz',{EEG.chanlocs.labels})));
 EEG.chanlocs.labels = 'GFP';
 EEG.icachansind = 1;
-[~, EEG.data] = evalc('eeg_gfp(mean(EEG.data,3)'')''');
+for t = 1:EEG.trials
+    [~, EEG.data(1,:,t)] = evalc('eeg_gfp(EEG.data(:,:,t)'')''');
+end
+EEG.data = EEG.data(1,:,:);
 EEG = pop_rmbase(EEG,[-200 0]);
+
+
 function estlat = calclat(times,data,pcarea)
 %estlat = sum(abs(data));
 
