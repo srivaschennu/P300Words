@@ -39,8 +39,13 @@ for c = 1:length(stat.condlist)
     else
         caxis(cscale);
     end
-    colorbar('FontSize',param.fontsize);    
     title(param.legendstrings{c},'FontSize',param.fontsize,'FontName',fontname);
+    cb_h = colorbar('FontSize',param.fontsize);
+    if c == 1
+        cb_labels = num2cell(get(cb_h,'YTickLabel'),2);
+        cb_labels{1} = [cb_labels{1} ' uV'];
+        set(cb_h,'YTickLabel',cb_labels);
+    end
 end
 
 
