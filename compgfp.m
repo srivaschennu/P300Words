@@ -76,7 +76,7 @@ for s = 1:numsubj
     
     for c = 1:numcond
         selectevents = subjcond{s,c};
-        selectsnum = 3;
+        selectsnum = [3 4];
         %selectpred = 1;
         
         typematches = false(1,length(EEG.epoch));
@@ -121,17 +121,17 @@ for s = 1:numsubj
         
         conddata{s,c} = pop_select(EEG,'trial',selectepochs);
         
-        if (strcmp(statmode,'trial') || strcmp(statmode,'cond')) && c == numcond
-            if conddata{s,1}.trials > conddata{s,2}.trials
-                fprintf('Equalising trials in condition %s.\n',subjcond{s,1});
-                randtrials = 1:conddata{s,1}.trials;%randperm(conddata{s,1}.trials);
-                conddata{s,1} = pop_select(conddata{s,1},'trial',randtrials(1:conddata{s,2}.trials));
-            elseif conddata{s,2}.trials > conddata{s,1}.trials
-                fprintf('Equalising trials in condition %s.\n',subjcond{s,2});
-                randtrials = 1:conddata{s,2}.trials;%randperm(conddata{s,2}.trials);
-                conddata{s,2} = pop_select(conddata{s,2},'trial',randtrials(1:conddata{s,1}.trials));
-            end
-        end
+%         if (strcmp(statmode,'trial') || strcmp(statmode,'cond')) && c == numcond
+%             if conddata{s,1}.trials > conddata{s,2}.trials
+%                 fprintf('Equalising trials in condition %s.\n',subjcond{s,1});
+%                 randtrials = 1:conddata{s,1}.trials;%randperm(conddata{s,1}.trials);
+%                 conddata{s,1} = pop_select(conddata{s,1},'trial',randtrials(1:conddata{s,2}.trials));
+%             elseif conddata{s,2}.trials > conddata{s,1}.trials
+%                 fprintf('Equalising trials in condition %s.\n',subjcond{s,2});
+%                 randtrials = 1:conddata{s,2}.trials;%randperm(conddata{s,2}.trials);
+%                 conddata{s,2} = pop_select(conddata{s,2},'trial',randtrials(1:conddata{s,1}.trials));
+%             end
+%         end
     end
 end
 

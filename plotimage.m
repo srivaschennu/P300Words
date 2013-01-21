@@ -3,7 +3,7 @@ function plotimage(subjinfo,varargin)
 loadpaths
 loadsubj
 
-param = finputcheck(varargin, { 'fontsize','integer', [], 18; ...
+param = finputcheck(varargin, { 'fontsize','integer', [], 22; ...
     });
 
 %% figure plotting
@@ -48,10 +48,15 @@ for c = 1:size(plotdata,3)
         'FontSize',param.fontsize,'FontName',fontname);
     
     line([0 0],ylim,'Color','black','LineStyle',':','LineWidth',linewidth);
-    xlabel('Time (ms) ','FontSize',param.fontsize,'FontName',fontname);
-    ylabel('Participant ','FontSize',param.fontsize,'FontName',fontname);
+    if c == 2
+        xlabel('Time (ms) ','FontSize',param.fontsize,'FontName',fontname);
+        ylabel('Participant ','FontSize',param.fontsize,'FontName',fontname);
+    else
+        xlabel('  ','FontSize',param.fontsize,'FontName',fontname);
+        ylabel('  ','FontSize',param.fontsize,'FontName',fontname);
+    end        
     box on
-    set(gcf,'Color','white');
     figfile = sprintf('figures/img_%s_%s_tval',num2str(subjinfo),plotorder{c});
+    set(gcf,'Color','white','FileName',figfile);
     export_fig(gcf,[figfile '.eps']);
 end

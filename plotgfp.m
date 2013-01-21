@@ -1,14 +1,15 @@
 function plotgfp(stat,varargin)
 
 colorlist = {
-    'explicit'    [0         0    1.0000]
+    'explicit'     [0         0    1.0000]
     'implicit'     [0    0.5000         0]
     'distractor'   [1.0000    0         0]
     };
 
 param = finputcheck(varargin, { 'ylim', 'real', [], [-5 20]; ...
-    'fontsize','integer', [], 20; ...
+    'fontsize','integer', [], 26; ...
     'legendstrings', 'cell', {}, stat.condlist; ...
+    'legendposition', 'string', {}, 'NorthEast'; ...
     });
 
 %% figure plotting
@@ -74,7 +75,7 @@ line([stat.times(1) stat.times(end)]-stat.timeshift,[0 0],'Color','black','LineS
 line([stat.times(plotpnt) stat.times(plotpnt)]-stat.timeshift,param.ylim,'Color','red','LineWidth',linewidth,'LineStyle','--');
 xlabel('Time (ms) ','FontSize',param.fontsize,'FontName',fontname);
 ylabel('Global field power ','FontSize',param.fontsize,'FontName',fontname);
-legend(param.legendstrings,'Location','NorthWest');
+legend(param.legendstrings,'Location',param.legendposition);
 box on
 title(sprintf('%dms', round(stat.times(plotpnt))),'FontSize',param.fontsize,'FontName',fontname);
 
