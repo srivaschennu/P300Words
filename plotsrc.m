@@ -9,7 +9,7 @@ scalefactor = 10^12;
 figure;
 figpos = get(gcf,'Position');
 figpos(4) = figpos(3);
-figpos(3) = round(figpos(3)*(1.75));
+figpos(4) = round(figpos(4)/2);
 set(gcf,'Position',[figpos(1) figpos(2) figpos(3)*length(data.F) figpos(4)]);
 
 colorlist = {
@@ -23,7 +23,7 @@ param = finputcheck(varargin, {
     'legendposition', 'string', {}, 'NorthWest'; ...
     'title','cell', {}, data.AxesTitle; ...
     'ylim', 'real', [], [0 50]; ...
-    'plottime','real', [], 0; ...
+    'plotlabels','string', {'on','off'}, 'on'; ...
     });
 
 
@@ -46,45 +46,45 @@ for i = 1:length(data.F)
     
     %remove baseline
     %data.F{i} = rmbase(data.F{i},[],find(data.Time-timeshift >= -0.2 & data.Time-timeshift <= 0));
-    data.F{i} = rmbase(data.F{i},[],find(data.Time >= -0.2 & data.Time <= 0));
+    %data.F{i} = rmbase(data.F{i},[],find(data.Time >= -0.2 & data.Time <= 0));
+    
+    data.Time = data.Time*1000;
     
     plot(data.Time-timeshift,data.F{i}*scalefactor,'LineWidth',linewidth*1.5);
     set(gca,'YLim',param.ylim);
     set(gca,'XLim',[data.Time(1) data.Time(end)]-timeshift,...
-        'XTick',data.Time(1)-timeshift:0.2:data.Time(end)-timeshift,...
+        'XTick',data.Time(1)-timeshift:200:data.Time(end)-timeshift,...
         'FontName',fontname,'FontSize',fontsize);
     if i == length(data.F)
         legend(legendstrings,'Location',param.legendposition);
     end
     line([data.Time(1) data.Time(end)]-timeshift,[0 0],'LineWidth',linewidth,'Color','black','LineStyle',':');
-    line([-0.60 -0.60],ylim,'LineWidth',linewidth,'Color','black','LineStyle',':');
-    line([-0.45 -0.45],ylim,'LineWidth',linewidth,'Color','black','LineStyle',':');
-    line([-0.30 -0.30],ylim,'LineWidth',linewidth,'Color','black','LineStyle',':');
-    line([-0.15 -0.15],ylim,'LineWidth',linewidth,'Color','black','LineStyle',':');
     line([    0     0],ylim,'LineWidth',linewidth,'Color','black','LineStyle',':');
     %line([param.plottime param.plottime],ylim,'LineWidth',linewidth','Color','red','LineStyle','--');
-    if i == length(data.F)
-        xlabel('Time relative to 5th tone (sec)','FontName',fontname,'FontSize',fontsize);
+    if strcmp(param.plotlabels,'on')
+        xlabel('Time (ms)','FontName',fontname,'FontSize',fontsize);
+    else
+        xlabel(' ','FontName',fontname,'FontSize',fontsize);
     end
-    %xlabel(' ','FontName',fontname,'FontSize',fontsize);
     
-    if i == length(data.F)
+    if strcmp(param.plotlabels,'on')
         ylabel('Activation (pA.m)','FontName',fontname,'FontSize',fontsize);
+    else
+        ylabel(' ','FontName',fontname,'FontSize',fontsize);
     end
-    %ylabel(' ','FontName',fontname,'FontSize',fontsize);
     
     box on
     title(param.title{i},'FontName',fontname,'FontSize',fontsize);
     %title(' ','FontName',fontname,'FontSize',fontsize);
-
-%     timewin = [-0.6 0.2];
-%     timeidx = find(data.Time-timeshift >= timewin(1) & data.Time-timeshift <= timewin(2));
-%     dataslope = zeros(size(data.F{1},1),2);
-%     for d = 1:size(data.F{1},1)
-%         dataslope(d,:) = polyfit(data.Time(timeidx),data.F{1}(d,timeidx)*scalefactor,1);
-%         plot(data.Time-timeshift,polyval(dataslope(d,:),data.Time),...
-%             'LineWidth',2,'LineStyle','--');
-%     end
+    
+    %     timewin = [-0.6 0.2];
+    %     timeidx = find(data.Time-timeshift >= timewin(1) & data.Time-timeshift <= timewin(2));
+    %     dataslope = zeros(size(data.F{1},1),2);
+    %     for d = 1:size(data.F{1},1)
+    %         dataslope(d,:) = polyfit(data.Time(timeidx),data.F{1}(d,timeidx)*scalefactor,1);
+    %         plot(data.Time-timeshift,polyval(dataslope(d,:),data.Time),...
+    %             'LineWidth',2,'LineStyle','--');
+    %     end
 end
-set(gcf,'Color','white','Name',data.AxesTitle{1},'FileName',['figures' filesep 'act_' cell2mat(data.AxesTitle)]);
-export_fig(gcf,['figures' filesep 'act_' cell2mat(data.AxesTitle) '.eps']);
+set(gcf,'Color','white','Name',data.AxesTitle{1},'FileName',['figures' filesep 'act_' data.FigTitle]);
+export_fig(gcf,['figures' filesep 'act_' data.FigTitle '.eps']);
