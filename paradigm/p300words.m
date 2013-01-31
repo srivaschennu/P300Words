@@ -234,6 +234,8 @@ while hd.blocknum <= hd.numblocks
     %         kbinput = GetChennu(true);
     %     end
     
+    NetStation('Synchronize');
+    pause(1);
     %start recording
     NetStation('StartRecording');
     pause(1);
@@ -336,9 +338,7 @@ while hd.blocknum <= hd.numblocks
     
     hd.blocknum = hd.blocknum+1;
     
-    if rem(hd.blocknum-1,hd.numblocks/2) == 0
-        NetStation('StopRecording');
-    end
+    NetStation('StopRecording');
     if pausefor(10)
         break
     end

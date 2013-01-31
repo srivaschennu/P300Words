@@ -55,7 +55,7 @@ for i = 1:length(data.F)
     set(gca,'XLim',[data.Time(1) data.Time(end)]-timeshift,...
         'XTick',data.Time(1)-timeshift:200:data.Time(end)-timeshift,...
         'FontName',fontname,'FontSize',fontsize);
-    if i == length(data.F)
+    if ~strcmp(param.legendposition,'none')
         legend(legendstrings,'Location',param.legendposition);
     end
     line([data.Time(1) data.Time(end)]-timeshift,[0 0],'LineWidth',linewidth,'Color','black','LineStyle',':');
