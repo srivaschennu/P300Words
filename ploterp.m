@@ -54,7 +54,7 @@ for s = 1:numsubj
     
     for c = 1:numcond
         selectevents = subjcond{s,c};
-        selectsnum = 3;
+        selectsnum = [3 4];
         %selectpred = 1;
         
         typematches = false(1,length(EEG.epoch));
@@ -102,7 +102,7 @@ for s = 1:numsubj
         conddata{s,c} = pop_editeventfield( conddata{s,c}, 'init_index',[]);
         conddata{s,c} = pop_editeventfield( conddata{s,c}, 'init_time',[]);
         conddata{s,c}.setname = sprintf('%s_%s_%s',statmode,num2str(subjinfo),condlist{c});
-        pop_saveset(conddata{s,c},'filepath',filepath,'filename',[conddata{s,c}.setname '.set']);
+        %pop_saveset(conddata{s,c},'filepath',filepath,'filename',[conddata{s,c}.setname '.set']);
 
         erpdata(:,:,c,s) = mean(conddata{s,c}.data,3);
     end
@@ -140,16 +140,16 @@ for c = 1:size(erpdata,3)
         'limits',[EEG.times(1)-timeshift EEG.times(end)-timeshift, param.ylim],...
         'plottimes',plottime-timeshift);
     
-%     saveEEG = EEG;
-%     saveEEG.data = plotdata;
-%     saveEEG.setname = sprintf('%s_%s_%s',statmode,num2str(subjinfo),condlist{c});
-%     saveEEG.filename = [saveEEG.setname '.set'];
-%     saveEEG.trials = 1;
-%     saveEEG.event = saveEEG.event(1);
-%     saveEEG.event(1).type = saveEEG.setname;
-%     saveEEG.epoch = saveEEG.epoch(1);
-%     saveEEG.epoch(1).eventtype = saveEEG.setname;
-%     pop_saveset(saveEEG,'filepath',filepath,'filename',saveEEG.filename);    
+    saveEEG = EEG;
+    saveEEG.data = plotdata;
+    saveEEG.setname = sprintf('%s_%s_%s',statmode,num2str(subjinfo),condlist{c});
+    saveEEG.filename = [saveEEG.setname '.set'];
+    saveEEG.trials = 1;
+    saveEEG.event = saveEEG.event(1);
+    saveEEG.event(1).type = saveEEG.setname;
+    saveEEG.epoch = saveEEG.epoch(1);
+    saveEEG.epoch(1).eventtype = saveEEG.setname;
+    pop_saveset(saveEEG,'filepath',filepath,'filename',saveEEG.filename);    
 end
 
 % gadiff = diffdata{1};
