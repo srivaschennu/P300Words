@@ -3,10 +3,14 @@ subjlists = {
     % 'subj01_p300words' too few trials
     'subj02_p300words'
     'subj03_p300words'
-    'subj04_p300words' %eye blinks
-    'subj05_p300words' %eye blinks
+    'subj04_p300words' %eye blinks %CONTIGUOUS TARGET ORDER
+    'subj05_p300words' %eye blinks %CONTIGUOUS TARGET ORDER
     'subj06_p300words' %eye blinks
     'subj07_p300words' %eye blinks
+    
+    'subj08_p300words' %eye blinks
+    'subj09_p300words' %eye blinks
+    'subj10_p300words' %eye blinks
     };
     {
     'p1611_p300words' %clean %TRG1 TRG2

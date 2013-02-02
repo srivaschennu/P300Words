@@ -171,16 +171,23 @@ if ~isfield(hd,'targwords')
         if hd.numblocks == 1
             blockorder = 1;
         else
-            grouporder = 1:hd.groupsize:hd.numblocks;
-            grouporder = grouporder(randperm(length(grouporder)));
-            blockorder = grouporder;
-            for g = 1:hd.groupsize-1
-                blockorder = cat(1,blockorder,grouporder+g);
+            while true
+                grouporder = 1:hd.groupsize:hd.numblocks;
+                grouporder = grouporder(randperm(length(grouporder)));
+                blockorder = grouporder;
+                for g = 1:hd.groupsize-1
+                    blockorder = cat(1,blockorder,grouporder+g);
+                end
+                blockorder = blockorder(:);
+                hd.targwords = hd.targwords(blockorder,:);
+                if isempty(strfind(num2str(hd.targwords(:,1)'),'1  1  1  1  1')) && ...
+                        isempty(strfind(num2str(hd.targwords(:,1)'),'2  2  2  2  2'))
+                    break;
+                end
             end
-            blockorder = blockorder(:);
         end
-        hd.targwords = hd.targwords(blockorder,:);
-        
+        fprintf('\nAbout to run %d blocks with target order: %s\n',hd.numblocks,num2str(hd.targwords(:,1)'));
+               
         if hd.presmode == 1
             hd.targori = repmat(find(hd.orideg == 0),hd.numblocks,2);
             hd.distori = repmat(find(hd.orideg == 0),1,length(hd.orilist));
