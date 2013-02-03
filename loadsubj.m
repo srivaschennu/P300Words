@@ -1,6 +1,7 @@
 subjlists = {
     {
     % 'subj01_p300words' too few trials
+    
     'subj02_p300words'
     'subj03_p300words'
     'subj04_p300words' %eye blinks %CONTIGUOUS TARGET ORDER

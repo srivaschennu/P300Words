@@ -24,20 +24,12 @@ for s = 1:length(subjlist)
     
 %             computeic([basename '_epochs']);
     %
-                rejectic(basename);
-                rejartifacts2(basename,2,3);
+%                 rejectic(basename);
+%                 rejartifacts2(basename,2,3);
     
-%     compgfp(basename,{'TRG1','DIST'},'latency',[150 400]);
-%     load(['trial_' basename '_TRG1-DIST.mat']);
-%     plotclusters(stat);
-    
-%     compgfp(basename,{'TRG2','DIST'},'latency',[150 400]);
-%     load(['trial_' basename '_TRG2-DIST.mat']);
-%     plotclusters(stat);
-    
-%     compgfp(basename,{'TRG1','TRG2'},'latency',[400 700]);
-%     load(['trial_' basename '_TRG1-TRG2.mat']);
-%     plotclusters(stat);
+    compgfp(basename,{'TRG1','DIST'},'latency',[150 400]);
+    compgfp(basename,{'TRG2','DIST'},'latency',[150 400]);
+    compgfp(basename,{'TRG1','TRG2'},'latency',[400 700]);
 
 %    EEG = pop_loadset('filepath',filepath,'filename',[basename '_orig.set'],'loadmode','info');
 %    for e = 1:length(EEG.event)

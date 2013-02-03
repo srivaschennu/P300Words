@@ -28,7 +28,11 @@ if isfield(stat,'pclust')
 else
     latpnt = find(stat.times-stat.timeshift >= stat.param.latency(1) & stat.times-stat.timeshift <= stat.param.latency(2));
 end
-[~, maxidx] = max(stat.condgfp(1,latpnt,1),[],2);
+
+%pick time point at max of condition 1
+%[~, maxidx] = max(stat.condgfp(1,latpnt,1),[],2);
+%pick time point at max of difference
+[~, maxidx] = max(stat.gfpdiff(1,latpnt),[],2);
 plotpnt = latpnt(1)-1+maxidx;
 
 for c = 1:length(stat.condlist)
