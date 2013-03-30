@@ -9,7 +9,7 @@ colorlist = {
 param = finputcheck(varargin, {
     'legendstrings', 'cell', {}, stat.condlist; ...
     'legendposition', 'string', {}, 'NorthWest'; ...
-    'ylim', 'real', [], [-10 10]; ...
+    'ylim', 'real', [], [-5 5]; ...
     'title','string', {}, ' '; ...
     });
 
@@ -73,10 +73,15 @@ if stat.cfg.tail >= 0
     subplot(2,1,1);
     plotvals = stat.diffcond.avg(:,maxtime);
     
-    %         % plot cluster with mask
-    topoplot(plotvals,stat.chanlocs, 'maplimits', 'absmax', 'electrodes','off', 'emarker2',{maxchan,'o','green',14,1},...
-    'pmask',stat.posclusterslabelmat(:,maxmaxidx)==posclustidx);
-    
+    if ~isempty(posclustidx)
+        %         % plot cluster with mask
+        topoplot(plotvals,stat.chanlocs, 'maplimits', 'absmax', 'electrodes','off', 'emarker2',{maxchan,'o','green',14,1},...
+            'pmask',stat.posclusterslabelmat(:,maxmaxidx)==posclustidx);
+    else
+        topoplot(plotvals,stat.chanlocs, 'maplimits', 'absmax', 'electrodes','off', 'emarker2',{maxchan,'o','green',14,1},...
+            'numcontour',0);
+    end
+
     colorbar('FontName',fontname,'FontSize',fontsize);
     title(param.title,'FontName',fontname,'FontSize',fontsize);
     

@@ -10,6 +10,7 @@ param = finputcheck(varargin, { 'ylim', 'real', [], [-5 20]; ...
     'fontsize','integer', [], 26; ...
     'legendstrings', 'cell', {}, stat.condlist; ...
     'legendposition', 'string', {}, 'NorthWest'; ...
+    'ttesttail', 'integer', [-1 0 1], 0, ...
     });
 
 %% figure plotting
@@ -85,24 +86,31 @@ title(sprintf('%dms', round(stat.times(plotpnt))),'FontSize',param.fontsize,'Fon
 
 %% plot clusters
 
-if isfield(stat,'pclust')
-    for p = 1:length(stat.pclust)
-        line([stat.pclust(p).win(1) stat.pclust(p).win(2)],[0 0],'Color','blue','LineWidth',8);
-        title(sprintf('%dms\nCluster t = %.2f, p = %.3f', round(stat.times(plotpnt)), stat.pclust(p).tstat, stat.pclust(p).prob),...
-            'FontSize',param.fontsize,'FontName',fontname);
+if param.ttesttail >= 0
+    if isfield(stat,'pclust')
+        for p = 1:length(stat.pclust)
+            line([stat.pclust(p).win(1) stat.pclust(p).win(2)],[0 0],'Color','blue','LineWidth',8);
+            title(sprintf('%dms\nCluster t = %.2f, p = %.3f', round(stat.times(plotpnt)), stat.pclust(p).tstat, stat.pclust(p).prob),...
+                'FontSize',param.fontsize,'FontName',fontname);
+        end
+    else
+        fprintf('No positive clusters found.\n');
     end
-else
-    fprintf('No positive clusters found.\n');
 end
 
-% for n = 1:length(stat.nclust)
-%     rectangle('Position',[stat.nclust(n).win(1) param.ylim(1) ...
-%         stat.nclust(n).win(2)-stat.nclust(n).win(1) param.ylim(2)-param.ylim(1)],...
-%         'EdgeColor','blue','LineWidth',linewidth,'LineStyle','--');
-%     title(sprintf('Cluster t = %.2f, p = %.3f', stat.nclust(n).tstat, stat.nclust(n).prob),...
-%         'FontSize',param.fontsize,'FontName',fontname);
-% end
-
+if param.ttesttail <= 0
+    if isfield(stat,'nclust')
+        for n = 1:length(stat.nclust)
+            line([stat.nclust(p).win(1) stat.nclust(p).win(2)],[0 0],'Color','red','LineWidth',8);
+            title(sprintf('Cluster t = %.2f, p = %.3f', stat.nclust(n).tstat, stat.nclust(n).prob),...
+                'FontSize',param.fontsize,'FontName',fontname);
+        end
+    else
+        fprintf('No negative clusters found.\n');
+    end
+    
+end
+    
 set(gcf,'Color','white');
 %saveas(gcf,[figfile '.fig']);
 export_fig(gcf,[figfile '.eps']);

@@ -135,6 +135,10 @@ for s = 1:numsubj
     end
 end
 
+if isempty(param.latency)
+    param.latency = [0 EEG.times(end)-timeshift];
+end
+
 if isempty(param.chanlist)
     chanidx = [];
 else
@@ -255,18 +259,15 @@ for n = 1:param.numrand+1
 end
 close(h_wait);
 
-for p = 1:size(gfpdiff,2)
-    stat.valu(p) = (gfpdiff(1,p) - mean(gfpdiff(2:end,p)))/(std(gfpdiff(2:end,p))/sqrt(size(gfpdiff,1)-1));
-    stat.pprob(p) = sum(gfpdiff(2:end,p) >= gfpdiff(1,p))/param.numrand;
-    stat.nprob(p) = sum(gfpdiff(2:end,p) <= gfpdiff(1,p))/param.numrand;
-end
-
-if isempty(param.latency)
-    param.latency = [0 EEG.times(end)-timeshift];
-end
-
 times = EEG.times - timeshift;
 corrwin = find(times >= param.latency(1) & times <= param.latency(2));
+
+for p = 1:size(gfpdiff,2)
+    stat.valu(p) = (gfpdiff(1,p) - mean(gfpdiff(2:end,p)))/(std(gfpdiff(2:end,p))/sqrt(size(gfpdiff,1)-1));
+    stat.pprob(p) = sum(max(gfpdiff(2:end,corrwin),[],2) >= gfpdiff(1,p))/param.numrand;
+    stat.nprob(p) = sum(min(gfpdiff(2:end,corrwin),[],2) <= gfpdiff(1,p))/param.numrand;
+end
+
 stat.pprob([1:corrwin(1)-1,corrwin(end)+1:end]) = 1;
 stat.nprob([1:corrwin(1)-1,corrwin(end)+1:end]) = 1;
 
@@ -313,16 +314,16 @@ for p = 2:EEG.pnts
         stat.pclust(pclustidx).win = [EEG.times(pstart) EEG.times(pend-1)]-timeshift;
     end
     
-    %     if stat.nprob(p) < param.alpha && stat.nprob(p-1) >= param.alpha
-    %         nstart = p;
-    %     elseif (stat.nprob(p) >= param.alpha || p == EEG.pnts) && stat.nprob(p-1) < param.alpha
-    %         nend = p;
-    %
-    %         nclustidx = nclustidx+1;
-    %         stat.nclust(nclustidx).tstat = mean(stat.valu(nstart:nend-1));
-    %         stat.nclust(nclustidx).prob = mean(stat.pprob(nstart:nend-1));
-    %         stat.nclust(nclustidx).win = [EEG.times(nstart) EEG.times(nend-1)]-timeshift;
-    %     end
+    if stat.nprob(p) < param.alpha && stat.nprob(p-1) >= param.alpha
+        nstart = p;
+    elseif (stat.nprob(p) >= param.alpha || p == EEG.pnts) && stat.nprob(p-1) < param.alpha
+        nend = p;
+        
+        nclustidx = nclustidx+1;
+        stat.nclust(nclustidx).tstat = mean(stat.valu(nstart:nend-1));
+        stat.nclust(nclustidx).prob = mean(stat.pprob(nstart:nend-1));
+        stat.nclust(nclustidx).win = [EEG.times(nstart) EEG.times(nend-1)]-timeshift;
+    end
 end
 
 stat.gfpdiff = gfpdiff;
@@ -338,7 +339,7 @@ stat.chanlocs = chanlocs;
 stat.srate = EEG.srate;
 
 if nargout == 0
-    save2file = sprintf('%s_%s_%s-%s.mat',statmode,num2str(subjinfo),condlist{1},condlist{2});
+    save2file = sprintf('%s_%s_%s-%s_gfp.mat',statmode,num2str(subjinfo),condlist{1},condlist{2});
     save(save2file,'stat');
 end
 
