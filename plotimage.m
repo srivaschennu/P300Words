@@ -24,7 +24,7 @@ for s = 1:length(subjlist)
     for c1 = 1:3
         for c2 = 1:3
             if c2 > c1
-                load(sprintf('trial_%s_%s-%s.mat',basename,condlist{c1},condlist{c2}));
+                load(sprintf('trial_%s_%s-%s_gfp.mat',basename,condlist{c1},condlist{c2}));
                 stat.valu(stat.pprob >= stat.param.alpha) = 0;
                 plotidx = plotidx+1;
                 plotdata(s,:,plotidx) = stat.valu;
@@ -57,6 +57,6 @@ for c = 1:size(plotdata,3)
     end        
     box on
     figfile = sprintf('figures/img_%s_%s_tval',num2str(subjinfo),plotorder{c});
-    set(gcf,'Color','white','FileName',figfile);
+    set(gcf,'Color','white','Name',figfile,'FileName',figfile);
     export_fig(gcf,[figfile '.eps']);
 end

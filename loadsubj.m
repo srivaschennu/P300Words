@@ -4,7 +4,7 @@ subjlists = {
     
     'subj02_p300words'
     'subj03_p300words'
-    'subj04_p300words' %eye blinks %CONTIGUOUS TARGET ORDER
+    %'subj04_p300words' %eye blinks %CONTIGUOUS TARGET ORDER
     'subj05_p300words' %eye blinks %CONTIGUOUS TARGET ORDER
     'subj06_p300words' %eye blinks
     'subj07_p300words' %eye blinks
