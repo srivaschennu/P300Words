@@ -262,7 +262,10 @@ close(h_wait);
 times = EEG.times - timeshift;
 corrwin = find(times >= param.latency(1) & times <= param.latency(2));
 
-for p = 1:size(gfpdiff,2)
+stat.valu = zeros(1,size(gfpdiff,2));
+stat.pprob = zeros(1,size(gfpdiff,2));
+stat.nprob = zeros(1,size(gfpdiff,2));
+for p = corrwin
     stat.valu(p) = (gfpdiff(1,p) - mean(gfpdiff(2:end,p)))/(std(gfpdiff(2:end,p))/sqrt(size(gfpdiff,1)-1));
     stat.pprob(p) = sum(max(gfpdiff(2:end,corrwin),[],2) >= gfpdiff(1,p))/param.numrand;
     stat.nprob(p) = sum(min(gfpdiff(2:end,corrwin),[],2) <= gfpdiff(1,p))/param.numrand;
