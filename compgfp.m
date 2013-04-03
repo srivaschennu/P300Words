@@ -263,8 +263,8 @@ times = EEG.times - timeshift;
 corrwin = find(times >= param.latency(1) & times <= param.latency(2));
 
 stat.valu = zeros(1,size(gfpdiff,2));
-stat.pprob = zeros(1,size(gfpdiff,2));
-stat.nprob = zeros(1,size(gfpdiff,2));
+stat.pprob = ones(1,size(gfpdiff,2));
+stat.nprob = ones(1,size(gfpdiff,2));
 for p = corrwin
     stat.valu(p) = (gfpdiff(1,p) - mean(gfpdiff(2:end,p)))/(std(gfpdiff(2:end,p))/sqrt(size(gfpdiff,1)-1));
     stat.pprob(p) = sum(max(gfpdiff(2:end,corrwin),[],2) >= gfpdiff(1,p))/param.numrand;
@@ -283,16 +283,16 @@ elseif strcmp(param.corrp,'cluster')
     stat.pmask(stat.pprob < param.alpha) = 1;
     stat.nmask(stat.nprob < param.alpha) = 1;
     %cluster-based pvalue correction
-    nsigidx = find(stat.pprob >= param.alpha);
+    nsigidx = find(stat.pmask == 0);
     for n = 1:length(nsigidx)-1
-        if nsigidx(n+1)-nsigidx(n) > 1 && nsigidx(n+1)-nsigidx(n) < param.clustsize
+        if nsigidx(n+1)-nsigidx(n) > 1 && nsigidx(n+1)-nsigidx(n)-1 < param.clustsize
             stat.pmask(nsigidx(n)+1:nsigidx(n+1)-1) = 0;
         end
     end
     
     nsigidx = find(stat.nprob >= param.alpha);
     for n = 1:length(nsigidx)-1
-        if nsigidx(n+1)-nsigidx(n) > 1 && nsigidx(n+1)-nsigidx(n) < param.clustsize
+        if nsigidx(n+1)-nsigidx(n) > 1 && nsigidx(n+1)-nsigidx(n)-1 < param.clustsize
             stat.nmask(nsigidx(n)+1:nsigidx(n+1)-1) = 0;
         end
     end
