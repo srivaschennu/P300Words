@@ -24,16 +24,24 @@ figure('Name',sprintf('%s-%s',stat.condlist{1},stat.condlist{2}),'Color','white'
 figpos = get(gcf,'Position');
 set(gcf,'Position',[figpos(1) figpos(2) figpos(3) figpos(3)]);
 
-if isfield(stat,'pclust')
-    latpnt = find(stat.times-stat.timeshift >= stat.pclust(1).win(1) & stat.times-stat.timeshift <= stat.pclust(end).win(2));
-else
+% if isfield(stat,'pclust')
+%     latpnt = find(stat.times-stat.timeshift >= stat.pclust(1).win(1) & stat.times-stat.timeshift <= stat.pclust(end).win(2));
+% else
     latpnt = find(stat.times-stat.timeshift >= stat.param.latency(1) & stat.times-stat.timeshift <= stat.param.latency(2));
-end
+% end
 
 %pick time point at max of condition 1
 %[~, maxidx] = max(stat.condgfp(1,latpnt,1),[],2);
+
 %pick time point at max of difference
-[~, maxidx] = max(stat.gfpdiff(1,latpnt),[],2);
+% [~, maxidx] = max(stat.gfpdiff(1,latpnt),[],2);
+
+%pick time point at max of t-statistic
+[~, maxidx] = max(stat.valu(latpnt));
+
+%pick time point at min of p-value
+[~, maxidx] = min(stat.pprob(latpnt));
+
 plotpnt = latpnt(1)-1+maxidx;
 
 for c = 1:length(stat.condlist)
@@ -110,6 +118,10 @@ if param.ttesttail <= 0
     end
     
 end
+
+title(sprintf('%dms\nt = %.2f, p = %.3f', round(stat.times(plotpnt)), stat.valu(plotpnt), stat.pprob(plotpnt)),...
+    'FontSize',param.fontsize,'FontName',fontname);
+
     
 set(gcf,'Color','white');
 %saveas(gcf,[figfile '.fig']);
