@@ -10,6 +10,7 @@ param = finputcheck(varargin, { 'fontsize','integer', [], 22; ...
 
 fontname = 'Helvetica';
 linewidth = 2;
+ranklist = [0.5 0.4 0.3 0.2 0.1 0.01 0.001 0.0001];
 
 subjlist = subjlists{subjinfo};
 
@@ -26,6 +27,7 @@ for s = 1:length(subjlist)
             if c2 > c1
                 load(sprintf('trial_%s_%s-%s_gfp.mat',basename,condlist{c1},condlist{c2}));
                 stat.valu(stat.pprob >= stat.param.alpha) = 0;
+                stat.pprob = rankvals(stat.pprob,ranklist);
                 plotidx = plotidx+1;
                 plotdata(s,:,plotidx) = stat.valu;
                 plotorder{plotidx} = sprintf('%s-%s',condlist{c1},condlist{c2});
@@ -42,6 +44,7 @@ for c = 1:size(plotdata,3)
     set(gcf,'Position',figpos);
     
     imagesc(stat.times,1:length(subjlist),plotdata(:,:,c));
+    %caxis([ranklist(end) ranklist(1)]);
     colorbar
     set(gca,'YDir','normal','XLim',[stat.times(1) stat.times(end)]-stat.timeshift,...
         'XTick',stat.times(1)-stat.timeshift:200:stat.times(end)-stat.timeshift,...
@@ -60,3 +63,12 @@ for c = 1:size(plotdata,3)
     set(gcf,'Color','white','Name',figfile,'FileName',figfile);
     export_fig(gcf,[figfile '.eps']);
 end
+
+function [pvals] = rankvals(pvals,ranklist)
+
+pvals(pvals >= ranklist(1)) = 1;
+
+for r = 2:length(ranklist)
+    pvals(pvals < ranklist(r-1) & pvals >= ranklist(r)) = ranklist(r-1);
+end
+pvals(pvals < ranklist(end)) = ranklist(end);
