@@ -85,16 +85,28 @@ for s = 1:numsubj
         for ep = 1:length(EEG.epoch)
             
             epochtype = EEG.epoch(ep).eventtype;
-            if iscell(epochtype)
-                epochtype = epochtype{cell2mat(EEG.epoch(ep).eventlatency) == 0};
+            if length(epochtype) > 1
+                if sum(cell2mat(EEG.epoch(ep).eventlatency) == 0) > 0
+                    epochtype = epochtype{cell2mat(EEG.epoch(ep).eventlatency) == 0};
+                elseif ~isempty(cell2mat(EEG.epoch(ep).eventlatency) == EEG.times(end)+1000/EEG.srate)
+                    epochtype = epochtype{cell2mat(EEG.epoch(ep).eventlatency) == EEG.times(end)+1000/EEG.srate};
+                end
+            else
+                epochtype = epochtype{1};
             end
             if sum(strcmp(epochtype,selectevents)) > 0
                 typematches(ep) = true;
             end
             
             epochcodes = EEG.epoch(ep).eventcodes;
-            if iscell(epochcodes{1,1})
-                epochcodes = epochcodes{cell2mat(EEG.epoch(ep).eventlatency) == 0};
+            if length(epochcodes) > 1
+                if sum(cell2mat(EEG.epoch(ep).eventlatency) == 0) > 0
+                    epochcodes = epochcodes{cell2mat(EEG.epoch(ep).eventlatency) == 0};
+                elseif ~isempty(cell2mat(EEG.epoch(ep).eventlatency) == EEG.times(end)+1000/EEG.srate)
+                    epochcodes = epochcodes{cell2mat(EEG.epoch(ep).eventlatency) == EEG.times(end)+1000/EEG.srate};
+                end
+            else
+                epochcodes = epochcodes{1};
             end
             
             snumidx = strcmp('SNUM',epochcodes(:,1)');
@@ -121,17 +133,17 @@ for s = 1:numsubj
         
         conddata{s,c} = pop_select(EEG,'trial',selectepochs);
         
-%         if (strcmp(statmode,'trial') || strcmp(statmode,'cond')) && c == numcond
-%             if conddata{s,1}.trials > conddata{s,2}.trials
-%                 fprintf('Equalising trials in condition %s.\n',subjcond{s,1});
-%                 randtrials = 1:conddata{s,1}.trials;%randperm(conddata{s,1}.trials);
-%                 conddata{s,1} = pop_select(conddata{s,1},'trial',randtrials(1:conddata{s,2}.trials));
-%             elseif conddata{s,2}.trials > conddata{s,1}.trials
-%                 fprintf('Equalising trials in condition %s.\n',subjcond{s,2});
-%                 randtrials = 1:conddata{s,2}.trials;%randperm(conddata{s,2}.trials);
-%                 conddata{s,2} = pop_select(conddata{s,2},'trial',randtrials(1:conddata{s,1}.trials));
-%             end
-%         end
+        if (strcmp(statmode,'trial') || strcmp(statmode,'cond')) && c == numcond
+            if conddata{s,1}.trials > conddata{s,2}.trials
+                fprintf('Equalising trials in condition %s.\n',subjcond{s,1});
+                randtrials = 1:conddata{s,1}.trials;%randperm(conddata{s,1}.trials);
+                conddata{s,1} = pop_select(conddata{s,1},'trial',randtrials(1:conddata{s,2}.trials));
+            elseif conddata{s,2}.trials > conddata{s,1}.trials
+                fprintf('Equalising trials in condition %s.\n',subjcond{s,2});
+                randtrials = 1:conddata{s,2}.trials;%randperm(conddata{s,2}.trials);
+                conddata{s,2} = pop_select(conddata{s,2},'trial',randtrials(1:conddata{s,1}.trials));
+            end
+        end
     end
 end
 

@@ -54,7 +54,7 @@ for s = 1:numsubj
     
     for c = 1:numcond
         selectevents = subjcond{s,c};
-        selectsnum = [3 4];
+        selectsnum = [1:7];
         %selectpred = 1;
         
         typematches = false(1,length(EEG.epoch));
@@ -63,16 +63,28 @@ for s = 1:numsubj
         for ep = 1:length(EEG.epoch)
             
             epochtype = EEG.epoch(ep).eventtype;
-            if iscell(epochtype)
-                epochtype = epochtype{cell2mat(EEG.epoch(ep).eventlatency) == 0};
+            if length(epochtype) > 1
+                if sum(cell2mat(EEG.epoch(ep).eventlatency) == 0) > 0
+                    epochtype = epochtype{cell2mat(EEG.epoch(ep).eventlatency) == 0};
+                elseif ~isempty(cell2mat(EEG.epoch(ep).eventlatency) == EEG.times(end)+1000/EEG.srate)
+                    epochtype = epochtype{cell2mat(EEG.epoch(ep).eventlatency) == EEG.times(end)+1000/EEG.srate};
+                end
+            else
+                epochtype = epochtype{1};
             end
             if sum(strcmp(epochtype,selectevents)) > 0
                 typematches(ep) = true;
             end
             
             epochcodes = EEG.epoch(ep).eventcodes;
-            if iscell(epochcodes{1,1})
-                epochcodes = epochcodes{cell2mat(EEG.epoch(ep).eventlatency) == 0};
+            if length(epochcodes) > 1
+                if sum(cell2mat(EEG.epoch(ep).eventlatency) == 0) > 0
+                    epochcodes = epochcodes{cell2mat(EEG.epoch(ep).eventlatency) == 0};
+                elseif ~isempty(cell2mat(EEG.epoch(ep).eventlatency) == EEG.times(end)+1000/EEG.srate)
+                    epochcodes = epochcodes{cell2mat(EEG.epoch(ep).eventlatency) == EEG.times(end)+1000/EEG.srate};
+                end
+            else
+                epochcodes = epochcodes{1};
             end
             
             snumidx = strcmp('SNUM',epochcodes(:,1)');
