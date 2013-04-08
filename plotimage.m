@@ -3,50 +3,58 @@ function plotimage(subjinfo,varargin)
 loadpaths
 loadsubj
 
-param = finputcheck(varargin, { 'fontsize','integer', [], 22; ...
+param = finputcheck(varargin, { 'fontsize','integer', [], 26; ...
     });
 
 %% figure plotting
 
 fontname = 'Helvetica';
 linewidth = 2;
-ranklist = [0.1 0.01 0.001 0.0001];
-
+ranklist = [0.11 0.1 0.05 0.01 0.001];
+ranklabel = {'','p < 0.1', 'p < 0.05', 'p < 0.01',''};
 subjlist = subjlists{subjinfo};
 
-condlist = {'TRG1','TRG2','DIST'};
-
-plotdata = zeros(length(subjlist),250,length(condlist));
+condlist = {
+    'TRG1','base'
+    'TRG2','base'
+    'TRG1','TRG2'
+    };
 
 for s = 1:length(subjlist)
     basename = subjlist{s};
     plotidx = 0;
     
-    for c = 1:length(condlist)
-        load(sprintf('trial_%s_%s-%s_BASE_gfp.mat',basename,condlist{c},condlist{c}));
+    for c = 1:size(condlist,1)
+        load(sprintf('trial_%s_%s-%s_gfp.mat',basename,condlist{c,1},condlist{c,2}));
+        
+        if s == 1 && c == 1
+            plotdata = zeros(length(subjlist),length(stat.times),length(condlist));
+        end
+        
         stat.valu(stat.pprob >= stat.param.alpha) = 0;
         stat.pprob = rankvals(stat.pprob,ranklist);
         plotidx = plotidx+1;
-        plotdata(s,:,plotidx) = stat.pprob;
-        plotorder{plotidx} = sprintf('%s-%s_BASE',condlist{c},condlist{c});
+        plotdata(s,:,plotidx) = 1-stat.pprob;
+        plotorder{plotidx} = sprintf('%s-%s',condlist{c,1},condlist{c,2});
     end
 end
 
 for c = 1:size(plotdata,3)
     figure;
     figpos = get(gcf,'Position');
+    figpos(4) = figpos(3);
     figpos(4) = figpos(4)/3;
     set(gcf,'Position',figpos);
     
     imagesc(stat.times,1:length(subjlist),plotdata(:,:,c));
-    caxis([ranklist(end) ranklist(1)]);
-    colorbar
     set(gca,'YDir','normal','XLim',[stat.times(1) stat.times(end)]-stat.timeshift,...
         'XTick',stat.times(1)-stat.timeshift:200:stat.times(end)-stat.timeshift,...
         'FontSize',param.fontsize,'FontName',fontname);
     
+    caxis(1-[ranklist(1) ranklist(end)]);
+    
     line([0 0],ylim,'Color','black','LineStyle',':','LineWidth',linewidth);
-    if c == 2
+    if c == 1
         xlabel('Time (ms) ','FontSize',param.fontsize,'FontName',fontname);
         ylabel('Participant ','FontSize',param.fontsize,'FontName',fontname);
     else
@@ -54,10 +62,25 @@ for c = 1:size(plotdata,3)
         ylabel('  ','FontSize',param.fontsize,'FontName',fontname);
     end
     box on
-    figfile = sprintf('figures/img_%s_%s_tval',num2str(subjinfo),plotorder{c});
+    figfile = sprintf('figures/img_%s_%s',num2str(subjinfo),plotorder{c});
     set(gcf,'Color','white','Name',figfile,'FileName',figfile);
     export_fig(gcf,[figfile '.eps']);
 end
+
+figure;
+figpos = get(gcf,'Position');
+figpos(4) = figpos(3);
+figpos(4) = figpos(4)/3;
+set(gcf,'Position',figpos);
+set(gca,'Visible','off');
+cb_h=colorbar;
+caxis(1-[ranklist(1) ranklist(end)]);
+set(cb_h,'YTick',1-ranklist,'YTickLabel',ranklabel,...
+    'FontSize',param.fontsize,'FontName',fontname);
+
+figfile = sprintf('figures/img_colorbar',num2str(subjinfo),plotorder{c});
+set(gcf,'Color','white','Name',figfile,'FileName',figfile);
+export_fig(gcf,[figfile '.eps']);
 
 function [pvals] = rankvals(pvals,ranklist)
 

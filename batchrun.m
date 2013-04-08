@@ -18,21 +18,20 @@ for s = 1:length(subjlist)
     %ploterp(basename,{'DIST'},'ylim',[-7 7]);
     
 %         dataimport(basename);
-%         epochdata_base(basename,1);
+%         epochdata(basename,1);
     
 %           rejartifacts2([basename '_epochs'],1,4);
     
 %             computeic([basename '_epochs']);
     %
-%                 rejectic([basename '_base'],'prompt','off');
-%                 rejartifacts2([basename '_base'],2,3);
+%                 rejectic(basename,'prompt','off');
+%                 rejartifacts2(basename,2,3,0);
                 
 %                 mergedata({basename,[basename '_base']});
     
-    compgfp(basename,{'DIST','DIST_BASE'},'latency',[150 400]);
-    compgfp(basename,{'TRG1','TRG1_BASE'},'latency',[150 400]);
-    compgfp(basename,{'TRG2','TRG2_BASE'},'latency',[150 400]);
-    compgfp(basename,{'TRG1','TRG2'},'latency',[400 700]);
+    compgfp(basename,{'TRG1','base'},'latency',[150 350]);
+    compgfp(basename,{'TRG2','base'},'latency',[150 350]);
+    compgfp(basename,{'TRG1','TRG2'},'latency',[350 650]);
 
 %    EEG = pop_loadset('filepath',filepath,'filename',[basename '_orig.set'],'loadmode','info');
 %    for e = 1:length(EEG.event)

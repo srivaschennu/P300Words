@@ -15,8 +15,26 @@ param = finputcheck(varargin, {
     'chanlist', 'cell', {}, {}; ...
     });
 
+if isempty(param.latency)
+    param.latency = [0 EEG.times(end)-timeshift];
+end
+
+if isempty(param.chanlist)
+    chanidx = [];
+else
+    for c = 1:length(param.chanlist)
+        chanidx(c) = find(param.chanlist{c},{chanlocs.labels});
+    end
+end
+
 %% SELECTION OF SUBJECTS AND LOADING OF DATA
 loadsubj
+
+if ischar(condlist)
+    condlist = {condlist,'base'};
+elseif iscell(condlist) && length(condlist) == 1
+    condlist{2} = 'base';
+end
 
 if ischar(subjinfo)
     %%%% perform single-trial statistics
@@ -72,10 +90,16 @@ for s = 1:numsubj
     % THIS ASSUMES THAT ALL DATASETS HAVE SAME NUMBER OF ELECTRODES
     if s == 1
         chanlocs = EEG.chanlocs;
+        times = EEG.times - timeshift;
+        corrwin = find(times >= param.latency(1) & times <= param.latency(2));
     end
     
     for c = 1:numcond
-        selectevents = subjcond{s,c};
+        if strcmp(subjcond{s,c},'base')
+            selectevents = subjcond{s,1};
+        else
+            selectevents = subjcond{s,c};
+        end
         selectsnum = 3;
         %selectpred = 1;
         
@@ -86,11 +110,7 @@ for s = 1:numsubj
             
             epochtype = EEG.epoch(ep).eventtype;
             if length(epochtype) > 1
-                if sum(cell2mat(EEG.epoch(ep).eventlatency) == 0) > 0
-                    epochtype = epochtype{cell2mat(EEG.epoch(ep).eventlatency) == 0};
-                elseif ~isempty(cell2mat(EEG.epoch(ep).eventlatency) == EEG.times(end)+1000/EEG.srate)
-                    epochtype = epochtype{cell2mat(EEG.epoch(ep).eventlatency) == EEG.times(end)+1000/EEG.srate};
-                end
+                epochtype = epochtype{cell2mat(EEG.epoch(ep).eventlatency) == 0};
             else
                 epochtype = epochtype{1};
             end
@@ -100,11 +120,7 @@ for s = 1:numsubj
             
             epochcodes = EEG.epoch(ep).eventcodes;
             if length(epochcodes) > 1
-                if sum(cell2mat(EEG.epoch(ep).eventlatency) == 0) > 0
-                    epochcodes = epochcodes{cell2mat(EEG.epoch(ep).eventlatency) == 0};
-                elseif ~isempty(cell2mat(EEG.epoch(ep).eventlatency) == EEG.times(end)+1000/EEG.srate)
-                    epochcodes = epochcodes{cell2mat(EEG.epoch(ep).eventlatency) == EEG.times(end)+1000/EEG.srate};
-                end
+                epochcodes = epochcodes{cell2mat(EEG.epoch(ep).eventlatency) == 0};
             else
                 epochcodes = epochcodes{1};
             end
@@ -144,21 +160,12 @@ for s = 1:numsubj
                 conddata{s,2} = pop_select(conddata{s,2},'trial',randtrials(1:conddata{s,1}.trials));
             end
         end
+        
+        if strcmp(subjcond{s,c},'base')
+            conddata{s,c}.data(:,corrwin,:) = conddata{s,1}.data(:,1:length(corrwin),:);
+        end
     end
 end
-
-if isempty(param.latency)
-    param.latency = [0 EEG.times(end)-timeshift];
-end
-
-if isempty(param.chanlist)
-    chanidx = [];
-else
-    for c = 1:length(param.chanlist)
-        chanidx(c) = find(param.chanlist{c},{chanlocs.labels});
-    end
-end
-
 
 if strcmp(statmode,'trial')
     cond1data = conddata{1}.data;
@@ -270,9 +277,6 @@ for n = 1:param.numrand+1
     stat.condgfp(n,:,2) = cond2gfp;
 end
 close(h_wait);
-
-times = EEG.times - timeshift;
-corrwin = find(times >= param.latency(1) & times <= param.latency(2));
 
 stat.valu = zeros(1,size(gfpdiff,2));
 stat.pprob = ones(1,size(gfpdiff,2));

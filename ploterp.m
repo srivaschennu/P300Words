@@ -64,11 +64,7 @@ for s = 1:numsubj
             
             epochtype = EEG.epoch(ep).eventtype;
             if length(epochtype) > 1
-                if sum(cell2mat(EEG.epoch(ep).eventlatency) == 0) > 0
-                    epochtype = epochtype{cell2mat(EEG.epoch(ep).eventlatency) == 0};
-                elseif ~isempty(cell2mat(EEG.epoch(ep).eventlatency) == EEG.times(end)+1000/EEG.srate)
-                    epochtype = epochtype{cell2mat(EEG.epoch(ep).eventlatency) == EEG.times(end)+1000/EEG.srate};
-                end
+                epochtype = epochtype{cell2mat(EEG.epoch(ep).eventlatency) == 0};
             else
                 epochtype = epochtype{1};
             end
@@ -78,11 +74,7 @@ for s = 1:numsubj
             
             epochcodes = EEG.epoch(ep).eventcodes;
             if length(epochcodes) > 1
-                if sum(cell2mat(EEG.epoch(ep).eventlatency) == 0) > 0
-                    epochcodes = epochcodes{cell2mat(EEG.epoch(ep).eventlatency) == 0};
-                elseif ~isempty(cell2mat(EEG.epoch(ep).eventlatency) == EEG.times(end)+1000/EEG.srate)
-                    epochcodes = epochcodes{cell2mat(EEG.epoch(ep).eventlatency) == EEG.times(end)+1000/EEG.srate};
-                end
+                epochcodes = epochcodes{cell2mat(EEG.epoch(ep).eventlatency) == 0};
             else
                 epochcodes = epochcodes{1};
             end

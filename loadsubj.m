@@ -15,8 +15,8 @@ subjlists = {
     };
     {
     'p1611_p300words' %clean %TRG1 TRG2
-%     'p1511_p300words' %TRG1 = TRG2
-%     'p0512_p300words' %TRG1 = TRG2
+    'p1511_p300words' %TRG1 = TRG2
+    'p0512_p300words' %TRG1 = TRG2
 % %     'p1511v2_p300words' %TRG2
     };
     {

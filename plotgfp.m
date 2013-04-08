@@ -1,5 +1,11 @@
 function plotgfp(stat,varargin)
 
+if strcmp(stat.condlist{end},'base')
+    condlist = stat.condlist(1:end-1);
+else
+    condlist = stat.condlist;
+end
+
 colorlist = {
     'explicit'     [0         0    1.0000]
     'implicit'     [0    0.5000         0]
@@ -8,9 +14,10 @@ colorlist = {
 
 param = finputcheck(varargin, { 'ylim', 'real', [], [-5 20]; ...
     'fontsize','integer', [], 26; ...
-    'legendstrings', 'cell', {}, stat.condlist; ...
+    'legendstrings', 'cell', {}, condlist; ...
     'legendposition', 'string', {}, 'NorthWest'; ...
-    'ttesttail', 'integer', [-1 0 1], 0, ...
+    'ttesttail', 'integer', [-1 0 1], 0; ...
+    'plotinfo', 'string', {'on','off'}, 'on'; ...
     });
 
 %% figure plotting
@@ -31,21 +38,21 @@ set(gcf,'Position',[figpos(1) figpos(2) figpos(3) figpos(3)]);
 % end
 
 %pick time point at max of condition 1
-%[~, maxidx] = max(stat.condgfp(1,latpnt,1),[],2);
+[~, maxidx] = max(stat.condgfp(1,latpnt,1),[],2);
 
 %pick time point at max of difference
 % [~, maxidx] = max(stat.gfpdiff(1,latpnt),[],2);
 
 %pick time point at max of t-statistic
-[~, maxidx] = max(stat.valu(latpnt));
+%[~, maxidx] = max(stat.valu(latpnt));
 
 %pick time point at min of p-value
-[~, maxidx] = min(stat.pprob(latpnt));
+%[~, maxidx] = min(stat.pprob(latpnt));
 
 plotpnt = latpnt(1)-1+maxidx;
 
-for c = 1:length(stat.condlist)
-    subplot(2,2,c);
+for c = 1:length(condlist)
+    subplot(2,length(condlist),c);
     plotvals = stat.condavg(:,plotpnt,c);
     topoplot(plotvals,stat.chanlocs);
     if c == 1
@@ -77,19 +84,25 @@ end
 
 set(gca,'ColorOrder',cat(1,colororder,[0 0 0]));
 hold all;
-plot((stat.times(1):1000/stat.srate:stat.times(end))-stat.timeshift,squeeze(stat.condgfp(1,:,:)),'LineWidth',linewidth*1.5);
-%plot((stat.times(1):1000/stat.srate:stat.times(end))-stat.timeshift,stat.gfpdiff(1,:),'LineWidth',linewidth*1.5);
+
+plotdata = squeeze(stat.condgfp(1,:,1:length(condlist)));
+%plotdata = stat.gfpdiff(1,:);
 %param.legendstrings{end+1} = 'difference';
+plot((stat.times(1):1000/stat.srate:stat.times(end))-stat.timeshift,plotdata,'LineWidth',linewidth*1.5);
 
 set(gca,'XLim',[stat.times(1) stat.times(end)]-stat.timeshift,'XTick',stat.times(1)-stat.timeshift:200:stat.times(end)-stat.timeshift,'YLim',param.ylim,...
     'FontSize',param.fontsize,'FontName',fontname);
 line([0 0],param.ylim,'Color','black','LineStyle',':','LineWidth',linewidth);
 line([stat.times(1) stat.times(end)]-stat.timeshift,[0 0],'Color','black','LineStyle',':','LineWidth',linewidth);
 line([stat.times(plotpnt) stat.times(plotpnt)]-stat.timeshift,param.ylim,'Color','red','LineWidth',linewidth,'LineStyle','--');
-xlabel('Time (ms) ','FontSize',param.fontsize,'FontName',fontname);
-ylabel('Global field power ','FontSize',param.fontsize,'FontName',fontname);
+if strcmp(param.plotinfo,'on')
+    xlabel('Time (ms) ','FontSize',param.fontsize,'FontName',fontname);
+    ylabel('Global field power ','FontSize',param.fontsize,'FontName',fontname);
+else
+    xlabel(' ','FontSize',param.fontsize,'FontName',fontname);
+    ylabel(' ','FontSize',param.fontsize,'FontName',fontname);
+end
 legend(param.legendstrings,'Location',param.legendposition);
-box on
 title(sprintf('%dms', round(stat.times(plotpnt))),'FontSize',param.fontsize,'FontName',fontname);
 
 %% plot clusters
