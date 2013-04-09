@@ -61,7 +61,6 @@ for c = 1:size(plotdata,3)
         xlabel('  ','FontSize',param.fontsize,'FontName',fontname);
         ylabel('  ','FontSize',param.fontsize,'FontName',fontname);
     end
-    box on
     figfile = sprintf('figures/img_%s_%s',num2str(subjinfo),plotorder{c});
     set(gcf,'Color','white','Name',figfile,'FileName',figfile);
     export_fig(gcf,[figfile '.eps']);

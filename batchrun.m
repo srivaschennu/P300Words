@@ -29,9 +29,10 @@ for s = 1:length(subjlist)
                 
 %                 mergedata({basename,[basename '_base']});
     
-    compgfp(basename,{'TRG1','base'},'latency',[150 350]);
-    compgfp(basename,{'TRG2','base'},'latency',[150 350]);
-    compgfp(basename,{'TRG1','TRG2'},'latency',[350 650]);
+%     compgfp(basename,{'TRG1','base'},'latency',[100 400]);
+%     compgfp(basename,{'TRG2','base'},'latency',[100 400]);
+    compgfp(basename,{'DIST','base'},'latency',[100 400]);
+%     compgfp(basename,{'TRG1','TRG2'},'latency',[400 700]);
 
 %    EEG = pop_loadset('filepath',filepath,'filename',[basename '_orig.set'],'loadmode','info');
 %    for e = 1:length(EEG.event)
