@@ -17,6 +17,7 @@ subjlist = subjlists{subjinfo};
 condlist = {
     'TRG1','base'
     'TRG2','base'
+    'DIST','base'
     'TRG1','TRG2'
     };
 
@@ -31,7 +32,6 @@ for s = 1:length(subjlist)
             plotdata = zeros(length(subjlist),length(stat.times),length(condlist));
         end
         
-        stat.valu(stat.pprob >= stat.param.alpha) = 0;
         stat.pprob = rankvals(stat.pprob,ranklist);
         plotidx = plotidx+1;
         plotdata(s,:,plotidx) = 1-stat.pprob;

@@ -18,6 +18,7 @@ param = finputcheck(varargin, { 'ylim', 'real', [], [-5 15]; ...
     'legendposition', 'string', {}, 'NorthWest'; ...
     'ttesttail', 'integer', [-1 0 1], 0; ...
     'plotinfo', 'string', {'on','off'}, 'on'; ...
+    'plottitle', 'string', {'on','off'}, 'on'; ...
     });
 
 %% figure plotting
@@ -37,11 +38,13 @@ set(gcf,'Position',[figpos(1) figpos(2) figpos(3) figpos(3)]);
     latpnt = find(stat.times-stat.timeshift >= stat.param.latency(1) & stat.times-stat.timeshift <= stat.param.latency(2));
 % end
 
-%pick time point at max of condition 1
-[~, maxidx] = max(stat.condgfp(1,latpnt,1),[],2);
-
-%pick time point at max of difference
-% [~, maxidx] = max(stat.gfpdiff(1,latpnt),[],2);
+if length(condlist) == 1
+    %pick time point at max of condition 1
+    [~, maxidx] = max(stat.condgfp(1,latpnt,1),[],2);
+else
+    %pick time point at max of difference
+    [~, maxidx] = max(stat.gfpdiff(1,latpnt),[],2);
+end
 
 %pick time point at max of t-statistic
 %[~, maxidx] = max(stat.valu(latpnt));
@@ -51,24 +54,23 @@ set(gcf,'Position',[figpos(1) figpos(2) figpos(3) figpos(3)]);
 
 plotpnt = latpnt(1)-1+maxidx;
 
-for c = 1:length(condlist)
-    subplot(2,length(condlist),c);
-    plotvals = stat.condavg(:,plotpnt,c);
-    topoplot(plotvals,stat.chanlocs);
-    if c == 1
-        cscale = caxis;
+subplot(2,1,1);
+plotvals = stat.diffcond(:,plotpnt);
+topoplot(plotvals,stat.chanlocs);
+if strcmp(param.plottitle,'on')
+    if length(condlist) == 1
+        title(param.legendstrings{1},'FontSize',param.fontsize,'FontName',fontname);
     else
-        caxis(cscale);
-    end
-    title(param.legendstrings{c},'FontSize',param.fontsize,'FontName',fontname);
-    cb_h = colorbar('FontSize',param.fontsize);
-    if c == 1
-        cb_labels = num2cell(get(cb_h,'YTickLabel'),2);
-        cb_labels{1} = [cb_labels{1} ' uV'];
-        set(cb_h,'YTickLabel',cb_labels);
-    end
+        title(sprintf('%s - %s',param.legendstrings{1},param.legendstrings{2}),...
+            'FontSize',param.fontsize,'FontName',fontname);
+    end        
+else
+    title(' ','FontSize',param.fontsize,'FontName',fontname);
 end
-
+cb_h = colorbar('FontSize',param.fontsize);
+cb_labels = num2cell(get(cb_h,'YTickLabel'),2);
+cb_labels{1} = [cb_labels{1} ' uV'];
+set(cb_h,'YTickLabel',cb_labels);
 
 subplot(2,2,3:4);
 curcolororder = get(gca,'ColorOrder');
@@ -138,4 +140,4 @@ title(sprintf('%dms\nt = %.2f, p = %.3f', round(stat.times(plotpnt)), stat.valu(
     
 set(gcf,'Color','white');
 %saveas(gcf,[figfile '.fig']);
-export_fig(gcf,[figfile '.eps'],'-nocrop');
+export_fig(gcf,[figfile '.eps']);
