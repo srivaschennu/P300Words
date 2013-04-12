@@ -38,13 +38,11 @@ set(gcf,'Position',[figpos(1) figpos(2) figpos(3) figpos(3)]);
     latpnt = find(stat.times-stat.timeshift >= stat.param.latency(1) & stat.times-stat.timeshift <= stat.param.latency(2));
 % end
 
-if length(condlist) == 1
-    %pick time point at max of condition 1
-    [~, maxidx] = max(stat.condgfp(1,latpnt,1),[],2);
-else
-    %pick time point at max of difference
-    [~, maxidx] = max(stat.gfpdiff(1,latpnt),[],2);
-end
+%pick time point at max of condition 1
+%[~, maxidx] = max(stat.condgfp(1,latpnt,1),[],2);
+
+%pick time point at max of difference
+[~, maxidx] = max(stat.gfpdiff(1,latpnt),[],2);
 
 %pick time point at max of t-statistic
 %[~, maxidx] = max(stat.valu(latpnt));

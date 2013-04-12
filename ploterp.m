@@ -38,7 +38,7 @@ for s = 1:numsubj
     EEG = sortchan(EEG);
     
     %rereference
-    %EEG = rereference(EEG,1);
+    EEG = rereference(EEG,1);
     
     %     %%%%% baseline correction relative to 5th tone
     %     bcwin = [-200 0];

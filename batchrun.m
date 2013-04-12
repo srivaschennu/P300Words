@@ -10,12 +10,34 @@ else
     subjlist = subjlists{subjinfo};
 end
 
+% compgfp(subjinfo,{'DIST','base'},'latency',[100 400]);
+% compgfp(subjinfo,{'TRG2','base'},'latency',[100 400]);
+% compgfp(subjinfo,{'TRG1','base'},'latency',[100 400]);
+% compgfp(subjinfo,{'TRG1','TRG2'},'latency',[400 700]);
+
+% load(sprintf('cond_%d_DIST-base_gfp.mat',subjinfo));
+% plotgfp(stat,'legendstrings',{'distractor'},'plotinfo','off');
+% close(gcf);
+% 
+% load(sprintf('cond_%d_TRG2-base_gfp.mat',subjinfo));
+% plotgfp(stat,'legendstrings',{'implicit'},'plotinfo','off');
+% close(gcf);
+% 
+% load(sprintf('cond_%d_TRG1-base_gfp.mat',subjinfo));
+% plotgfp(stat,'legendstrings',{'explicit'});
+% close(gcf);
+% 
+% load(sprintf('cond_%d_TRG1-TRG2_gfp.mat',subjinfo));
+% plotgfp(stat,'legendstrings',{'explicit','implicit'},'plotinfo','off');
+% close(gcf);
+
 for s = 1:length(subjlist)
     basename = subjlist{s};
     fprintf('Processing %s.\n',basename);
         
     %batchres{s,1} = basename;
-    ploterp(basename,{'TRG1','TRG2','DIST'},'ylim',[-7 7]);
+%     ploterp(basename,{'TRG1','TRG2','DIST'},'ylim',[-7 7]);
+%     close all
     
 %         dataimport(basename);
 %         epochdata(basename,1);
@@ -28,12 +50,28 @@ for s = 1:length(subjlist)
 %                 rejartifacts2(basename,2,3,0);
                 
 %                 mergedata({basename,[basename '_base']});
-    
-%     compgfp(basename,{'TRG1','base'},'latency',[100 400]);
-%     compgfp(basename,{'TRG2','base'},'latency',[100 400]);
-%     compgfp(basename,{'DIST','base'},'latency',[100 400]);
-%     compgfp(basename,{'TRG1','TRG2'},'latency',[400 700]);
 
+    compgfp(basename,{'DIST','base'},'latency',[100 400]);
+    compgfp(basename,{'TRG2','base'},'latency',[100 400]);
+    compgfp(basename,{'TRG1','base'},'latency',[100 400]);
+    compgfp(basename,{'TRG1','TRG2'},'latency',[400 700]);
+
+    load(sprintf('trial_%s_DIST-base_gfp.mat',basename));
+    plotgfp(stat,'legendstrings',{'distractor'},'plotinfo','off');
+    close(gcf);
+    
+    load(sprintf('trial_%s_TRG2-base_gfp.mat',basename));
+    plotgfp(stat,'legendstrings',{'implicit'},'plotinfo','off');
+    close(gcf);
+    
+    load(sprintf('trial_%s_TRG1-base_gfp.mat',basename));
+    plotgfp(stat,'legendstrings',{'explicit'});
+    close(gcf);
+
+    load(sprintf('trial_%s_TRG1-TRG2_gfp.mat',basename));
+    plotgfp(stat,'legendstrings',{'explicit','implicit'},'plotinfo','off');
+    close(gcf);
+    
 %    EEG = pop_loadset('filepath',filepath,'filename',[basename '_orig.set'],'loadmode','info');
 %    for e = 1:length(EEG.event)
 %        if strcmp(EEG.event(e).type,'TRG1') && firsttarg
@@ -75,6 +113,7 @@ for s = 1:length(subjlist)
     %     end
     
 end
+
 % [~,sortidx] = sort(batchres(:,2));
 % batchres(sortidx,:)
 
