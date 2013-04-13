@@ -362,7 +362,8 @@ stat.chanlocs = chanlocs;
 stat.srate = EEG.srate;
 
 if nargout == 0
-    save2file = sprintf('%s_%s_%s-%s_gfp.mat',statmode,num2str(subjinfo),condlist{1},condlist{2});
+    save2file = sprintf('%s_%s_%s-%s_%d-%d_gfp.mat',statmode,num2str(subjinfo),...
+        condlist{1},condlist{2},param.latency(1),param.latency(2));
     save(save2file,'stat');
 end
 

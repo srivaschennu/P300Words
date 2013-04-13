@@ -52,23 +52,25 @@ set(gcf,'Position',[figpos(1) figpos(2) figpos(3) figpos(3)]);
 
 plotpnt = latpnt(1)-1+maxidx;
 
-subplot(2,1,1);
+subplot(2,2,1:2);
 plotvals = stat.diffcond(:,plotpnt);
 topoplot(plotvals,stat.chanlocs);
-if strcmp(param.plottitle,'on')
-    if length(condlist) == 1
-        title(param.legendstrings{1},'FontSize',param.fontsize,'FontName',fontname);
-    else
-        title(sprintf('%s - %s',param.legendstrings{1},param.legendstrings{2}),...
-            'FontSize',param.fontsize,'FontName',fontname);
-    end        
-else
-    title(' ','FontSize',param.fontsize,'FontName',fontname);
-end
+% if strcmp(param.plottitle,'on')
+%     if length(condlist) == 1
+%         title(param.legendstrings{1},'FontSize',param.fontsize,'FontName',fontname);
+%     else
+%         title(sprintf('%s - %s',param.legendstrings{1},param.legendstrings{2}),...
+%             'FontSize',param.fontsize,'FontName',fontname);
+%     end        
+% else
+%     title(' ','FontSize',param.fontsize,'FontName',fontname);
+% end
 cb_h = colorbar('FontSize',param.fontsize);
 cb_labels = num2cell(get(cb_h,'YTickLabel'),2);
 cb_labels{1} = [cb_labels{1} ' uV'];
 set(cb_h,'YTickLabel',cb_labels);
+text(0,-0.9,sprintf('%dms\nt = %.2f, p = %.2f',round(stat(s).times(stat(s).plotpnt)),stat(s).valu(stat(s).plotpnt),stat(s).pprob(stat(s).plotpnt)),...
+    'FontSize',param.fontsize,'FontName',fontname,'HorizontalAlignment','center');
 
 subplot(2,2,3:4);
 curcolororder = get(gca,'ColorOrder');

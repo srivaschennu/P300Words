@@ -2,7 +2,7 @@ function batchrun(subjinfo)
 
 loadpaths
 loadsubj
-
+numrand = 1000;
 
 if ischar(subjinfo)
     subjlist = {subjinfo};
@@ -10,26 +10,25 @@ else
     subjlist = subjlists{subjinfo};
 end
 
-% compgfp(subjinfo,{'DIST','base'},'latency',[100 400]);
-% compgfp(subjinfo,{'TRG2','base'},'latency',[100 400]);
-% compgfp(subjinfo,{'TRG1','base'},'latency',[100 400]);
-% compgfp(subjinfo,{'TRG1','TRG2'},'latency',[400 700]);
+condlist = {
+    'TRG1'
+    'TRG2'
+    'DIST'
+};
 
-% load(sprintf('cond_%d_DIST-base_gfp.mat',subjinfo));
-% plotgfp(stat,'legendstrings',{'distractor'},'plotinfo','off');
-% close(gcf);
-% 
-% load(sprintf('cond_%d_TRG2-base_gfp.mat',subjinfo));
-% plotgfp(stat,'legendstrings',{'implicit'},'plotinfo','off');
-% close(gcf);
-% 
-% load(sprintf('cond_%d_TRG1-base_gfp.mat',subjinfo));
-% plotgfp(stat,'legendstrings',{'explicit'});
-% close(gcf);
-% 
-% load(sprintf('cond_%d_TRG1-TRG2_gfp.mat',subjinfo));
-% plotgfp(stat,'legendstrings',{'explicit','implicit'},'plotinfo','off');
-% close(gcf);
+timewin = {
+   [100 400]
+   [400 700]
+};
+
+for c = 1:length(condlist)
+    for t = 1:length(timewin)
+        compgfp(subjinfo,{condlist{c},'base'},'latency',timewin{t},'numrand',numrand);
+    end
+%     load(sprintf('cond_%d_%s-base_%d-%d_gfp.mat',subjinfo,condlist{c},timewin{t}(1),timewin{t}(2)));
+%     plotgfp(stat,'legendstrings',{'distractor'},'plotinfo','off');
+%     close(gcf);
+end
 
 for s = 1:length(subjlist)
     basename = subjlist{s};
@@ -51,26 +50,28 @@ for s = 1:length(subjlist)
                 
 %                 mergedata({basename,[basename '_base']});
 
-    compgfp(basename,{'DIST','base'},'latency',[100 400]);
-    compgfp(basename,{'TRG2','base'},'latency',[100 400]);
-    compgfp(basename,{'TRG1','base'},'latency',[100 400]);
-    compgfp(basename,{'TRG1','TRG2'},'latency',[400 700]);
+for c = 1:length(condlist)
+    for t = 1:length(timewin)
+        compgfp(basename,{condlist{c},'base'},'latency',timewin{t},'numrand',numrand);
+    end
 
-    load(sprintf('trial_%s_DIST-base_gfp.mat',basename));
-    plotgfp(stat,'legendstrings',{'distractor'},'plotinfo','off');
-    close(gcf);
-    
-    load(sprintf('trial_%s_TRG2-base_gfp.mat',basename));
-    plotgfp(stat,'legendstrings',{'implicit'},'plotinfo','off');
-    close(gcf);
-    
-    load(sprintf('trial_%s_TRG1-base_gfp.mat',basename));
-    plotgfp(stat,'legendstrings',{'explicit'});
-    close(gcf);
 
-    load(sprintf('trial_%s_TRG1-TRG2_gfp.mat',basename));
-    plotgfp(stat,'legendstrings',{'explicit','implicit'},'plotinfo','off');
-    close(gcf);
+%     load(sprintf('trial_%s_DIST-base_gfp.mat',basename));
+%     plotgfp(stat,'legendstrings',{'distractor'},'plotinfo','off');
+%     close(gcf);
+end
+
+%     load(sprintf('trial_%s_TRG2-base_gfp.mat',basename));
+%     plotgfp(stat,'legendstrings',{'implicit'},'plotinfo','off');
+%     close(gcf);
+%     
+%     load(sprintf('trial_%s_TRG1-base_gfp.mat',basename));
+%     plotgfp(stat,'legendstrings',{'explicit'});
+%     close(gcf);
+% 
+%     load(sprintf('trial_%s_TRG1-TRG2_gfp.mat',basename));
+%     plotgfp(stat,'legendstrings',{'explicit','implicit'},'plotinfo','off');
+%     close(gcf);
     
 %    EEG = pop_loadset('filepath',filepath,'filename',[basename '_orig.set'],'loadmode','info');
 %    for e = 1:length(EEG.event)
