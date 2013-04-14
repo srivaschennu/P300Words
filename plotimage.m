@@ -15,10 +15,14 @@ ranklabel = {'','p < 0.1', 'p < 0.05', 'p < 0.01',''};
 subjlist = subjlists{subjinfo};
 
 condlist = {
-    'TRG1','base'
-    'TRG2','base'
-    'DIST','base'
-    'TRG1','TRG2'
+    'TRG1' 'explicit'
+    'TRG2' 'implicit'
+    'DIST' 'distractor'
+    };
+
+timewin = {
+    [100 400]
+    [400 700]
     };
 
 for s = 1:length(subjlist)
@@ -26,16 +30,20 @@ for s = 1:length(subjlist)
     plotidx = 0;
     
     for c = 1:size(condlist,1)
-        load(sprintf('trial_%s_%s-%s_gfp.mat',basename,condlist{c,1},condlist{c,2}));
+        plotidx = plotidx+1;
+        
+        load(sprintf('trial_%s_%s-base_%d-%d_gfp.mat',basename,condlist{c,1},timewin{1}(1),timewin{1}(2)));
         
         if s == 1 && c == 1
             plotdata = zeros(length(subjlist),length(stat.times),length(condlist));
         end
-        
-        stat.pprob = rankvals(stat.pprob,ranklist);
-        plotidx = plotidx+1;
-        plotdata(s,:,plotidx) = 1-stat.pprob;
-        plotorder{plotidx} = sprintf('%s-%s',condlist{c,1},condlist{c,2});
+        if strcmp(condlist{c,1},'TRG1')
+            stat2 = load(sprintf('trial_%s_%s-base_%d-%d_gfp.mat',basename,condlist{c,1},timewin{2}(1),timewin{2}(2)));
+            stat.pprob(stat2.stat.times >= stat2.stat.param.latency(1) & stat2.stat.times <= stat2.stat.param.latency(2)) = ...
+                stat2.stat.pprob(stat2.stat.times >= stat2.stat.param.latency(1) & stat2.stat.times <= stat2.stat.param.latency(2));
+        end
+        plotdata(s,:,plotidx) = 1-rankvals(stat.pprob,ranklist);
+        plotinfo{plotidx} = sprintf('%s-base',condlist{c,1});
     end
 end
 
@@ -61,7 +69,7 @@ for c = 1:size(plotdata,3)
         xlabel('  ','FontSize',param.fontsize,'FontName',fontname);
         ylabel('  ','FontSize',param.fontsize,'FontName',fontname);
     end
-    figfile = sprintf('figures/img_%s_%s',num2str(subjinfo),plotorder{c});
+    figfile = sprintf('figures/img_%s_%s',num2str(subjinfo),plotinfo{c});
     set(gcf,'Color','white','Name',figfile,'FileName',figfile);
     export_fig(gcf,[figfile '.eps']);
 end
@@ -77,7 +85,7 @@ caxis(1-[ranklist(1) ranklist(end)]);
 set(cb_h,'YTick',1-ranklist,'YTickLabel',ranklabel,...
     'FontSize',param.fontsize,'FontName',fontname);
 
-figfile = sprintf('figures/img_colorbar',num2str(subjinfo),plotorder{c});
+figfile = sprintf('figures/img_colorbar',num2str(subjinfo),plotinfo{c});
 set(gcf,'Color','white','Name',figfile,'FileName',figfile);
 export_fig(gcf,[figfile '.eps']);
 

@@ -11,9 +11,9 @@ else
 end
 
 condlist = {
-    'TRG1'
-    'TRG2'
-    'DIST'
+    'TRG1' 'explicit'
+    'TRG2' 'implicit'
+    'DIST' 'distractor'
 };
 
 timewin = {
@@ -21,14 +21,24 @@ timewin = {
    [400 700]
 };
 
-for c = 1:length(condlist)
-    for t = 1:length(timewin)
-        compgfp(subjinfo,{condlist{c},'base'},'latency',timewin{t},'numrand',numrand);
-    end
-%     load(sprintf('cond_%d_%s-base_%d-%d_gfp.mat',subjinfo,condlist{c},timewin{t}(1),timewin{t}(2)));
-%     plotgfp(stat,'legendstrings',{'distractor'},'plotinfo','off');
+% for c = 1:size(condlist,1)
+%     %     for t = 1:length(timewin)
+%     %         compgfp(subjinfo,{condlist{c,1},'base'},'latency',timewin{t},'numrand',numrand);
+%     %     end
+%     
+%     load(sprintf('cond_%d_%s-base_%d-%d_gfp.mat',subjinfo,condlist{c,1},timewin{1}(1),timewin{1}(2)));
+%     if strcmp(condlist{c,1},'TRG1')
+%         clear stats
+%         stats(1) = stat;
+%         load(sprintf('cond_%d_%s-base_%d-%d_gfp.mat',subjinfo,condlist{c,1},timewin{2}(1),timewin{2}(2)));
+%         stats(2) = stat;
+%         plotgfp2(stats,'legendstrings',condlist(c,2));
+%         
+%     else
+%         plotgfp(stat,'legendstrings',condlist(c,2),'plotinfo','off');
+%     end
 %     close(gcf);
-end
+% end
 
 for s = 1:length(subjlist)
     basename = subjlist{s};
@@ -50,41 +60,46 @@ for s = 1:length(subjlist)
                 
 %                 mergedata({basename,[basename '_base']});
 
-for c = 1:length(condlist)
-    for t = 1:length(timewin)
-        compgfp(basename,{condlist{c},'base'},'latency',timewin{t},'numrand',numrand);
+
+
+    for c = 1:size(condlist,1)
+        for t = 1:length(timewin)
+            compgfp(basename,{condlist{c,1},'base'},'latency',timewin{t},'numrand',numrand);
+        end
+
+        load(sprintf('trial_%s_%s-base_%d-%d_gfp.mat',basename,condlist{c,1},timewin{1}(1),timewin{1}(2)));
+        stat = corrp(stat);
+
+        if strcmp(condlist{c,1},'TRG1')
+            clear stats
+            stats(1) = stat;
+
+            load(sprintf('trial_%s_%s-base_%d-%d_gfp.mat',basename,condlist{c,1},timewin{2}(1),timewin{2}(2)));
+            stat = corrp(stat);
+            
+            stats(2) = stat;
+            plotgfp2(stats,'legendstrings',condlist(c,2));
+        else
+            plotgfp(stat,'legendstrings',condlist(c,2),'plotinfo','off');
+        end
+        close(gcf);
     end
-
-
-%     load(sprintf('trial_%s_DIST-base_gfp.mat',basename));
-%     plotgfp(stat,'legendstrings',{'distractor'},'plotinfo','off');
-%     close(gcf);
-end
-
-%     load(sprintf('trial_%s_TRG2-base_gfp.mat',basename));
-%     plotgfp(stat,'legendstrings',{'implicit'},'plotinfo','off');
-%     close(gcf);
-%     
-%     load(sprintf('trial_%s_TRG1-base_gfp.mat',basename));
-%     plotgfp(stat,'legendstrings',{'explicit'});
-%     close(gcf);
-% 
-%     load(sprintf('trial_%s_TRG1-TRG2_gfp.mat',basename));
-%     plotgfp(stat,'legendstrings',{'explicit','implicit'},'plotinfo','off');
-%     close(gcf);
     
 %    EEG = pop_loadset('filepath',filepath,'filename',[basename '_orig.set'],'loadmode','info');
+%    fprintf('%s :',basename);
 %    for e = 1:length(EEG.event)
-%        if strcmp(EEG.event(e).type,'TRG1') && firsttarg
-%            fprintf('block %d num %d ori %d.\n',...
-%                EEG.event(e).codes{strcmp('BNUM',EEG.event(e).codes(:,1)),2},...
-%                EEG.event(e).codes{strcmp('WNUM',EEG.event(e).codes(:,1)),2},...
-%                EEG.event(e).codes{strcmp('WORI',EEG.event(e).codes(:,1)),2});
-%            firsttarg = false;
-%        elseif strcmp(EEG.event(e).type,'BGIN') || strcmp(EEG.event(e).type,'BEND')
-%            firsttarg = true;
+% %        if strcmp(EEG.event(e).type,'TRG1') && firsttarg
+% %            fprintf('block %d num %d ori %d.\n',...
+% %                EEG.event(e).codes{strcmp('BNUM',EEG.event(e).codes(:,1)),2},...
+% %                EEG.event(e).codes{strcmp('WNUM',EEG.event(e).codes(:,1)),2},...
+% %                EEG.event(e).codes{strcmp('WORI',EEG.event(e).codes(:,1)),2});
+% %            firsttarg = false;
+%        if strcmp(EEG.event(e).type,'BGIN')% || strcmp(EEG.event(e).type,'BEND')
+%            fprintf('%d ',EEG.event(e).codes{strcmp('BNUM',EEG.event(e).codes(:,1)),2});
+% %            firsttarg = true;
 %        end
 %    end
+%    fprintf('\n');
 
 %    batchres{s,2} = lda(EEG,{'TRG1','DIST'},'stepwise','50:50');
 %    batchres{s,3} = lda(EEG,{'TRG2','DIST'},'stepwise','50:50');

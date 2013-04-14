@@ -28,20 +28,22 @@ set(gcf,'Position',[figpos(1) figpos(2) figpos(3) figpos(3)]);
 
 for s = 1:length(stat)
     latpnt = find(stat(s).times-stat(s).timeshift >= stat(s).param.latency(1) & stat(s).times-stat(s).timeshift <= stat(s).param.latency(2));
-    [~, maxidx] = max(stat(s).gfpdiff(1,latpnt),[],2);
+    %pick time point at max of condition 1
+    [~, maxidx] = max(stat(s).condgfp(1,latpnt,1),[],2);
+
+    %pick time point at max of difference
+    %[~, maxidx] = max(stat(s).gfpdiff(1,latpnt),[],2);
+
     stat(s).plotpnt = latpnt(1)-1+maxidx;
     
     subplot(2,2,s);
-    plotvals = stat(s).diffcond(:,stat(s).plotpnt);
+    plotvals = stat(s).condavg(:,stat(s).plotpnt,1);
     topoplot(plotvals,stat(s).chanlocs);
     cb_h = colorbar('FontSize',param.fontsize);
     if s == 1
         cb_labels = num2cell(get(cb_h,'YTickLabel'),2);
         cb_labels{1} = [cb_labels{1} ' uV'];
         set(cb_h,'YTickLabel',cb_labels);
-        curcaxis = caxis;
-    elseif s == 2
-        caxis(curcaxis);
     end
     text(0,-0.9,sprintf('%dms\nt = %.2f, p = %.2f',round(stat(s).times(stat(s).plotpnt)),stat(s).valu(stat(s).plotpnt),stat(s).pprob(stat(s).plotpnt)),...
         'FontSize',param.fontsize,'FontName',fontname,'HorizontalAlignment','center');

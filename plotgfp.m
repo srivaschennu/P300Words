@@ -39,10 +39,10 @@ set(gcf,'Position',[figpos(1) figpos(2) figpos(3) figpos(3)]);
 % end
 
 %pick time point at max of condition 1
-%[~, maxidx] = max(stat.condgfp(1,latpnt,1),[],2);
+[~, maxidx] = max(stat.condgfp(1,latpnt,1),[],2);
 
 %pick time point at max of difference
-[~, maxidx] = max(stat.gfpdiff(1,latpnt),[],2);
+%[~, maxidx] = max(stat.gfpdiff(1,latpnt),[],2);
 
 %pick time point at max of t-statistic
 %[~, maxidx] = max(stat.valu(latpnt));
@@ -53,7 +53,7 @@ set(gcf,'Position',[figpos(1) figpos(2) figpos(3) figpos(3)]);
 plotpnt = latpnt(1)-1+maxidx;
 
 subplot(2,2,1:2);
-plotvals = stat.diffcond(:,plotpnt);
+plotvals = stat.condavg(:,plotpnt,1);
 topoplot(plotvals,stat.chanlocs);
 % if strcmp(param.plottitle,'on')
 %     if length(condlist) == 1
@@ -69,7 +69,7 @@ cb_h = colorbar('FontSize',param.fontsize);
 cb_labels = num2cell(get(cb_h,'YTickLabel'),2);
 cb_labels{1} = [cb_labels{1} ' uV'];
 set(cb_h,'YTickLabel',cb_labels);
-text(0,-0.9,sprintf('%dms\nt = %.2f, p = %.2f',round(stat(s).times(stat(s).plotpnt)),stat(s).valu(stat(s).plotpnt),stat(s).pprob(stat(s).plotpnt)),...
+text(0,-0.7,sprintf('%dms\nt = %.2f, p = %.2f', round(stat.times(plotpnt)), stat.valu(plotpnt), stat.pprob(plotpnt)),...
     'FontSize',param.fontsize,'FontName',fontname,'HorizontalAlignment','center');
 
 subplot(2,2,3:4);
@@ -105,7 +105,6 @@ else
     ylabel(' ','FontSize',param.fontsize,'FontName',fontname);
 end
 legend(param.legendstrings,'Location',param.legendposition);
-title(sprintf('%dms', round(stat.times(plotpnt))),'FontSize',param.fontsize,'FontName',fontname);
 
 %% plot clusters
 
@@ -113,8 +112,8 @@ if param.ttesttail >= 0
     if isfield(stat,'pclust')
         for p = 1:length(stat.pclust)
             line([stat.pclust(p).win(1) stat.pclust(p).win(2)],[0 0],'Color','blue','LineWidth',8);
-            title(sprintf('%dms\nCluster t = %.2f, p = %.3f', round(stat.times(plotpnt)), stat.pclust(p).tstat, stat.pclust(p).prob),...
-                'FontSize',param.fontsize,'FontName',fontname);
+%             title(sprintf('%dms\nCluster t = %.2f, p = %.3f', round(stat.times(plotpnt)), stat.pclust(p).tstat, stat.pclust(p).prob),...
+%                 'FontSize',param.fontsize,'FontName',fontname);
         end
     else
         fprintf('No positive clusters found.\n');
@@ -125,18 +124,14 @@ if param.ttesttail <= 0
     if isfield(stat,'nclust')
         for n = 1:length(stat.nclust)
             line([stat.nclust(p).win(1) stat.nclust(p).win(2)],[0 0],'Color','red','LineWidth',8);
-            title(sprintf('Cluster t = %.2f, p = %.3f', stat.nclust(n).tstat, stat.nclust(n).prob),...
-                'FontSize',param.fontsize,'FontName',fontname);
+%             title(sprintf('Cluster t = %.2f, p = %.3f', stat.nclust(n).tstat, stat.nclust(n).prob),...
+%                 'FontSize',param.fontsize,'FontName',fontname);
         end
     else
         fprintf('No negative clusters found.\n');
     end
     
 end
-
-title(sprintf('%dms\nt = %.2f, p = %.3f', round(stat.times(plotpnt)), stat.valu(plotpnt), stat.pprob(plotpnt)),...
-    'FontSize',param.fontsize,'FontName',fontname);
-
     
 set(gcf,'Color','white');
 %saveas(gcf,[figfile '.fig']);
