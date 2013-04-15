@@ -17,25 +17,23 @@ condlist = {
 };
 
 timewin = {
-   [100 400]
+   [150 350]
    [400 700]
+%    [100 700]
 };
 
 % for c = 1:size(condlist,1)
-%     %     for t = 1:length(timewin)
-%     %         compgfp(subjinfo,{condlist{c,1},'base'},'latency',timewin{t},'numrand',numrand);
-%     %     end
+%     for t = 1:length(timewin)
+% %         compgfp(subjinfo,{condlist{c,1},'base'},'latency',timewin{t},'numrand',numrand);
+%         load(sprintf('cond_%d_%s-base_%d-%d_gfp.mat',subjinfo,condlist{c,1},timewin{t}(1),timewin{t}(2)));
+%         stat = corrp(stat,'corrp','cluster','clustsize',10);
+%         stats{t} = stat;
+%     end
 %     
-%     load(sprintf('cond_%d_%s-base_%d-%d_gfp.mat',subjinfo,condlist{c,1},timewin{1}(1),timewin{1}(2)));
-%     if strcmp(condlist{c,1},'TRG1')
-%         clear stats
-%         stats(1) = stat;
-%         load(sprintf('cond_%d_%s-base_%d-%d_gfp.mat',subjinfo,condlist{c,1},timewin{2}(1),timewin{2}(2)));
-%         stats(2) = stat;
+%     if ~isempty(stats{2}).pclust)
 %         plotgfp2(stats,'legendstrings',condlist(c,2));
-%         
 %     else
-%         plotgfp(stat,'legendstrings',condlist(c,2),'plotinfo','off');
+%         plotgfp(stats{1},'legendstrings',condlist(c,2),'plotinfo','off');
 %     end
 %     close(gcf);
 % end
@@ -63,24 +61,23 @@ for s = 1:length(subjlist)
 
 
     for c = 1:size(condlist,1)
+        if strcmp(condlist{c,1},'TRG1')
+            plotparam = {'plotinfo','on'};
+        else
+            plotparam = {'plotinfo','off'};
+        end
+        
         for t = 1:length(timewin)
-            compgfp(basename,{condlist{c,1},'base'},'latency',timewin{t},'numrand',numrand);
+            %compgfp(basename,{condlist{c,1},'base'},'latency',timewin{t},'numrand',numrand);
+            load(sprintf('trial_%s_%s-base_%d-%d_gfp.mat',basename,condlist{c,1},timewin{t}(1),timewin{t}(2)));
+            stat = corrp(stat,'corrp','cluster','clustsize',10);
+            stats{t} = stat;
         end
 
-        load(sprintf('trial_%s_%s-base_%d-%d_gfp.mat',basename,condlist{c,1},timewin{1}(1),timewin{1}(2)));
-        stat = corrp(stat);
-
-        if strcmp(condlist{c,1},'TRG1')
-            clear stats
-            stats(1) = stat;
-
-            load(sprintf('trial_%s_%s-base_%d-%d_gfp.mat',basename,condlist{c,1},timewin{2}(1),timewin{2}(2)));
-            stat = corrp(stat);
-            
-            stats(2) = stat;
-            plotgfp2(stats,'legendstrings',condlist(c,2));
+        if false%~isempty(stats{2}.pclust)
+            plotgfp2(stats,'legendstrings',condlist(c,2),plotparam{:});
         else
-            plotgfp(stat,'legendstrings',condlist(c,2),'plotinfo','off');
+            plotgfp(stats{1},'legendstrings',condlist(c,2),plotparam{:});
         end
         close(gcf);
     end

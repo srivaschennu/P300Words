@@ -18,7 +18,6 @@ param = finputcheck(varargin, { 'ylim', 'real', [], [-5 15]; ...
     'legendposition', 'string', {}, 'NorthWest'; ...
     'ttesttail', 'integer', [-1 0 1], 0; ...
     'plotinfo', 'string', {'on','off'}, 'on'; ...
-    'plottitle', 'string', {'on','off'}, 'on'; ...
     });
 
 %% figure plotting
@@ -32,11 +31,11 @@ figure('Name',sprintf('%s-%s',stat.condlist{1},stat.condlist{2}),'Color','white'
 figpos = get(gcf,'Position');
 set(gcf,'Position',[figpos(1) figpos(2) figpos(3) figpos(3)]);
 
-% if isfield(stat,'pclust')
-%     latpnt = find(stat.times-stat.timeshift >= stat.pclust(1).win(1) & stat.times-stat.timeshift <= stat.pclust(end).win(2));
-% else
+if ~isempty(stat.pclust)
+    latpnt = find(stat.times-stat.timeshift >= stat.pclust(1).win(1) & stat.times-stat.timeshift <= stat.pclust(end).win(2));
+else
     latpnt = find(stat.times-stat.timeshift >= stat.param.latency(1) & stat.times-stat.timeshift <= stat.param.latency(2));
-% end
+end
 
 %pick time point at max of condition 1
 [~, maxidx] = max(stat.condgfp(1,latpnt,1),[],2);
@@ -55,22 +54,20 @@ plotpnt = latpnt(1)-1+maxidx;
 subplot(2,2,1:2);
 plotvals = stat.condavg(:,plotpnt,1);
 topoplot(plotvals,stat.chanlocs);
-% if strcmp(param.plottitle,'on')
-%     if length(condlist) == 1
-%         title(param.legendstrings{1},'FontSize',param.fontsize,'FontName',fontname);
-%     else
-%         title(sprintf('%s - %s',param.legendstrings{1},param.legendstrings{2}),...
-%             'FontSize',param.fontsize,'FontName',fontname);
-%     end        
-% else
-%     title(' ','FontSize',param.fontsize,'FontName',fontname);
-% end
 cb_h = colorbar('FontSize',param.fontsize);
 cb_labels = num2cell(get(cb_h,'YTickLabel'),2);
 cb_labels{1} = [cb_labels{1} ' uV'];
 set(cb_h,'YTickLabel',cb_labels);
-text(0,-0.7,sprintf('%dms\nt = %.2f, p = %.2f', round(stat.times(plotpnt)), stat.valu(plotpnt), stat.pprob(plotpnt)),...
-    'FontSize',param.fontsize,'FontName',fontname,'HorizontalAlignment','center');
+
+if ~isempty(stat.pclust)
+    text(0,-0.7,sprintf('%dms\nt = %.2f, p = %.2f', round(stat.times(plotpnt)), stat.pclust(1).tstat, stat.pclust(1).prob),...
+        'FontSize',param.fontsize,'FontName',fontname,'HorizontalAlignment','center');
+else
+%     text(0,-0.7,sprintf('%dms\nt = %.2f, p = %.2f', round(stat.times(plotpnt)), stat.valu(plotpnt), stat.pprob(plotpnt)),...
+%         'FontSize',param.fontsize,'FontName',fontname,'HorizontalAlignment','center');
+    text(0,-0.7,sprintf('%dms', round(stat.times(plotpnt))),...
+        'FontSize',param.fontsize,'FontName',fontname,'HorizontalAlignment','center');
+end
 
 subplot(2,2,3:4);
 curcolororder = get(gca,'ColorOrder');
@@ -109,11 +106,9 @@ legend(param.legendstrings,'Location',param.legendposition);
 %% plot clusters
 
 if param.ttesttail >= 0
-    if isfield(stat,'pclust')
+    if ~isempty(stat.pclust)
         for p = 1:length(stat.pclust)
             line([stat.pclust(p).win(1) stat.pclust(p).win(2)],[0 0],'Color','blue','LineWidth',8);
-%             title(sprintf('%dms\nCluster t = %.2f, p = %.3f', round(stat.times(plotpnt)), stat.pclust(p).tstat, stat.pclust(p).prob),...
-%                 'FontSize',param.fontsize,'FontName',fontname);
         end
     else
         fprintf('No positive clusters found.\n');
@@ -121,11 +116,9 @@ if param.ttesttail >= 0
 end
 
 if param.ttesttail <= 0
-    if isfield(stat,'nclust')
+    if ~isempty(stat.nclust)
         for n = 1:length(stat.nclust)
             line([stat.nclust(p).win(1) stat.nclust(p).win(2)],[0 0],'Color','red','LineWidth',8);
-%             title(sprintf('Cluster t = %.2f, p = %.3f', stat.nclust(n).tstat, stat.nclust(n).prob),...
-%                 'FontSize',param.fontsize,'FontName',fontname);
         end
     else
         fprintf('No negative clusters found.\n');

@@ -15,32 +15,34 @@ subjlists = {
     };
     {
     'p1611_p300words' %clean %TRG1 TRG2
-    'p0512_p300words' %messy TRG2
     'p1511_p300words' %TRG1 = TRG2
+    'p0112_p300words'    
     };
     {
 %     'p0510V2_p300words'
 %     'p0710V2_p300words'
-    'p211v2_p300words'
-    'p0311v2_p300words'
+%     'p211v2_p300words'
 %     'p1211_p300words' % flipped TRG1 AND TRG2
 %     'p1311_p300words'
 %     'p1411_p300words'
 %     'p1711_p300words' %DIST > TRG1, TRG2
-    'p1811_p300words' %clean %TRG1
-    'p0112_p300words' %TRG1?    
+%     'p1811_p300words' %clean %TRG1
+
 %     'p0212_p300words'
 %     'p0312_p300words'
+%     'p0512_p300words' %messy TRG2
 %     'p0812_p300words'
 %     'p0912_p300words' %weak TRG1, TRG2
 %     'p1012_p300words'
 
+
 %NOISY
+%     'p0311v2_p300words' %noisy topography
 %     'p0411V2_p300words' %noisy
+%     'p0511v2_p300words' %%noisy
+%     'p1911_p300words' %noisy %TRG1
 %     'p2011_p300words' %weird spiky
 %     'p0712_p300words' %noisy
-%     'p1911_p300words' %noisy %TRG1
-%     'p0511v2_p300words' %%noisy
 
 %REPEATS
 %     'p1311v2_p300words' %clean
