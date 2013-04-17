@@ -1,4 +1,4 @@
- function loadpaths
+function loadpaths
 
 [~, hostname] = system('hostname');
 
