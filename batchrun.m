@@ -11,32 +11,32 @@ else
 end
 
 condlist = {
-    'TRG1' 'explicit'
-    'TRG2' 'implicit'
+%     'TRG1' 'explicit'
+%     'TRG2' 'implicit'
     'DIST' 'distractor'
 };
 
 timewin = {
-   [150 350]
-   [400 700]
+   [100 400]
+%    [400 700]
 %    [100 700]
 };
 
-% for c = 1:size(condlist,1)
-%     for t = 1:length(timewin)
-% %         compgfp(subjinfo,{condlist{c,1},'base'},'latency',timewin{t},'numrand',numrand);
-%         load(sprintf('cond_%d_%s-base_%d-%d_gfp.mat',subjinfo,condlist{c,1},timewin{t}(1),timewin{t}(2)));
-%         stat = corrp(stat,'corrp','cluster','clustsize',10);
-%         stats{t} = stat;
-%     end
-%     
-%     if ~isempty(stats{2}).pclust)
-%         plotgfp2(stats,'legendstrings',condlist(c,2));
-%     else
-%         plotgfp(stats{1},'legendstrings',condlist(c,2),'plotinfo','off');
-%     end
-%     close(gcf);
-% end
+for c = 1:size(condlist,1)
+    for t = 1:length(timewin)
+        compgfp(subjinfo,{condlist{c,1},'base'},'latency',timewin{t},'numrand',numrand);
+        load(sprintf('cond_%d_%s-base_%d-%d_gfp.mat',subjinfo,condlist{c,1},timewin{t}(1),timewin{t}(2)));
+        stat = corrp(stat,'corrp','cluster','clustsize',10);
+        stats{t} = stat;
+    end
+    
+    if false%~isempty(stats{2}).pclust)
+        plotgfp2(stats,'legendstrings',condlist(c,2));
+    else
+        plotgfp(stats{1},'legendstrings',condlist(c,2),'plotinfo','off');
+    end
+    close(gcf);
+end
 
 for s = 1:length(subjlist)
     basename = subjlist{s};
@@ -68,7 +68,7 @@ for s = 1:length(subjlist)
         end
         
         for t = 1:length(timewin)
-            %compgfp(basename,{condlist{c,1},'base'},'latency',timewin{t},'numrand',numrand);
+            compgfp(basename,{condlist{c,1},'base'},'latency',timewin{t},'numrand',numrand);
             load(sprintf('trial_%s_%s-base_%d-%d_gfp.mat',basename,condlist{c,1},timewin{t}(1),timewin{t}(2)));
             stat = corrp(stat,'corrp','cluster','clustsize',10);
             stats{t} = stat;

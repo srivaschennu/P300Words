@@ -42,7 +42,8 @@ for s = 1:length(subjlist)
             stat.pprob(stat2.stat.times >= stat2.stat.param.latency(1) & stat2.stat.times <= stat2.stat.param.latency(2)) = ...
                 stat2.stat.pprob(stat2.stat.times >= stat2.stat.param.latency(1) & stat2.stat.times <= stat2.stat.param.latency(2));
         end
-        plotdata(s,:,plotidx) = 1-rankvals(stat.pprob,ranklist);
+        stat.pprob = rankvals(stat.pprob,ranklist);
+        plotdata(s,:,plotidx) = 1-stat.pprob;
         plotinfo{plotidx} = sprintf('%s-base',condlist{c,1});
     end
 end
@@ -59,19 +60,25 @@ for c = 1:size(plotdata,3)
         'XTick',stat.times(1)-stat.timeshift:200:stat.times(end)-stat.timeshift,...
         'FontSize',param.fontsize,'FontName',fontname);
     
-    caxis(1-[ranklist(1) ranklist(end)]);
+%     set(gca,'YDir','normal','XLim',[stat.times(1) stat.times(end)]-stat.timeshift,...
+%         'XTick',stat.times(1)-stat.timeshift:200:stat.times(end)-stat.timeshift,...
+%         'XTickLabel',{},'YTickLabel',{},...
+%         'FontSize',param.fontsize,'FontName',fontname);
+    
+   caxis(1-[ranklist(1) ranklist(end)]);
     
     line([0 0],ylim,'Color','black','LineStyle',':','LineWidth',linewidth);
     if c == 1
-        xlabel('Time (ms) ','FontSize',param.fontsize,'FontName',fontname);
-        ylabel('Participant ','FontSize',param.fontsize,'FontName',fontname);
+        xlabel(' ','FontSize',param.fontsize,'FontName',fontname);
+        ylabel(' ','FontSize',param.fontsize,'FontName',fontname);
     else
-        xlabel('  ','FontSize',param.fontsize,'FontName',fontname);
-        ylabel('  ','FontSize',param.fontsize,'FontName',fontname);
+        xlabel(' ','FontSize',param.fontsize,'FontName',fontname);
+        ylabel(' ','FontSize',param.fontsize,'FontName',fontname);
     end
+    
     figfile = sprintf('figures/img_%s_%s',num2str(subjinfo),plotinfo{c});
     set(gcf,'Color','white','Name',figfile,'FileName',figfile);
-    export_fig(gcf,[figfile '.eps']);
+    export_fig(gcf,[figfile '.eps']);%,'-opengl');
 end
 
 figure;
@@ -83,7 +90,7 @@ set(gca,'Visible','off');
 cb_h=colorbar;
 caxis(1-[ranklist(1) ranklist(end)]);
 set(cb_h,'YTick',1-ranklist,'YTickLabel',ranklabel,...
-    'FontSize',param.fontsize,'FontName',fontname);
+    'FontSize',param.fontsize+2,'FontName',fontname);
 
 figfile = sprintf('figures/img_colorbar',num2str(subjinfo),plotinfo{c});
 set(gcf,'Color','white','Name',figfile,'FileName',figfile);
