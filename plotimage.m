@@ -60,25 +60,25 @@ for c = 1:size(plotdata,3)
         'XTick',stat.times(1)-stat.timeshift:200:stat.times(end)-stat.timeshift,...
         'FontSize',param.fontsize,'FontName',fontname);
     
-%     set(gca,'YDir','normal','XLim',[stat.times(1) stat.times(end)]-stat.timeshift,...
-%         'XTick',stat.times(1)-stat.timeshift:200:stat.times(end)-stat.timeshift,...
-%         'XTickLabel',{},'YTickLabel',{},...
-%         'FontSize',param.fontsize,'FontName',fontname);
+    set(gca,'YDir','normal','XLim',[stat.times(1) stat.times(end)]-stat.timeshift,...
+        'XTick',stat.times(1)-stat.timeshift:200:stat.times(end)-stat.timeshift,...
+        'XTickLabel',{},'YTickLabel',{},...
+        'FontSize',param.fontsize,'FontName',fontname);
     
    caxis(1-[ranklist(1) ranklist(end)]);
     
     line([0 0],ylim,'Color','black','LineStyle',':','LineWidth',linewidth);
-    if c == 1
-        xlabel(' ','FontSize',param.fontsize,'FontName',fontname);
-        ylabel(' ','FontSize',param.fontsize,'FontName',fontname);
-    else
-        xlabel(' ','FontSize',param.fontsize,'FontName',fontname);
-        ylabel(' ','FontSize',param.fontsize,'FontName',fontname);
-    end
+%     if c == 1
+%         xlabel('Participants','FontSize',param.fontsize,'FontName',fontname);
+%         ylabel(' ','FontSize',param.fontsize,'FontName',fontname);
+%     else
+%         xlabel(' ','FontSize',param.fontsize,'FontName',fontname);
+%         ylabel(' ','FontSize',param.fontsize,'FontName',fontname);
+%     end
     
     figfile = sprintf('figures/img_%s_%s',num2str(subjinfo),plotinfo{c});
     set(gcf,'Color','white','Name',figfile,'FileName',figfile);
-    export_fig(gcf,[figfile '.eps']);%,'-opengl');
+    export_fig(gcf,[figfile '.eps'],'-opengl');
 end
 
 figure;
