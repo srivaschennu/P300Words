@@ -97,7 +97,7 @@ for s = 1:numsubj
         else
             selectevents = subjcond{s,c};
         end
-        %selectsnum = 3;
+        selectsnum = 2:8;
         %selectpred = 1;
         
         typematches = false(1,length(EEG.epoch));
@@ -113,7 +113,7 @@ for s = 1:numsubj
                     epochtype = epochtype{1};
                 end
             end
-            if sum(strcmp(epochtype,selectevents)) > 0
+            if sum(strncmp(epochtype,selectevents,length(selectevents))) > 0
                 typematches(ep) = true;
             end
             
