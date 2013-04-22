@@ -11,29 +11,31 @@ else
 end
 
 condlist = {
-    'TRG1' 'explicit'
-    'TRG2' 'implicit'
-%     'DIST' 'distractor'
+    {'TRG1' 'base'} {'explicit'}
+    {'TRG2' 'base'} {'implicit'}
+    {'DIST' 'base'} {'distractor'}
+%     {'TRG1'  'DIST'} {'explicit' 'distractor'}
+%     {'TRG2'  'DIST'} {'implicit' 'distractor'}
 };
 
 timewin = {
    [100 400]
-%    [400 700]
+   [400 700]
 %    [100 700]
 };
 
 % for c = 1:size(condlist,1)
 %     for t = 1:length(timewin)
-%         compgfp(subjinfo,{condlist{c,1},'base'},'latency',timewin{t},'numrand',numrand);
-%         load(sprintf('cond_%d_%s-base_%d-%d_gfp.mat',subjinfo,condlist{c,1},timewin{t}(1),timewin{t}(2)));
-%         stat = corrp(stat,'corrp','cluster','clustsize',10);
+%         compgfp(subjinfo,condlist{c,1},'latency',timewin{t},'numrand',numrand);
+%         load(sprintf('cond_%d_%s-%s_%d-%d_gfp.mat',subjinfo,condlist{c,1}{1},condlist{c,1}{2},timewin{t}(1),timewin{t}(2)));
+%         stat = corrp(stat,'corrp','cluster');
 %         stats{t} = stat;
 %     end
 %     
 %     if false%~isempty(stats{2}).pclust)
-%         plotgfp2(stats,'legendstrings',condlist(c,2));
+%         plotgfp2(stats,'legendstrings',condlist{c,2});
 %     else
-%         plotgfp(stats{1},'legendstrings',condlist(c,2),'plotinfo','off');
+%         plotgfp(stats{1},'legendstrings',condlist{c,2},'plotinfo','off');
 %     end
 %     close(gcf);
 % end
@@ -42,7 +44,8 @@ for s = 1:length(subjlist)
     basename = subjlist{s};
     fprintf('Processing %s.\n',basename);
         
-    %batchres{s,1} = basename;
+    batchres{s,1} = basename;
+    
 %     ploterp(basename,{'TRG1','TRG2','DIST'},'ylim',[-7 7]);
 %     close all
     
@@ -61,23 +64,23 @@ for s = 1:length(subjlist)
 
 
     for c = 1:size(condlist,1)
-        if strcmp(condlist{c,1},'TRG1')
+        if strcmp(condlist{c,1}{1},'TRG1')
             plotparam = {'plotinfo','on'};
         else
             plotparam = {'plotinfo','off'};
         end
         
         for t = 1:length(timewin)
-            compgfp(basename,{condlist{c,1},'base'},'latency',timewin{t},'numrand',numrand);
-            load(sprintf('trial_%s_%s-base_%d-%d_gfp.mat',basename,condlist{c,1},timewin{t}(1),timewin{t}(2)));
-            stat = corrp(stat,'corrp','cluster','clustsize',10);
+            compgfp(basename,condlist{c,1},'latency',timewin{t},'numrand',numrand);
+            load(sprintf('trial_%s_%s-%s_%d-%d_gfp.mat',basename,condlist{c,1}{1},condlist{c,1}{2},timewin{t}(1),timewin{t}(2)));
+            stat = corrp(stat,'corrp','cluster');
             stats{t} = stat;
         end
 
         if false%~isempty(stats{2}.pclust)
-            plotgfp2(stats,'legendstrings',condlist(c,2),plotparam{:});
+            plotgfp2(stats,'legendstrings',condlist{c,2},plotparam{:});
         else
-            plotgfp(stats{1},'legendstrings',condlist(c,2),plotparam{:});
+            plotgfp(stats{1},'legendstrings',condlist{c,2},plotparam{:});
         end
         close(gcf);
     end
@@ -105,7 +108,11 @@ for s = 1:length(subjlist)
 %         filenames = dir(sprintf('%s%s*', filepath, basename));
 %         mfffiles = filenames(logical(cell2mat({filenames.isdir})));
 %         filename = mfffiles.name;
-%         info = read_mff_subj([filepath filename]);
+%         fprintf('Reading information from %s%s.\n',filepath,filename);
+%         mffinfo = read_mff_info([filepath filename]);
+%         mffdate = sscanf(mffinfo.date,'%d-%d-%d');
+%         batchres{s,2} = sprintf('%02d-%02d-%04d',mffdate(3),mffdate(2),mffdate(1));
+        
     
     %    EEG = pop_loadset('filepath',filepath,'filename',[basename '_epochs.set'],'loadmode','info');
     %     prevblocknum = 0;
@@ -130,4 +137,4 @@ end
 % [~,sortidx] = sort(batchres(:,2));
 % batchres(sortidx,:)
 
-%save(sprintf('batch %s.mat',datestr(now)),'batchres');
+save(sprintf('batch %s.mat',datestr(now)),'batchres');

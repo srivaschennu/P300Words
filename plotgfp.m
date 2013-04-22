@@ -10,6 +10,7 @@ colorlist = {
     'explicit'     [0         0    1.0000]
     'implicit'     [0    0.5000         0]
     'distractor'   [1.0000    0         0]
+    'target'      [0    0.7500    0.7500]
     };
 
 param = finputcheck(varargin, { 'ylim', 'real', [], [-5 15]; ...
