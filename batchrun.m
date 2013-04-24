@@ -86,22 +86,20 @@ for s = 1:length(subjlist)
     %     end
     
        EEG = pop_loadset('filepath',filepath,'filename',[basename '_orig.set'],'loadmode','info');
-       round((sum(strcmp('DIST',{EEG.event.type})))/20)
-       
-    %    fprintf('%s :',basename);
-    %    for e = 1:length(EEG.event)
-    % %        if strcmp(EEG.event(e).type,'TRG1') && firsttarg
-    % %            fprintf('block %d num %d ori %d.\n',...
-    % %                EEG.event(e).codes{strcmp('BNUM',EEG.event(e).codes(:,1)),2},...
-    % %                EEG.event(e).codes{strcmp('WNUM',EEG.event(e).codes(:,1)),2},...
-    % %                EEG.event(e).codes{strcmp('WORI',EEG.event(e).codes(:,1)),2});
-    % %            firsttarg = false;
-    %        if strcmp(EEG.event(e).type,'BGIN')% || strcmp(EEG.event(e).type,'BEND')
-    %            fprintf('%d ',EEG.event(e).codes{strcmp('BNUM',EEG.event(e).codes(:,1)),2});
-    % %            firsttarg = true;
-    %        end
-    %    end
-    %    fprintf('\n');
+       fprintf('%s: ',basename);
+       for e = 1:length(EEG.event)
+           if strcmp(EEG.event(e).type,'TRG1') && firsttarg
+               fprintf('%d ',...
+                   EEG.event(e).codes{strcmp('WNUM',EEG.event(e).codes(:,1)),2});%,...
+             %      EEG.event(e).codes{strcmp('BNUM',EEG.event(e).codes(:,1)),2},...
+                   %EEG.event(e).codes{strcmp('WORI',EEG.event(e).codes(:,1)),2});
+               firsttarg = false;
+           elseif strcmp(EEG.event(e).type,'BGIN')% || strcmp(EEG.event(e).type,'BEND')
+               %fprintf('%d ',EEG.event(e).codes{strcmp('BNUM',EEG.event(e).codes(:,1)),2});
+               firsttarg = true;
+           end
+       end
+       fprintf('\n');
     
     %    batchres{s,2} = lda(EEG,{'TRG1','DIST'},'stepwise','50:50');
     %    batchres{s,3} = lda(EEG,{'TRG2','DIST'},'stepwise','50:50');
