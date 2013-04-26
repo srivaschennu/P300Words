@@ -85,32 +85,33 @@ for s = 1:length(subjlist)
     %         close(gcf);
     %     end
     
-       EEG = pop_loadset('filepath',filepath,'filename',[basename '_orig.set'],'loadmode','info');
-       fprintf('%s: ',basename);
-       for e = 1:length(EEG.event)
-           if strcmp(EEG.event(e).type,'TRG1') && firsttarg
-               fprintf('%d ',...
-                   EEG.event(e).codes{strcmp('WNUM',EEG.event(e).codes(:,1)),2});%,...
-             %      EEG.event(e).codes{strcmp('BNUM',EEG.event(e).codes(:,1)),2},...
-                   %EEG.event(e).codes{strcmp('WORI',EEG.event(e).codes(:,1)),2});
-               firsttarg = false;
-           elseif strcmp(EEG.event(e).type,'BGIN')% || strcmp(EEG.event(e).type,'BEND')
-               %fprintf('%d ',EEG.event(e).codes{strcmp('BNUM',EEG.event(e).codes(:,1)),2});
-               firsttarg = true;
-           end
-       end
-       fprintf('\n');
+%        EEG = pop_loadset('filepath',filepath,'filename',[basename '_orig.set'],'loadmode','info');
+%        fprintf('%s: ',basename);
+%        for e = 1:length(EEG.event)
+%            if strcmp(EEG.event(e).type,'TRG1') && firsttarg
+%                fprintf('%d ',...
+%                    EEG.event(e).codes{strcmp('WNUM',EEG.event(e).codes(:,1)),2});%,...
+%              %      EEG.event(e).codes{strcmp('BNUM',EEG.event(e).codes(:,1)),2},...
+%                    %EEG.event(e).codes{strcmp('WORI',EEG.event(e).codes(:,1)),2});
+%                firsttarg = false;
+%            elseif strcmp(EEG.event(e).type,'BGIN')% || strcmp(EEG.event(e).type,'BEND')
+%                %fprintf('%d ',EEG.event(e).codes{strcmp('BNUM',EEG.event(e).codes(:,1)),2});
+%                firsttarg = true;
+%            end
+%        end
+%        fprintf('\n');
     
     %    batchres{s,2} = lda(EEG,{'TRG1','DIST'},'stepwise','50:50');
     %    batchres{s,3} = lda(EEG,{'TRG2','DIST'},'stepwise','50:50');
     
-%             javaaddpath('/Users/chennu/Work/mffimport/MFF-1.0.d0004.jar');
-%             filenames = dir(sprintf('%s%s*', filepath, basename));
-%             mfffiles = filenames(logical(cell2mat({filenames.isdir})));
-%             filename = mfffiles.name;
+            javaaddpath('/Users/chennu/Work/mffimport/MFF-1.0.d0004.jar');
+            filenames = dir(sprintf('%s%s*', filepath, basename));
+            mfffiles = filenames(logical(cell2mat({filenames.isdir})));
+            filename = mfffiles.name;
 
-%             fprintf('Reading information from %s%s.\n',filepath,filename);
-%             mffinfo = read_mff_info([filepath filename]);
+            fprintf('Reading information from %s%s.\n',filepath,filename);
+            mffinfo = read_mff_info([filepath filename]);
+            batchres{s,2} = mffinfo.date;
 %             mffdate = sscanf(mffinfo.date,'%d-%d-%d');
 %             batchres{s,2} = sprintf('%02d-%02d-%04d',mffdate(3),mffdate(2),mffdate(1));
     
@@ -153,7 +154,7 @@ for s = 1:length(subjlist)
 %     batchres{s,4} = sum(EEG.reject.gcompreject);
 end
 
-% [~,sortidx] = sort(batchres(:,2));
-% batchres(sortidx,:)
+[~,sortidx] = sort(batchres(:,2));
+batchres(sortidx,:)
 
-% save(sprintf('batch %s.mat',datestr(now)),'batchres');
+save(sprintf('batch %s.mat',datestr(now)),'batchres');

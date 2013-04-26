@@ -56,10 +56,12 @@ for s = 1:numsubj
         selectevents = subjcond{s,c};
         selectsnum = 3:8;
         %selectpred = 1;
+        %selectwnum = 2;
         
         typematches = false(1,length(EEG.epoch));
         snummatches = false(1,length(EEG.epoch));
         predmatches = false(1,length(EEG.epoch));
+        wnummatches = false(1,length(EEG.epoch));
         for ep = 1:length(EEG.epoch)
             
             epochtype = EEG.epoch(ep).eventtype;
@@ -68,7 +70,7 @@ for s = 1:numsubj
             else
                 epochtype = epochtype{1};
             end
-            if sum(strcmp(epochtype,selectevents)) > 0
+            if sum(strncmp(epochtype,selectevents,length(selectevents))) > 0
                 typematches(ep) = true;
             end
             
@@ -96,9 +98,20 @@ for s = 1:numsubj
             else
                 predmatches(ep) = true;
             end
+
+            wnumidx = strcmp('WNUM',epochcodes(:,1)');
+            if exist('selectwnum','var') && ~isempty(selectwnum) && sum(wnumidx) > 0
+                if sum(epochcodes{wnumidx,2} == selectwnum) > 0
+                    wnummatches(ep) = true;
+                end
+            else
+                wnummatches(ep) = true;
+            end
+            
         end
         
-        selectepochs = find(typematches & snummatches & predmatches);
+        selectepochs = find(typematches & snummatches & predmatches & wnummatches);
+        %selectepochs = find(typematches & snummatches & predmatches);
         fprintf('Condition %s: found %d matching epochs.\n',subjcond{s,c},length(selectepochs));
         
         conddata{s,c} = pop_select(EEG,'trial',selectepochs);
