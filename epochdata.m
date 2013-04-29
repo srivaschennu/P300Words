@@ -38,12 +38,16 @@ EEG = pop_rmbase(EEG, [EEG.times(1) 0]);
 
 EEG = eeg_checkset(EEG);
 
+for c = 1:length(EEG.chanlocs)
+    EEG.chanlocs(c).badchan = 0;
+end
+
 if ischar(basename)
-    EEG.setname = basename;
-    
     if icamode
+        EEG.setname = [basename '_epochs'];
         EEG.filename = [basename '_epochs.set'];
     else
+        EEG.setname = basename;
         EEG.filename = [basename '.set'];
     end
     
@@ -51,22 +55,6 @@ if ischar(basename)
         oldEEG = pop_loadset('filepath',filepath,'filename',EEG.filename,'loadmode','info');
         if isfield(oldEEG,'icaweights') && ~isempty(oldEEG.icaweights)
             fprintf('Loading existing ICA info from %s%s.\n',filepath,EEG.filename);
-
-            EEG.icaact = oldEEG.icaact;
-            EEG.icawinv = oldEEG.icawinv;
-            EEG.icasphere = oldEEG.icasphere;
-            EEG.icaweights = oldEEG.icaweights;
-            EEG.icachansind = oldEEG.icachansind;
-            EEG.reject.gcompreject = oldEEG.reject.gcompreject;
-            keepchan = [];
-            for c = 1:length(EEG.chanlocs)
-                if ismember({EEG.chanlocs(c).labels},{oldEEG.chanlocs.labels})
-                    keepchan = [keepchan c];
-                end
-                EEG.chanlocs(c).badchan = 0;
-            end
-            rejchan = EEG.chanlocs(setdiff(1:length(EEG.chanlocs),keepchan));
-            EEG = pop_select(EEG,'channel',keepchan);
             
             EEG.icaact = oldEEG.icaact;
             EEG.icawinv = oldEEG.icawinv;
@@ -74,12 +62,33 @@ if ischar(basename)
             EEG.icaweights = oldEEG.icaweights;
             EEG.icachansind = oldEEG.icachansind;
             EEG.reject.gcompreject = oldEEG.reject.gcompreject;
-            if isfield('oldEEG','rejchan')
+            
+            if isfield(oldEEG,'rejchan')
                 EEG.rejchan = oldEEG.rejchan;
             else
-                EEG.rejchan = rejchan;
+                keepchan = [];
+                for c = 1:length(EEG.chanlocs)
+                    if ismember({EEG.chanlocs(c).labels},{oldEEG.chanlocs.labels})
+                        keepchan = [keepchan c];
+                    end
+                end
+                EEG.rejchan = EEG.chanlocs(setdiff(1:length(EEG.chanlocs),keepchan));
             end
             
+            if isfield(oldEEG,'rejepoch')
+                EEG.rejepoch = oldEEG.rejepoch;
+            else
+                EEG.rejepoch = [];
+            end
+            
+            fprintf('Found %d bad channels and %d bad trials in existing file.\n', length(EEG.rejchan), length(EEG.rejepoch));
+            if ~isempty(EEG.rejchan)
+                EEG = pop_select(EEG,'nochannel',{EEG.rejchan.labels});
+            end
+            
+            if ~isempty(EEG.rejepoch)
+                EEG = pop_select(EEG, 'notrial', EEG.rejepoch);
+            end
         end
     end
     
