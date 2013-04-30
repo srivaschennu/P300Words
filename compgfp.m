@@ -97,7 +97,7 @@ for s = 1:numsubj
         else
             selectevents = subjcond{s,c};
         end
-        selectsnum = 2:8;
+        selectsnum = 3:8;
         %selectpred = 1;
         
         typematches = false(1,length(EEG.epoch));

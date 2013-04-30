@@ -14,30 +14,29 @@ subjlists = {
     'subj10_p300words' %eye blinks
     };
     {
-    'p1611_p300words' %clean %TRG1 TRG2
-    'p1511_p300words' %TRG1 = TRG2
+    'p1611_p300words'
+    'p1511_p300words'
     'p0112_p300words'
     };
     {
-%     'p0510V2_p300words'
-%     'p0710V2_p300words' %weak response
-%     'p211v2_p300words' %only distractors get a response
-    'p0611v2_p300words'
-%     'p1211_p300words' % flipped TRG1 AND TRG2
-%     'p1311_p300words'
-%     'p1411_p300words'
-%     'p1711_p300words'  %weak responses to all three
-%     'p1811_p300words' %clean %TRG1
-%     'p0212_p300words'
-%     'p0312_p300words'
-%     'p0512_p300words'
-    'p0612v2_p300words'
-%     'p0812_p300words'
-%     'p0912_p300words' %response for trg2 and distractors
-%     'p1012_p300words'
-    'p0113_p300words'
-    'p0213_p300words'
-    'p0313_p300words'
+    'p0510V2_p300words'
+    'p0710V2_p300words' %weak response
+    'p211v2_p300words' %only distractors get a response
+    'p1211_p300words' % flipped TRG1 AND TRG2
+    'p1311_p300words'
+    'p1411_p300words'
+    'p1811_p300words' %clean %TRG1
+    'p0212_p300words'
+    'p0312_p300words'
+    'p0512_p300words'
+    'p0812_p300words'
+    'p0912_p300words' %response for trg2 and distractors
+    'p1012_p300words'
+%     'p0611v2_p300words'
+%     'p0612v2_p300words'
+%     'p0113_p300words'
+%     'p0213_p300words'
+%     'p0313_p300words'
     };
     {
     %NOISY
@@ -61,5 +60,8 @@ subjlists = {
     'p1011_p300words' %only 10 blcoks TRG1 TRG2
     'p0811_p300words' %only 12 blocks
     'p0911_p300words' %only 12 blocks
+    
+    %SEVERELY DISABLED
+    'p1711_p300words' %weak responses to all three
     };
     };
