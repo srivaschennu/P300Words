@@ -13,9 +13,9 @@ end
 condlist = {
 %     {'TRG1' 'base'} {'explicit'}
 %     {'TRG2' 'base'} {'implicit'}
-    {'DIST' 'base'} {'distractor'}
-    %     {'TRG1'  'DIST'} {'explicit' 'distractor'}
-    %     {'TRG2'  'DIST'} {'implicit' 'distractor'}
+%     {'DIST' 'base'} {'distractor'}
+        {'TRG1'  'DIST'} {'explicit' 'distractor'}
+        {'TRG2'  'DIST'} {'implicit' 'distractor'}
     };
 
 timewin = {
