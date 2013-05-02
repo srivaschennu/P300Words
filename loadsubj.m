@@ -1,23 +1,23 @@
 subjlists = {
     {
     % 'subj01_p300words' too few trials
-    
     'subj02_p300words'
     'subj03_p300words'
     %'subj04_p300words' %eye blinks %CONTIGUOUS TARGET ORDER
     'subj05_p300words' %eye blinks %CONTIGUOUS TARGET ORDER
     'subj06_p300words' %eye blinks
     'subj07_p300words' %eye blinks
-    
     'subj08_p300words' %eye blinks
     'subj09_p300words' %eye blinks
     'subj10_p300words' %eye blinks
     };
+    
     {
     'p1611_p300words'
     'p1511_p300words'
     'p0112_p300words'
     };
+    
     {
     'p0510V2_p300words'
     'p0710V2_p300words' %weak response
@@ -32,12 +32,13 @@ subjlists = {
     'p0812_p300words'
     'p0912_p300words' %response for trg2 and distractors
     'p1012_p300words'
-%     'p0611v2_p300words'
-%     'p0612v2_p300words'
-%     'p0113_p300words'
-%     'p0213_p300words'
-%     'p0313_p300words'
+    %     'p0611v2_p300words'
+    %     'p0612v2_p300words'
+    %     'p0113_p300words'
+    %     'p0213_p300words'
+    %     'p0313_p300words'
     };
+    
     {
     %NOISY
     'p0311v2_p300words' %noisy topography
@@ -63,5 +64,33 @@ subjlists = {
     
     %SEVERELY DISABLED
     'p1711_p300words' %weak responses to all three
+    };
+    
+    %VS
+    {
+    'p1611_p300words'
+    'p0510V2_p300words'
+    'p1311_p300words'
+    'p1411_p300words'
+    'p0312_p300words'
+    };
+    
+    %MCS
+    {
+    'p1511_p300words'
+    'p0112_p300words'
+    'p1211_p300words'
+    'p1811_p300words'
+    'p0212_p300words'
+    'p0512_p300words'
+    'p0812_p300words'
+    };
+    
+    %MCS+
+    {
+    'p0710V2_p300words'
+    'p211v2_p300words'
+    'p0912_p300words'
+    'p1012_p300words'
     };
     };

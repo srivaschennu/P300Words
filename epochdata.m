@@ -19,7 +19,7 @@ else
     EEG = basename;
 end
 
-fprintf('Retaining only first 20 epochs.\n');
+fprintf('Retaining only first 20 blocks.\n');
 bendevents = EEG.event(strcmp('BEND',{EEG.event.type}));
 for b = 1:length(bendevents)
     bendcodes = bendevents(b).codes;
@@ -54,15 +54,6 @@ if ischar(basename)
     if icamode == true && keepica == true && exist([filepath EEG.filename],'file') == 2
         oldEEG = pop_loadset('filepath',filepath,'filename',EEG.filename,'loadmode','info');
         if isfield(oldEEG,'icaweights') && ~isempty(oldEEG.icaweights)
-            fprintf('Loading existing ICA info from %s%s.\n',filepath,EEG.filename);
-            
-            EEG.icaact = oldEEG.icaact;
-            EEG.icawinv = oldEEG.icawinv;
-            EEG.icasphere = oldEEG.icasphere;
-            EEG.icaweights = oldEEG.icaweights;
-            EEG.icachansind = oldEEG.icachansind;
-            EEG.reject.gcompreject = oldEEG.reject.gcompreject;
-            
             if isfield(oldEEG,'rejchan')
                 EEG.rejchan = oldEEG.rejchan;
             else
@@ -81,14 +72,18 @@ if ischar(basename)
                 EEG.rejepoch = [];
             end
             
-            fprintf('Found %d bad channels and %d bad trials in existing file.\n', length(EEG.rejchan), length(EEG.rejepoch));
             if ~isempty(EEG.rejchan)
                 EEG = pop_select(EEG,'nochannel',{EEG.rejchan.labels});
             end
             
-            if ~isempty(EEG.rejepoch)
-                EEG = pop_select(EEG, 'notrial', EEG.rejepoch);
-            end
+            fprintf('Loading existing ICA info from %s%s.\n',filepath,EEG.filename);
+            
+            EEG.icaact = oldEEG.icaact;
+            EEG.icawinv = oldEEG.icawinv;
+            EEG.icasphere = oldEEG.icasphere;
+            EEG.icaweights = oldEEG.icaweights;
+            EEG.icachansind = oldEEG.icachansind;
+            EEG.reject.gcompreject = oldEEG.reject.gcompreject;            
         end
     end
     

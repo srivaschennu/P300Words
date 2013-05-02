@@ -11,16 +11,16 @@ else
 end
 
 condlist = {
-%     {'TRG1' 'base'} {'explicit'}
-%     {'TRG2' 'base'} {'implicit'}
-%     {'DIST' 'base'} {'distractor'}
-        {'TRG1'  'DIST'} {'explicit' 'distractor'}
-        {'TRG2'  'DIST'} {'implicit' 'distractor'}
+    {'TRG1' 'base'} {'explicit'}
+    {'TRG2' 'base'} {'implicit'}
+    {'DIST' 'base'} {'distractor'}
+%         {'TRG1'  'DIST'} {'explicit' 'distractor'}
+%         {'TRG2'  'DIST'} {'implicit' 'distractor'}
     };
 
 timewin = {
     [100 400]
-%     [400 700]
+    [400 700]
     %    [100 700]
     };
 
@@ -32,7 +32,7 @@ timewin = {
 %         stats{t} = stat;
 %     end
 % 
-%     if false%~isempty(stats{2}).pclust)
+%     if ~isempty(stats{2}.pclust)
 %         plotgfp2(stats,'legendstrings',condlist{c,2});
 %     else
 %         plotgfp(stats{1},'legendstrings',condlist{c,2},'plotinfo','off');
@@ -50,41 +50,41 @@ for s = 1:length(subjlist)
     %     close all
     
     %             dataimport(basename);
-    %             epochdata(basename,1);
+%                 epochdata(basename,1);
     
     %               rejartifacts2([basename '_epochs'],1,4);
     
 %     computeic([basename '_epochs']);
     
     
-%                     rejectic(basename);
-%                     rejartifacts2(basename,2,3);
+%                     rejectic(basename,'prompt','off');
+%                     rejartifacts2(basename,2,3,0);
     
     %                 mergedata({basename,[basename '_base']});
     
     
     
-%         for c = 1:size(condlist,1)
-%             if strcmp(condlist{c,1}{1},'TRG1')
-%                 plotparam = {'plotinfo','on'};
-%             else
-%                 plotparam = {'plotinfo','off'};
-%             end
-%     
-%             for t = 1:length(timewin)
-%                 compgfp(basename,condlist{c,1},'latency',timewin{t},'numrand',numrand);
-%                 load(sprintf('trial_%s_%s-%s_%d-%d_gfp.mat',basename,condlist{c,1}{1},condlist{c,1}{2},timewin{t}(1),timewin{t}(2)));
-%                 stat = corrp(stat,'corrp','cluster');
-%                 stats{t} = stat;
-%             end
-%     
-%             if false%~isempty(stats{2}.pclust)
-%                 plotgfp2(stats,'legendstrings',condlist{c,2},plotparam{:});
-%             else
-%                 plotgfp(stats{1},'legendstrings',condlist{c,2},plotparam{:});
-%             end
-%             close(gcf);
-%         end
+        for c = 1:size(condlist,1)
+            if strcmp(condlist{c,1}{1},'TRG1')
+                plotparam = {'plotinfo','on'};
+            else
+                plotparam = {'plotinfo','off'};
+            end
+    
+            for t = 1:length(timewin)
+                compgfp(basename,condlist{c,1},'latency',timewin{t},'numrand',numrand);
+                load(sprintf('trial_%s_%s-%s_%d-%d_gfp.mat',basename,condlist{c,1}{1},condlist{c,1}{2},timewin{t}(1),timewin{t}(2)));
+                stat = corrp(stat,'corrp','cluster');
+                stats{t} = stat;
+            end
+    
+            if false%~isempty(stats{2}.pclust)
+                plotgfp2(stats,'legendstrings',condlist{c,2},plotparam{:});
+            else
+                plotgfp(stats{1},'legendstrings',condlist{c,2},plotparam{:});
+            end
+            close(gcf);
+        end
     
     %        EEG = pop_loadset('filepath',filepath,'filename',[basename '_orig.set'],'loadmode','info');
     %        fprintf('%s: ',basename);
@@ -105,15 +105,15 @@ for s = 1:length(subjlist)
     %    batchres{s,2} = lda(EEG,{'TRG1','DIST'},'stepwise','50:50');
     %    batchres{s,3} = lda(EEG,{'TRG2','DIST'},'stepwise','50:50');
     
-                javaaddpath('/Users/chennu/Work/mffimport/MFF-1.0.d0004.jar');
-                filenames = dir(sprintf('%s%s*', filepath, basename));
-                mfffiles = filenames(logical(cell2mat({filenames.isdir})));
-                filename = mfffiles.name;
-    
-                fprintf('Reading information from %s%s.\n',filepath,filename);
-                mffinfo = read_mff_info([filepath filename]);
-                mffdate = sscanf(mffinfo.date,'%d-%d-%d');
-                batchres{s,2} = sprintf('%02d.%02d.%04d',mffdate(3),mffdate(2),mffdate(1));
+%                 javaaddpath('/Users/chennu/Work/mffimport/MFF-1.0.d0004.jar');
+%                 filenames = dir(sprintf('%s%s*', filepath, basename));
+%                 mfffiles = filenames(logical(cell2mat({filenames.isdir})));
+%                 filename = mfffiles.name;
+%     
+%                 fprintf('Reading information from %s%s.\n',filepath,filename);
+%                 mffinfo = read_mff_info([filepath filename]);
+%                 mffdate = sscanf(mffinfo.date,'%d-%d-%d');
+%                 batchres{s,2} = sprintf('%02d.%02d.%04d',mffdate(3),mffdate(2),mffdate(1));
     %
     %             fprintf('Reading subject information from %s%s.\n',filepath,filename);
     %             subjinfo = read_mff_subj([filepath filename])
@@ -156,4 +156,4 @@ end
 % [~,sortidx] = sort(batchres(:,2));
 % batchres(sortidx,:)
 %
-save(sprintf('batch %s.mat',datestr(now)),'batchres');
+% save(sprintf('batch %s.mat',datestr(now)),'batchres');
