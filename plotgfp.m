@@ -80,13 +80,40 @@ for str = 1:length(param.legendstrings)
     end
 end
 
-set(gca,'ColorOrder',cat(1,colororder,[0 0 0]));
+%set(gca,'ColorOrder',cat(1,colororder,[0 0 0]));
 hold all;
 
 plotdata = squeeze(stat.condgfp(1,:,1:length(condlist)));
 %plotdata = stat.gfpdiff(1,:);
 %param.legendstrings{end+1} = 'difference';
-plot((stat.times(1):1000/stat.srate:stat.times(end))-stat.timeshift,plotdata,'LineWidth',linewidth*1.5);
+
+if strcmp(stat.statmode,'trial')
+    plot((stat.times(1):1000/stat.srate:stat.times(end))-stat.timeshift,plotdata,'LineWidth',linewidth*1.5);
+elseif strcmp(stat.statmode,'cond') || strcmp(stat.statmode,'subj')
+    H = shadedErrorBar((stat.times(1):1000/stat.srate:stat.times(end))-stat.timeshift,plotdata(1,:),...
+        std(stat.cond1data')/sqrt(size(stat.cond1data',1)),{'LineWidth',linewidth*1.5,'Color',colororder(1,:)});
+    hAnnotation = get(H.patch,'Annotation');
+    hLegendEntry = get(hAnnotation','LegendInformation');
+    set(hLegendEntry,'IconDisplayStyle','off');
+    for e = 1:length(H.edge)
+        hAnnotation = get(H.edge(e),'Annotation');
+        hLegendEntry = get(hAnnotation','LegendInformation');
+        set(hLegendEntry,'IconDisplayStyle','off');
+    end
+
+    if length(condlist) == 2
+        H = shadedErrorBar((stat.times(1):1000/stat.srate:stat.times(end))-stat.timeshift,plotdata(2,:),...
+            std(stat.cond2data')/sqrt(size(stat.cond2data',1)),{'LineWidth',linewidth*1.5,'Color',colororder(2,:)});
+        hAnnotation = get(H.patch,'Annotation');
+        hLegendEntry = get(hAnnotation','LegendInformation');
+        set(hLegendEntry,'IconDisplayStyle','off');
+        for e = 1:length(H.edge)
+            hAnnotation = get(H.edge(e),'Annotation');
+            hLegendEntry = get(hAnnotation','LegendInformation');
+            set(hLegendEntry,'IconDisplayStyle','off');
+        end
+    end
+end
 
 set(gca,'XLim',[stat.times(1) stat.times(end)]-stat.timeshift,'XTick',stat.times(1)-stat.timeshift:200:stat.times(end)-stat.timeshift,'YLim',param.ylim,...
     'FontSize',param.fontsize,'FontName',fontname);

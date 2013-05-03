@@ -232,6 +232,8 @@ end
 
 gfpdiff = zeros(param.numrand+1,conddata{1,1}.pnts);
 stat.condgfp = zeros(param.numrand+1,conddata{1,1}.pnts,numcond);
+stat.cond1data = cond1data;
+stat.cond2data = cond2data;
 
 h_wait = waitbar(0,'Please wait...');
 set(h_wait,'Name',[mfilename ' progress']);
