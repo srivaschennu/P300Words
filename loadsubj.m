@@ -17,9 +17,9 @@ subjlists = {
     'p1611_p300words'
     'p1511_p300words'
     'p0112_p300words'
-    };
-    %3
-    {
+%     };
+%     %3
+%     {
     'p0510V2_p300words'
     'p0710V2_p300words' %weak response
     'p211v2_p300words' %only distractors get a response
@@ -74,10 +74,10 @@ subjlists = {
     'p1311_p300words'
     'p1411_p300words'
     'p0312_p300words'
-%     };
-%     %6
-%     %MCS
-%     {
+    };
+    %6
+    %MCS
+    {
     'p1511_p300words'
     'p0112_p300words'
     'p1211_p300words'
@@ -85,10 +85,10 @@ subjlists = {
     'p0212_p300words'
     'p0512_p300words'
     'p0812_p300words'
-%     };
-%     %7
-%     %MCS+
-%     {
+    };
+    %7
+    %MCS+
+    {
     'p0710V2_p300words'
     'p211v2_p300words'
     'p0912_p300words'

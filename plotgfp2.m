@@ -33,13 +33,13 @@ for s = 1:length(stats)
     else
         latpnt = find(stats{s}.times-stats{s}.timeshift >= stats{s}.param.latency(1) & stats{s}.times-stats{s}.timeshift <= stats{s}.param.latency(2));
     end
-
+    
     %pick time point at max of condition 1
     [~, maxidx] = max(stats{s}.condgfp(1,latpnt,1),[],2);
-
+    
     %pick time point at max of difference
     %[~, maxidx] = max(stats{s}.gfpdiff(1,latpnt),[],2);
-
+    
     stats{s}.plotpnt = latpnt(1)-1+maxidx;
     
     subplot(2,2,s);
@@ -58,8 +58,8 @@ for s = 1:length(stats)
     else
         text(0,-0.9,sprintf('%dms',round(stats{s}.times(stats{s}.plotpnt))),...
             'FontSize',param.fontsize,'FontName',fontname,'HorizontalAlignment','center');
-%         text(0,-0.9,sprintf('%dms\nt = %.2f, p = %.2f',round(stats{s}.times(stats{s}.plotpnt)),stats{s}.valu(stats{s}.plotpnt),stats{s}.pprob(stats{s}.plotpnt)),...
-%             'FontSize',param.fontsize,'FontName',fontname,'HorizontalAlignment','center');
+        %         text(0,-0.9,sprintf('%dms\nt = %.2f, p = %.2f',round(stats{s}.times(stats{s}.plotpnt)),stats{s}.valu(stats{s}.plotpnt),stats{s}.pprob(stats{s}.plotpnt)),...
+        %             'FontSize',param.fontsize,'FontName',fontname,'HorizontalAlignment','center');
     end
 end
 
@@ -80,7 +80,36 @@ set(gca,'ColorOrder',cat(1,colororder,[0 0 0]));
 hold all;
 
 plotdata = squeeze(stats{1}.condgfp(1,:,1));
-plot((stats{1}.times(1):1000/stats{1}.srate:stats{1}.times(end))-stats{1}.timeshift,plotdata,'LineWidth',linewidth*1.5);
+%plotdata = stats{1}.gfpdiff(1,:);
+%param.legendstrings{end+1} = 'difference';
+
+if strcmp(stats{1}.statmode,'trial')
+    plot((stats{1}.times(1):1000/stats{1}.srate:stats{1}.times(end))-stats{1}.timeshift,plotdata,'LineWidth',linewidth*1.5);
+elseif strcmp(stats{1}.statmode,'cond') || strcmp(stats{1}.statmode,'subj')
+    H = shadedErrorBar((stats{1}.times(1):1000/stats{1}.srate:stats{1}.times(end))-stats{1}.timeshift,plotdata(1,:),...
+        std(stats{1}.cond1data'),{'LineWidth',linewidth*1.5,'Color',colororder(1,:)});
+    hAnnotation = get(H.patch,'Annotation');
+    hLegendEntry = get(hAnnotation','LegendInformation');
+    set(hLegendEntry,'IconDisplayStyle','off');
+    for e = 1:length(H.edge)
+        hAnnotation = get(H.edge(e),'Annotation');
+        hLegendEntry = get(hAnnotation','LegendInformation');
+        set(hLegendEntry,'IconDisplayStyle','off');
+    end
+    
+%     if length(stats{1}.condlist) == 2
+%         H = shadedErrorBar((stats{1}.times(1):1000/stats{1}.srate:stats{1}.times(end))-stats{1}.timeshift,plotdata(2,:),...
+%             std(stats{1}.cond2data'),{'LineWidth',linewidth*1.5,'Color',colororder(2,:)});
+%         hAnnotation = get(H.patch,'Annotation');
+%         hLegendEntry = get(hAnnotation','LegendInformation');
+%         set(hLegendEntry,'IconDisplayStyle','off');
+%         for e = 1:length(H.edge)
+%             hAnnotation = get(H.edge(e),'Annotation');
+%             hLegendEntry = get(hAnnotation','LegendInformation');
+%             set(hLegendEntry,'IconDisplayStyle','off');
+%         end
+%     end
+end
 
 set(gca,'XLim',[stats{1}.times(1) stats{1}.times(end)]-stats{1}.timeshift,'XTick',stats{1}.times(1)-stats{1}.timeshift:200:stats{1}.times(end)-stats{1}.timeshift,'YLim',param.ylim,...
     'FontSize',param.fontsize,'FontName',fontname);
@@ -103,7 +132,7 @@ for s = 1:length(stats)
     if param.ttesttail >= 0
         if ~isempty(stats{s}.pclust)
             for p = 1:length(stats{s}.pclust)
-            line([stats{s}.pclust(p).win(1) stats{s}.pclust(p).win(2)],[0 0],'Color','blue','LineWidth',8);
+                line([stats{s}.pclust(p).win(1) stats{s}.pclust(p).win(2)],[0 0],'Color','blue','LineWidth',8);
             end
         end
     end

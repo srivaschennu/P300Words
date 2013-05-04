@@ -69,8 +69,8 @@ for c = 1:size(plotdata,3)
     
     line([0 0],ylim,'Color','black','LineStyle',':','LineWidth',linewidth);
 %     if c == 1
-%         xlabel('Participants','FontSize',param.fontsize,'FontName',fontname);
-%         ylabel(' ','FontSize',param.fontsize,'FontName',fontname);
+%         xlabel(' ','FontSize',param.fontsize,'FontName',fontname);
+%         ylabel('Patient','FontSize',param.fontsize,'FontName',fontname);
 %     else
 %         xlabel(' ','FontSize',param.fontsize,'FontName',fontname);
 %         ylabel(' ','FontSize',param.fontsize,'FontName',fontname);

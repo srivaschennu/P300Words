@@ -32,10 +32,11 @@ for c = 1:size(condlist,1)
         stats{t} = stat;
     end
 
-    if strcmp(condlist{1},'TRG1')
-        plotgfp2(stats,'legendstrings',condlist{c,2});
+    if strcmp(condlist{c,1}{1},'TRG1')
+        %plotgfp2(stats,'legendstrings',condlist{c,2},'ylim',[-2 8]);
+        plotgfp(stats{1},'legendstrings',condlist{c,2},'plotinfo','on','ylim',[-2 8]);
     else
-        plotgfp(stats{1},'legendstrings',condlist{c,2},'plotinfo','off');
+        plotgfp(stats{1},'legendstrings',condlist{c,2},'plotinfo','off','ylim',[-2 8]);
     end
     close(gcf);
 end
