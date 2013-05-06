@@ -54,14 +54,18 @@ for s = 1:numsubj
     
     for c = 1:numcond
         selectevents = subjcond{s,c};
-        selectsnum = 3:8;
+        %selectsnum = 3:8;
         %selectpred = 1;
         %selectwnum = 2;
+        selectwori = [2 8]; %eccentric distractors
+        selectwori = [5]; %central distractors
         
         typematches = false(1,length(EEG.epoch));
         snummatches = false(1,length(EEG.epoch));
         predmatches = false(1,length(EEG.epoch));
         wnummatches = false(1,length(EEG.epoch));
+        worimatches = false(1,length(EEG.epoch));
+        
         for ep = 1:length(EEG.epoch)
             
             epochtype = EEG.epoch(ep).eventtype;
@@ -108,9 +112,18 @@ for s = 1:numsubj
                 wnummatches(ep) = true;
             end
             
+            woriidx = strcmp('WORI',epochcodes(:,1)');
+            if exist('selectwori','var') && ~isempty(selectwori) && sum(woriidx) > 0
+                if sum(epochcodes{woriidx,2} == selectwori) > 0
+                    worimatches(ep) = true;
+                end
+            else
+                worimatches(ep) = true;
+            end
+            
         end
         
-        selectepochs = find(typematches & snummatches & predmatches & wnummatches);
+        selectepochs = find(typematches & snummatches & predmatches & wnummatches & worimatches);
         %selectepochs = find(typematches & snummatches & predmatches);
         fprintf('Condition %s: found %d matching epochs.\n',subjcond{s,c},length(selectepochs));
         
