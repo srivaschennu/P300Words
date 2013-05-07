@@ -10,6 +10,7 @@ param = finputcheck(varargin, {
     'numrand', 'integer', [], 1000; ...
     'latency', 'real', [], []; ...
     'chanlist', 'cell', {}, {}; ...
+    'wori', 'cell', {}, cell(1,length(condlist)), ...
     });
 
 if isempty(param.latency)
@@ -99,10 +100,14 @@ for s = 1:numsubj
         end
         selectsnum = 3:8;
         %selectpred = 1;
+%         selectwori = param.wori{c};
         
         typematches = false(1,length(EEG.epoch));
         snummatches = false(1,length(EEG.epoch));
         predmatches = false(1,length(EEG.epoch));
+        wnummatches = false(1,length(EEG.epoch));
+        worimatches = false(1,length(EEG.epoch));
+        
         for ep = 1:length(EEG.epoch)
             
             epochtype = EEG.epoch(ep).eventtype;
@@ -143,9 +148,28 @@ for s = 1:numsubj
             else
                 predmatches(ep) = true;
             end
+            
+            wnumidx = strcmp('WNUM',epochcodes(:,1)');
+            if exist('selectwnum','var') && ~isempty(selectwnum) && sum(wnumidx) > 0
+                if sum(epochcodes{wnumidx,2} == selectwnum) > 0
+                    wnummatches(ep) = true;
+                end
+            else
+                wnummatches(ep) = true;
+            end
+            
+            woriidx = strcmp('WORI',epochcodes(:,1)');
+            if exist('selectwori','var') && ~isempty(selectwori) && sum(woriidx) > 0
+                if sum(epochcodes{woriidx,2} == selectwori) > 0
+                    worimatches(ep) = true;
+                end
+            else
+                worimatches(ep) = true;
+            end
         end
         
-        selectepochs = find(typematches & snummatches & predmatches);
+        selectepochs = find(typematches & snummatches & predmatches & wnummatches & worimatches);
+        %selectepochs = find(typematches & snummatches & predmatches);
         fprintf('Condition %s: found %d matching epochs.\n',subjcond{s,c},length(selectepochs));
         
         conddata{s,c} = pop_select(EEG,'trial',selectepochs);

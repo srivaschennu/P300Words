@@ -14,7 +14,7 @@ colorlist = {
     };
 
 param = finputcheck(varargin, { 'ylim', 'real', [], [-5 15]; ...
-    'fontsize','integer', [], 26; ...
+    'fontsize','integer', [], 28; ...
     'legendstrings', 'cell', {}, condlist; ...
     'legendposition', 'string', {}, 'NorthWest'; ...
     'ttesttail', 'integer', [-1 0 1], 0; ...
@@ -80,10 +80,15 @@ for str = 1:length(param.legendstrings)
     end
 end
 
-%set(gca,'ColorOrder',cat(1,colororder,[0 0 0]));
+% colororder = cat(1,colororder,[0 0 0]);
+set(gca,'ColorOrder',colororder);
 hold all;
 
 plotdata = squeeze(stat.condgfp(1,:,1:length(condlist)));
+if length(condlist) == 2
+    plotdata = plotdata';
+end
+
 %plotdata = stat.gfpdiff(1,:);
 %param.legendstrings{end+1} = 'difference';
 
@@ -144,7 +149,7 @@ end
 if param.ttesttail <= 0
     if ~isempty(stat.nclust)
         for n = 1:length(stat.nclust)
-            line([stat.nclust(p).win(1) stat.nclust(p).win(2)],[0 0],'Color','red','LineWidth',8);
+            line([stat.nclust(n).win(1) stat.nclust(n).win(2)],[0 0],'Color','red','LineWidth',8);
         end
     else
         fprintf('No negative clusters found.\n');

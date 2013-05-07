@@ -3,15 +3,18 @@ function plotimage(subjinfo,varargin)
 loadpaths
 loadsubj
 
-param = finputcheck(varargin, { 'fontsize','integer', [], 26; ...
+param = finputcheck(varargin, { 'fontsize','integer', [], 28; ...
     });
 
 %% figure plotting
 
 fontname = 'Helvetica';
 linewidth = 2;
-ranklist = [0.11 0.1 0.05 0.01 0.001];
-ranklabel = {'','p < 0.1', 'p < 0.05', 'p < 0.01',''};
+% ranklist = [0.11 0.1 0.05 0.01 0.001];
+% ranklabel = {'','p < 0.1', 'p < 0.05', 'p < 0.01',''};
+ranklist = [0.012 0.01 0.005 0.001 0.0001];
+ranklabel = {'', 'p < 0.01', 'p < 0.005', 'p < 0.001',''};
+
 subjlist = subjlists{subjinfo};
 
 condlist = {
@@ -33,6 +36,7 @@ for s = 1:length(subjlist)
         plotidx = plotidx+1;
         
         load(sprintf('trial_%s_%s-base_%d-%d_gfp.mat',basename,condlist{c,1},timewin{1}(1),timewin{1}(2)));
+        stat = corrp(stat,'corrp','cluster');
         
         if s == 1 && c == 1
             plotdata = zeros(length(subjlist),length(stat.times),length(condlist));
@@ -79,6 +83,7 @@ for c = 1:size(plotdata,3)
     figfile = sprintf('figures/img_%s_%s',num2str(subjinfo),plotinfo{c});
     set(gcf,'Color','white','Name',figfile,'FileName',figfile);
     export_fig(gcf,[figfile '.eps'],'-opengl');
+    close(gcf);
 end
 
 figure;

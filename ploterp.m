@@ -58,7 +58,7 @@ for s = 1:numsubj
         %selectpred = 1;
         %selectwnum = 2;
         selectwori = [2 8]; %eccentric distractors
-        selectwori = [5]; %central distractors
+%         selectwori = [5]; %central distractors
         
         typematches = false(1,length(EEG.epoch));
         snummatches = false(1,length(EEG.epoch));
@@ -120,7 +120,6 @@ for s = 1:numsubj
             else
                 worimatches(ep) = true;
             end
-            
         end
         
         selectepochs = find(typematches & snummatches & predmatches & wnummatches & worimatches);
