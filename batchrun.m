@@ -2,7 +2,7 @@ function batchrun(subjinfo)
 
 loadpaths
 loadsubj
-numrand = 200;
+numrand = 1000;
 
 if ischar(subjinfo)
     subjlist = {subjinfo};
@@ -74,13 +74,13 @@ for s = 1:length(subjlist)
             end
     
             for t = 1:length(timewin)
-%                 compgfp(basename,condlist{c,1},'latency',timewin{t},'numrand',numrand);
+                %compgfp(basename,condlist{c,1},'latency',timewin{t},'numrand',numrand);
                 load(sprintf('trial_%s_%s-%s_%d-%d_gfp.mat',basename,condlist{c,1}{1},condlist{c,1}{2},timewin{t}(1),timewin{t}(2)));
                 stat = corrp(stat,'corrp','cluster');
                 stats{t} = stat;
             end
     
-            if false%~isempty(stats{2}.pclust)
+            if false%strcmp(condlist{c,1}{1},'TRG1')
                 plotgfp2(stats,'legendstrings',condlist{c,2},plotparam{:},'ylim',[-2 18]);
             else
                 plotgfp(stats{1},'legendstrings',condlist{c,2},plotparam{:},'ylim',[-2 18]);

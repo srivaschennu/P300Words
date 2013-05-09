@@ -17,9 +17,9 @@ subjlists = {
     'p1611_p300words'
     'p1511_p300words'
     'p0112_p300words'
-%     };
-%     %3
-%     {
+    };
+    %3
+    {
     'p0510V2_p300words'
     'p0710V2_p300words' %weak response
     'p211v2_p300words' %only distractors get a response
@@ -31,7 +31,7 @@ subjlists = {
     'p0312_p300words'
     'p0512_p300words'
     'p0812_p300words'
-    'p0912_p300words' %response for trg2 and distractors
+    'p1711_p300words' %weak responses to all three
     'p1012_p300words'
     %     'p0611v2_p300words'
     %     'p0612v2_p300words'
@@ -64,7 +64,7 @@ subjlists = {
     'p0911_p300words' %only 12 blocks
     
     %SEVERELY DISABLED
-    'p1711_p300words' %weak responses to all three
+    'p0912_p300words' %response for trg2 and distractors    
     };
     %5
     %VS

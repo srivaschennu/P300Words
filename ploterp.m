@@ -54,10 +54,10 @@ for s = 1:numsubj
     
     for c = 1:numcond
         selectevents = subjcond{s,c};
-        %selectsnum = 3:8;
+        selectsnum = 3:8;
         %selectpred = 1;
         %selectwnum = 2;
-        selectwori = [2 8]; %eccentric distractors
+%         selectwori = [2 8]; %eccentric distractors
 %         selectwori = [5]; %central distractors
         
         typematches = false(1,length(EEG.epoch));
