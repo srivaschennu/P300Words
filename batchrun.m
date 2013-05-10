@@ -26,19 +26,25 @@ timewin = {
     };
 
 % for c = 1:size(condlist,1)
-%     for t = 1:length(timewin)
-% %         compgfp(subjinfo,condlist{c,1},'latency',timewin{t},'numrand',numrand);
-%         load(sprintf('cond_%d_%s-%s_%d-%d_gfp.mat',subjinfo,condlist{c,1}{1},condlist{c,1}{2},timewin{t}(1),timewin{t}(2)));
-%         stat = corrp(stat,'corrp','cluster');
-%         stats{t} = stat;
-%     end
-% 
-%     if strcmp(condlist{c,1}{1},'TRG1')
-% %         plotgfp2(stats,'legendstrings',condlist{c,2},'ylim',[-2 8]);
-%         plotgfp(stats{1},'legendstrings',condlist{c,2},'plotinfo','on','ylim',[-2 8]);
-%     else
-%         plotgfp(stats{1},'legendstrings',condlist{c,2},'plotinfo','off','ylim',[-2 8]);
-%     end
+%             if strcmp(condlist{c,1}{1},'TRG1')
+%                 ploterp(subjinfo,condlist{c,1}(1),'ylim',[-5 5],'topowin',[100 400; 400 700]);
+%             else
+%                 ploterp(subjinfo,condlist{c,1}(1),'ylim',[-5 5],'topowin',[100 400],'plotinfo','off');
+%             end
+%     
+% %     for t = 1:length(timewin)
+% % %         compgfp(subjinfo,condlist{c,1},'latency',timewin{t},'numrand',numrand);
+% %         load(sprintf('cond_%d_%s-%s_%d-%d_gfp.mat',subjinfo,condlist{c,1}{1},condlist{c,1}{2},timewin{t}(1),timewin{t}(2)));
+% %         stat = corrp(stat,'corrp','cluster');
+% %         stats{t} = stat;
+% %     end
+% % 
+% %     if strcmp(condlist{c,1}{1},'TRG1')
+% % %         plotgfp2(stats,'legendstrings',condlist{c,2},'ylim',[-2 8]);
+% %         plotgfp(stats{1},'legendstrings',condlist{c,2},'plotinfo','on','ylim',[-2 8]);
+% %     else
+% %         plotgfp(stats{1},'legendstrings',condlist{c,2},'plotinfo','off','ylim',[-2 8]);
+% %     end
 %     close(gcf);
 % end
 
@@ -48,7 +54,7 @@ for s = 1:length(subjlist)
 %     fprintf('%s\n',strtok(basename,'_'));
     batchres{s,1} = basename;
     
-%         ploterp(basename,{'TRG1','TRG2','DIST'},'ylim',[-7 7]);
+    
     %     close all
     
     %             dataimport(basename);
@@ -68,23 +74,31 @@ for s = 1:length(subjlist)
     
         for c = 1:size(condlist,1)
             if strcmp(condlist{c,1}{1},'TRG1')
-                plotparam = {'plotinfo','on'};
+                ploterp(basename,condlist{c,1}(1),'ylim',[-5 5],'topowin',[100 400]);
             else
-                plotparam = {'plotinfo','off'};
+                ploterp(basename,condlist{c,1}(1),'ylim',[-5 5],'topowin',[100 400],'plotinfo','off');
             end
-    
-            for t = 1:length(timewin)
-                %compgfp(basename,condlist{c,1},'latency',timewin{t},'numrand',numrand);
-                load(sprintf('trial_%s_%s-%s_%d-%d_gfp.mat',basename,condlist{c,1}{1},condlist{c,1}{2},timewin{t}(1),timewin{t}(2)));
-                stat = corrp(stat,'corrp','cluster');
-                stats{t} = stat;
-            end
-    
-            if false%strcmp(condlist{c,1}{1},'TRG1')
-                plotgfp2(stats,'legendstrings',condlist{c,2},plotparam{:},'ylim',[-2 18]);
-            else
-                plotgfp(stats{1},'legendstrings',condlist{c,2},plotparam{:},'ylim',[-2 18]);
-            end
+            
+%             if strcmp(condlist{c,1}{1},'TRG1')
+%                 plotparam = {'plotinfo','on'};
+%             else
+%                 plotparam = {'plotinfo','off'};
+%             end
+%     
+%             for t = 1:length(timewin)
+%                 %compgfp(basename,condlist{c,1},'latency',timewin{t},'numrand',numrand);
+%                 load(sprintf('trial_%s_%s-%s_%d-%d_gfp.mat',basename,condlist{c,1}{1},condlist{c,1}{2},timewin{t}(1),timewin{t}(2)));
+%                 stat = corrp(stat,'corrp','cluster');
+%                 stats{t} = stat;
+%             end
+%     
+%             if strcmp(condlist{c,1}{1},'TRG1')
+% %                 plotgfp2(stats,'legendstrings',condlist{c,2},plotparam{:},'ylim',[-2 18]);
+%                 plotgfp(stats{2},'legendstrings',condlist{c,2},plotparam{:},'ylim',[-2 18]);
+%             else
+%                 plotgfp(stats{1},'legendstrings',condlist{c,2},plotparam{:},'ylim',[-2 18]);
+%             end
+
             close(gcf);
         end
     
@@ -115,7 +129,7 @@ for s = 1:length(subjlist)
 %                 fprintf('Reading information from %s%s.\n',filepath,filename);
 %                 mffinfo = read_mff_info([filepath filename]);
 %                 mffdate = sscanf(mffinfo.date,'%d-%d-%d');
-%                 batchres{s,2} = sprintf('%02d.%02d.%04d',mffdate(3),mffdate(2),mffdate(1));
+%                 batchres{s,2} = sprintf('%02d/%02d/%04d',mffdate(3),mffdate(2),mffdate(1));
     %
     %             fprintf('Reading subject information from %s%s.\n',filepath,filename);
     %             subjinfo = read_mff_subj([filepath filename])

@@ -31,13 +31,12 @@ subjlists = {
     'p0312_p300words'
     'p0512_p300words'
     'p0812_p300words'
-    'p1711_p300words' %weak responses to all three
     'p1012_p300words'
-    %     'p0611v2_p300words'
-    %     'p0612v2_p300words'
-    %     'p0113_p300words'
-    %     'p0213_p300words'
-    %     'p0313_p300words'
+%         'p0611v2_p300words'
+%         'p0612v2_p300words'   
+%         'p0113_p300words'
+%         'p0213_p300words'
+%         'p0313_p300words'
     };
     %4
     {
@@ -65,6 +64,7 @@ subjlists = {
     
     %SEVERELY DISABLED
     'p0912_p300words' %response for trg2 and distractors    
+    'p1711_p300words' %weak responses to all three    
     };
     %5
     %VS

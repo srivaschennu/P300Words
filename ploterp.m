@@ -7,7 +7,13 @@ timeshift = 0; %milliseconds
 param = finputcheck(varargin, { 'ylim', 'real', [], [-12 12]; ...
     'subcond', 'string', {'on','off'}, 'off'; ...
     'topowin', 'real', [], [200 600]; ...
+    'fontsize','integer', [], 28; ...
+    'plotinfo', 'string', {'on','off'}, 'on'; ...
     });
+
+if isempty(param.topowin)
+    param.topowin = [0 EEG.times(end)-timeshift];
+end
 
 %% SELECTION OF SUBJECTS AND LOADING OF DATA
 
@@ -49,6 +55,7 @@ for s = 1:numsubj
     % THIS ASSUMES THAT ALL DATASETS HAVE SAME NUMBER OF ELECTRODES
     if s == 1
         chanlocs = EEG.chanlocs;
+        times = EEG.times;
         erpdata = zeros(EEG.nbchan,EEG.pnts,numcond,numsubj);
     end
     
@@ -149,36 +156,92 @@ end
 
 erpdata = mean(erpdata,4);
 
+fontname = 'Helvetica';
+linewidth = 2;
+
 for c = 1:size(erpdata,3)
     plotdata = erpdata(:,:,c);
     
-    if isempty(param.topowin)
-        param.topowin = [0 EEG.times(end)-timeshift];
-    end
-    latpnt = find(EEG.times-timeshift >= param.topowin(1) & EEG.times-timeshift <= param.topowin(2));
-    [maxval, maxidx] = max(abs(plotdata(:,latpnt)),[],2);
-    [~, maxmaxidx] = max(maxval);
-    plottime = EEG.times(latpnt(1)-1+maxidx(maxmaxidx));
-    if plottime == EEG.times(end)
-        plottime = EEG.times(end-1);
-    end
-    
     %plot ERP data
-    figure('Name',condlist{c},'Color','white');
-    timtopo(plotdata,chanlocs,...
-        'limits',[EEG.times(1)-timeshift EEG.times(end)-timeshift, param.ylim],...
-        'plottimes',plottime-timeshift);
+    figfile = sprintf('figures/%s_%s_%s_erp',statmode,num2str(subjinfo),condlist{c});
     
-    saveEEG = EEG;
-    saveEEG.data = plotdata;
-    saveEEG.setname = sprintf('%s_%s_%s',statmode,num2str(subjinfo),condlist{c});
-    saveEEG.filename = [saveEEG.setname '.set'];
-    saveEEG.trials = 1;
-    saveEEG.event = saveEEG.event(1);
-    saveEEG.event(1).type = saveEEG.setname;
-    saveEEG.epoch = saveEEG.epoch(1);
-    saveEEG.epoch(1).eventtype = saveEEG.setname;
-    pop_saveset(saveEEG,'filepath',filepath,'filename',saveEEG.filename);    
+    figure('Name',condlist{c},'Color','white','FileName',[figfile '.fig']);
+    figpos = get(gcf,'Position');
+    set(gcf,'Position',[figpos(1) figpos(2) figpos(3) figpos(3)]);
+    
+    if size(param.topowin,1) == 1
+        latpnt = find(EEG.times-timeshift >= param.topowin(1) & EEG.times-timeshift <= param.topowin(2));
+        [maxval, maxidx] = max(abs(plotdata(:,latpnt)),[],2);
+        [~, maxmaxidx] = max(maxval);
+        plotpnt = latpnt(1)-1+maxidx(maxmaxidx);
+        
+        subplot(2,2,1:2);
+        plotvals = plotdata(:,plotpnt);
+        topoplot(plotvals,chanlocs);
+        cb_h = colorbar('FontSize',param.fontsize);
+        cb_labels = num2cell(get(cb_h,'YTickLabel'),2);
+        cb_labels{1} = [cb_labels{1} ' uV'];
+        set(cb_h,'YTickLabel',cb_labels);
+        text(0,-0.7,sprintf('%dms', round(times(plotpnt))),...
+            'FontSize',param.fontsize,'FontName',fontname,'HorizontalAlignment','center');
+    else
+        for s = 1:size(param.topowin,1)
+            latpnt = find(EEG.times-timeshift >= param.topowin(s,1) & EEG.times-timeshift <= param.topowin(s,2));
+            [maxval, maxidx] = max(abs(plotdata(:,latpnt)),[],2);
+            [~, maxmaxidx] = max(maxval);
+            plotpnt(s) = latpnt(1)-1+maxidx(maxmaxidx);
+            
+            subplot(2,2,s);
+            plotvals = plotdata(:,plotpnt(s));
+            topoplot(plotvals,chanlocs);
+            cb_h = colorbar('FontSize',param.fontsize);
+            cb_labels = num2cell(get(cb_h,'YTickLabel'),2);
+            cb_labels{1} = [cb_labels{1} ' uV'];
+            set(cb_h,'YTickLabel',cb_labels);
+            text(0,-0.7,sprintf('%dms', round(times(plotpnt(s)))),...
+                'FontSize',param.fontsize,'FontName',fontname,'HorizontalAlignment','center');
+        end
+    end
+
+    subplot(2,2,3:4);
+    plot(times-timeshift,plotdata');
+
+    set(gca,'XLim',[times(1) times(end)]-timeshift,'XTick',times(1)-timeshift:200:times(end)-timeshift,'YLim',param.ylim,...
+        'FontSize',param.fontsize,'FontName',fontname);
+    line([0 0],param.ylim,'Color','black','LineStyle',':','LineWidth',linewidth);
+    line([times(1) times(end)]-timeshift,[0 0],'Color','black','LineStyle',':','LineWidth',linewidth);
+    
+    for s = 1:length(plotpnt)
+        line([times(plotpnt(s)) times(plotpnt(s))]-timeshift,param.ylim,'Color','red','LineWidth',linewidth,'LineStyle','--');
+    end
+    
+    if strcmp(param.plotinfo,'on')
+        xlabel('Time (ms) ','FontSize',param.fontsize,'FontName',fontname);
+        ylabel('Voltage ({\mu}V) ','FontSize',param.fontsize,'FontName',fontname);
+    else
+        xlabel(' ','FontSize',param.fontsize,'FontName',fontname);
+        ylabel(' ','FontSize',param.fontsize,'FontName',fontname);
+    end
+    box off
+    
+%     timtopo(plotdata,chanlocs,...
+%         'limits',[EEG.times(1)-timeshift EEG.times(end)-timeshift, param.ylim],...
+%         'plottimes',plottime-timeshift);
+    
+%     saveEEG = EEG;
+%     saveEEG.data = plotdata;
+%     saveEEG.setname = sprintf('%s_%s_%s',statmode,num2str(subjinfo),condlist{c});
+%     saveEEG.filename = [saveEEG.setname '.set'];
+%     saveEEG.trials = 1;
+%     saveEEG.event = saveEEG.event(1);
+%     saveEEG.event(1).type = saveEEG.setname;
+%     saveEEG.epoch = saveEEG.epoch(1);
+%     saveEEG.epoch(1).eventtype = saveEEG.setname;
+%     pop_saveset(saveEEG,'filepath',filepath,'filename',saveEEG.filename);    
+    set(gcf,'Color','white');
+    %saveas(gcf,[figfile '.fig']);
+    export_fig(gcf,[figfile '.eps']);
+
 end
 
 % gadiff = diffdata{1};
