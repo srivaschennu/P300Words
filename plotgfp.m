@@ -53,7 +53,7 @@ end
 plotpnt = latpnt(1)-1+maxidx;
 
 subplot(2,2,1:2);
-plotvals = stat.condavg(:,plotpnt,1);
+plotvals = mean(stat.inddata{1}(:,plotpnt,:),3);
 topoplot(plotvals,stat.chanlocs);
 cb_h = colorbar('FontSize',param.fontsize);
 cb_labels = num2cell(get(cb_h,'YTickLabel'),2);
@@ -96,7 +96,7 @@ if strcmp(stat.statmode,'trial')
     plot((stat.times(1):1000/stat.srate:stat.times(end))-stat.timeshift,plotdata,'LineWidth',linewidth*1.5);
 elseif strcmp(stat.statmode,'cond') || strcmp(stat.statmode,'subj')
     H = shadedErrorBar((stat.times(1):1000/stat.srate:stat.times(end))-stat.timeshift,plotdata(1,:),...
-        std(stat.cond1data'),{'LineWidth',linewidth*1.5,'Color',colororder(1,:)});
+        std(stat.indgfp{1}'),{'LineWidth',linewidth*1.5,'Color',colororder(1,:)});
     hAnnotation = get(H.patch,'Annotation');
     hLegendEntry = get(hAnnotation','LegendInformation');
     set(hLegendEntry,'IconDisplayStyle','off');
@@ -108,7 +108,7 @@ elseif strcmp(stat.statmode,'cond') || strcmp(stat.statmode,'subj')
 
     if length(condlist) == 2
         H = shadedErrorBar((stat.times(1):1000/stat.srate:stat.times(end))-stat.timeshift,plotdata(2,:),...
-            std(stat.cond2data'),{'LineWidth',linewidth*1.5,'Color',colororder(2,:)});
+            std(stat.indgfp{2}'),{'LineWidth',linewidth*1.5,'Color',colororder(2,:)});
         hAnnotation = get(H.patch,'Annotation');
         hLegendEntry = get(hAnnotation','LegendInformation');
         set(hLegendEntry,'IconDisplayStyle','off');

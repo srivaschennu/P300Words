@@ -17,9 +17,9 @@ subjlists = {
     'p1611_p300words'
     'p1511_p300words'
     'p0112_p300words'
-    };
-    %3
-    {
+%     };
+%     %3
+%     {
     'p0510V2_p300words'
     'p0710V2_p300words' %weak response
     'p211v2_p300words' %only distractors get a response
