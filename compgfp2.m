@@ -195,6 +195,8 @@ end
 if strcmp(statmode,'trial')
     inddata{1} = conddata{1}.data;
     inddata{2} = conddata{2}.data;
+    indgfp{1} = calcgfp(mean(inddata{1},3),EEG.times);
+    indgfp{2} = calcgfp(mean(inddata{2},3),EEG.times);
     mergedata = cat(3,conddata{1,1}.data,conddata{1,2}.data);
     diffcond = mean(inddata{1},3) - mean(inddata{2},3);
     

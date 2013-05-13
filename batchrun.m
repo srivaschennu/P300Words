@@ -11,42 +11,42 @@ else
 end
 
 condlist = {
-%     {'TRG1' 'base'} {'explicit'}
-%     {'TRG2' 'base'} {'implicit'}
-%     {'DIST' 'base'} {'distractor'}
-        {'TRG'  'DIST'} {'explicit' 'distractor'}
+    {'TRG1' 'base'} {'explicit'}
+    {'TRG2' 'base'} {'implicit'}
+    {'DIST' 'base'} {'distractor'}
+%         {'TRG1'  'DIST'} {'explicit' 'distractor'}
 %         {'TRG2'  'DIST'} {'implicit' 'distractor'}
 %     {'DIST'  'DIST'} {'eccentric' 'central'}
     };
 
 timewin = {
     [100 400]
-%     [400 700]
+    [400 700]
     %    [100 700]
     };
 
-for c = 1:size(condlist,1)
-%             if strcmp(condlist{c,1}{1},'TRG1')
-%                 ploterp(subjinfo,condlist{c,1}(1),'ylim',[-5 5],'topowin',[100 400; 400 700]);
-%             else
-%                 ploterp(subjinfo,condlist{c,1}(1),'ylim',[-5 5],'topowin',[100 400],'plotinfo','off');
-%             end
-    
-    for t = 1:length(timewin)
-        compgfp2(subjinfo,condlist{c,1},'latency',timewin{t},'numrand',numrand);
-        load(sprintf('cond_%d_%s-%s_%d-%d_gfp.mat',subjinfo,condlist{c,1}{1},condlist{c,1}{2},timewin{t}(1),timewin{t}(2)));
-        stat = corrp(stat,'corrp','cluster');
-        stats{t} = stat;
-    end
-
-    if strcmp(condlist{c,1}{1},'TRG1')
-%         plotgfp2(stats,'legendstrings',condlist{c,2},'ylim',[-5 20]);
-        plotgfp(stats{1},'legendstrings',condlist{c,2},'plotinfo','on','ylim',[-3 6]);
-    else
-        plotgfp(stats{1},'legendstrings',condlist{c,2},'plotinfo','off','ylim',[-3 6]);
-    end
-    close(gcf);
-end
+% for c = 1:size(condlist,1)
+% %             if strcmp(condlist{c,1}{1},'TRG1')
+% %                 ploterp(subjinfo,condlist{c,1}(1),'ylim',[-5 5],'topowin',[100 400; 400 700]);
+% %             else
+% %                 ploterp(subjinfo,condlist{c,1}(1),'ylim',[-5 5],'topowin',[100 400],'plotinfo','off');
+% %             end
+%     
+%     for t = 1:length(timewin)
+%         compgfp2(subjinfo,condlist{c,1},'latency',timewin{t},'numrand',numrand);
+%         load(sprintf('cond_%d_%s-%s_%d-%d_gfp.mat',subjinfo,condlist{c,1}{1},condlist{c,1}{2},timewin{t}(1),timewin{t}(2)));
+%         stat = corrp(stat,'corrp','cluster');
+%         stats{t} = stat;
+%     end
+% 
+%     if strcmp(condlist{c,1}{1},'TRG1')
+% %         plotgfp2(stats,'legendstrings',condlist{c,2},'ylim',[-5 20]);
+%         plotgfp(stats{1},'legendstrings',condlist{c,2},'plotinfo','on','ylim',[-3 6]);
+%     else
+%         plotgfp(stats{1},'legendstrings',condlist{c,2},'plotinfo','off','ylim',[-3 6]);
+%     end
+%     close(gcf);
+% end
 
 for s = 1:length(subjlist)
     basename = subjlist{s};
@@ -65,42 +65,44 @@ for s = 1:length(subjlist)
 %     computeic([basename '_epochs']);
     
     
+% rejectic(basename);
+
 %                     rejectic(basename,'prompt','off');
-%                     rejartifacts2(basename,2,3,0);
+%                     rejartifacts2(basename,2,3);
     
     %                 mergedata({basename,[basename '_base']});
     
     
     
-%         for c = 1:size(condlist,1)
+        for c = 1:size(condlist,1)
 %             if strcmp(condlist{c,1}{1},'TRG1')
 %                 ploterp(basename,condlist{c,1}(1),'ylim',[-5 5],'topowin',[100 400]);
 %             else
 %                 ploterp(basename,condlist{c,1}(1),'ylim',[-5 5],'topowin',[100 400],'plotinfo','off');
 %             end
             
-%             if strcmp(condlist{c,1}{1},'TRG1')
-%                 plotparam = {'plotinfo','on'};
-%             else
-%                 plotparam = {'plotinfo','off'};
-%             end
-%     
-%             for t = 1:length(timewin)
-%                 %compgfp2(basename,condlist{c,1},'latency',timewin{t},'numrand',numrand);
-%                 load(sprintf('trial_%s_%s-%s_%d-%d_gfp.mat',basename,condlist{c,1}{1},condlist{c,1}{2},timewin{t}(1),timewin{t}(2)));
-%                 stat = corrp(stat,'corrp','cluster');
-%                 stats{t} = stat;
-%             end
-%     
-%             if strcmp(condlist{c,1}{1},'TRG1')
-% %                 plotgfp2(stats,'legendstrings',condlist{c,2},plotparam{:},'ylim',[-2 18]);
-%                 plotgfp(stats{2},'legendstrings',condlist{c,2},plotparam{:},'ylim',[-2 18]);
-%             else
-%                 plotgfp(stats{1},'legendstrings',condlist{c,2},plotparam{:},'ylim',[-2 18]);
-%             end
+            if strcmp(condlist{c,1}{1},'TRG1')
+                plotparam = {'plotinfo','on'};
+            else
+                plotparam = {'plotinfo','off'};
+            end
+    
+            for t = 1:length(timewin)
+                compgfp2(basename,condlist{c,1},'latency',timewin{t},'numrand',numrand);
+                load(sprintf('trial_%s_%s-%s_%d-%d_gfp.mat',basename,condlist{c,1}{1},condlist{c,1}{2},timewin{t}(1),timewin{t}(2)));
+                stat = corrp(stat,'corrp','cluster');
+                stats{t} = stat;
+            end
+    
+            if strcmp(condlist{c,1}{1},'TRG1')
+%                 plotgfp2(stats,'legendstrings',condlist{c,2},plotparam{:},'ylim',[-2 18]);
+                plotgfp(stats{1},'legendstrings',condlist{c,2},plotparam{:},'ylim',[-2 18]);
+            else
+                plotgfp(stats{1},'legendstrings',condlist{c,2},plotparam{:},'ylim',[-2 18]);
+            end
 
-%             close(gcf);
-%         end
+            close(gcf);
+        end
     
     %        EEG = pop_loadset('filepath',filepath,'filename',[basename '_orig.set'],'loadmode','info');
     %        fprintf('%s: ',basename);
