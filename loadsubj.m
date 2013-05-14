@@ -17,26 +17,26 @@ subjlists = {
     'p1611_p300words'
     'p1511_p300words'
     'p0112_p300words'
-    };
-    %3
-    {
-%     'p0510V2_p300words'
-%     'p0710V2_p300words' %weak response
-%     'p211v2_p300words' %only distractors get a response
-%     'p1211_p300words' % flipped TRG1 AND TRG2
-%     'p1311_p300words'
-%     'p1411_p300words'
-%     'p1811_p300words' %clean %TRG1
-%     'p0212_p300words'
-%     'p0312_p300words'
-%     'p0512_p300words'
-%     'p0812_p300words'
-%     'p1012_p300words'
-        'p0611v2_p300words'
-        'p0612v2_p300words'   
-        'p0113_p300words'
-        'p0213_p300words'
-        'p0313_p300words'
+%     };
+%     %3
+%     {
+    'p0510V2_p300words'
+    'p0710V2_p300words' %weak response
+    'p211v2_p300words' %only distractors get a response
+    'p1211_p300words' % flipped TRG1 AND TRG2
+    'p1311_p300words'
+    'p1411_p300words'
+    'p1811_p300words' %clean %TRG1
+    'p0212_p300words'
+    'p0312_p300words'
+    'p0512_p300words'
+    'p0812_p300words'
+    'p1012_p300words'
+%         'p0611v2_p300words'
+%         'p0612v2_p300words'   
+%         'p0113_p300words'
+%         'p0213_p300words'
+%         'p0313_p300words'
     };
     %4
     {

@@ -26,12 +26,12 @@ timewin = {
     };
 
 % for c = 1:size(condlist,1)
-% %             if strcmp(condlist{c,1}{1},'TRG1')
-% %                 ploterp(subjinfo,condlist{c,1}(1),'ylim',[-5 5],'topowin',[100 400; 400 700]);
-% %             else
-% %                 ploterp(subjinfo,condlist{c,1}(1),'ylim',[-5 5],'topowin',[100 400],'plotinfo','off');
-% %             end
-%     
+%             if strcmp(condlist{c,1}{1},'TRG1')
+%                 ploterp(subjinfo,condlist{c,1}(1),'ylim',[-3 3],'topowin',[100 400; 400 700]);
+%             else
+%                 ploterp(subjinfo,condlist{c,1}(1),'ylim',[-3 3],'topowin',[100 400],'plotinfo','off');
+%             end
+    
 %     for t = 1:length(timewin)
 %         compgfp2(subjinfo,condlist{c,1},'latency',timewin{t},'numrand',numrand);
 %         load(sprintf('cond_%d_%s-%s_%d-%d_gfp.mat',subjinfo,condlist{c,1}{1},condlist{c,1}{2},timewin{t}(1),timewin{t}(2)));
@@ -55,7 +55,6 @@ for s = 1:length(subjlist)
     batchres{s,1} = basename;
     
     
-    %     close all
     
     %             dataimport(basename);
 %                 epochdata(basename,1);
@@ -72,38 +71,42 @@ for s = 1:length(subjlist)
     
     %                 mergedata({basename,[basename '_base']});
     
+%     calcspectra(basename);
+    specinfo = load([basename '_spec.mat']);
+    batchres{s,2} = specinfo.bandpower;
     
     
-        for c = 1:size(condlist,1)
+    
+%         for c = 1:size(condlist,1)
 %             if strcmp(condlist{c,1}{1},'TRG1')
-%                 ploterp(basename,condlist{c,1}(1),'ylim',[-5 5],'topowin',[100 400]);
+%                 ploterp(basename,condlist{c,1}(1),'ylim',[-4 4],'topowin',[400 700]);
 %             else
-%                 ploterp(basename,condlist{c,1}(1),'ylim',[-5 5],'topowin',[100 400],'plotinfo','off');
+%                 ploterp(basename,condlist{c,1}(1),'ylim',[-4 4],'topowin',[100 400],'plotinfo','off');
 %             end
             
-            if strcmp(condlist{c,1}{1},'TRG1')
-                plotparam = {'plotinfo','on'};
-            else
-                plotparam = {'plotinfo','off'};
-            end
-    
-            for t = 1:length(timewin)
-                compgfp2(basename,condlist{c,1},'latency',timewin{t},'numrand',numrand);
-                load(sprintf('trial_%s_%s-%s_%d-%d_gfp.mat',basename,condlist{c,1}{1},condlist{c,1}{2},timewin{t}(1),timewin{t}(2)));
-                stat = corrp(stat,'corrp','cluster');
-                stats{t} = stat;
-            end
-    
-            if strcmp(condlist{c,1}{1},'TRG1')
-%                 plotgfp2(stats,'legendstrings',condlist{c,2},plotparam{:},'ylim',[-2 18]);
-                plotgfp(stats{1},'legendstrings',condlist{c,2},plotparam{:},'ylim',[-2 18]);
-            else
-                plotgfp(stats{1},'legendstrings',condlist{c,2},plotparam{:},'ylim',[-2 18]);
-            end
-
-            close(gcf);
-        end
-    
+%             if strcmp(condlist{c,1}{1},'TRG1')
+%                 plotparam = {'plotinfo','on'};
+%             else
+%                 plotparam = {'plotinfo','off'};
+%             end
+%     
+%             for t = 1:length(timewin)
+%                 compgfp2(basename,condlist{c,1},'latency',timewin{t},'numrand',numrand);
+%                 load(sprintf('trial_%s_%s-%s_%d-%d_gfp.mat',basename,condlist{c,1}{1},condlist{c,1}{2},timewin{t}(1),timewin{t}(2)));
+%                 stat = corrp(stat,'corrp','cluster');
+%                 stats{t} = stat;
+%             end
+%     
+%             if strcmp(condlist{c,1}{1},'TRG1')
+% %                 plotgfp2(stats,'legendstrings',condlist{c,2},plotparam{:},'ylim',[-2 18]);
+%                 plotgfp(stats{1},'legendstrings',condlist{c,2},plotparam{:},'ylim',[-2 18]);
+%             else
+%                 plotgfp(stats{1},'legendstrings',condlist{c,2},plotparam{:},'ylim',[-2 18]);
+%             end
+% 
+%             close(gcf);
+%         end
+%     
     %        EEG = pop_loadset('filepath',filepath,'filename',[basename '_orig.set'],'loadmode','info');
     %        fprintf('%s: ',basename);
     %        for e = 1:length(EEG.event)
@@ -174,4 +177,4 @@ end
 % [~,sortidx] = sort(batchres(:,2));
 % batchres(sortidx,:)
 %
-% save(sprintf('batch %s.mat',datestr(now)),'batchres');
+save(sprintf('batch %s.mat',datestr(now)),'batchres');
