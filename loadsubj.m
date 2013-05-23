@@ -17,9 +17,9 @@ subjlists = {
     'p1611_p300words'
     'p1511_p300words'
     'p0112_p300words'
-%     };
-%     %3
-%     {
+    };
+    %3
+    {
     'p0510V2_p300words'
     'p0710V2_p300words' %weak response
     'p211v2_p300words' %only distractors get a response
@@ -39,6 +39,33 @@ subjlists = {
 %         'p0313_p300words'
     };
     %4
+    %VS
+    {
+    'p1611_p300words'
+    'p0510V2_p300words'
+    'p1311_p300words'
+    'p1411_p300words'
+    'p0312_p300words'
+%     };
+%     %5
+%     %MCS
+%     {
+    'p1511_p300words'
+    'p0112_p300words'
+    'p1211_p300words'
+    'p1811_p300words'
+    'p0212_p300words'
+    'p0512_p300words'
+    'p0812_p300words'
+%     };
+%     %6
+%     %MCS+
+%     {
+    'p0710V2_p300words'
+    'p211v2_p300words'
+    'p1012_p300words'
+    };
+    %7
     {
     %NOISY
     'p0311v2_p300words' %noisy topography
@@ -65,33 +92,5 @@ subjlists = {
     %SEVERELY DISABLED
     'p0912_p300words' %response for trg2 and distractors    
     'p1711_p300words' %weak responses to all three    
-    };
-    %5
-    %VS
-    {
-    'p1611_p300words'
-    'p0510V2_p300words'
-    'p1311_p300words'
-    'p1411_p300words'
-    'p0312_p300words'
-    };
-    %6
-    %MCS
-    {
-    'p1511_p300words'
-    'p0112_p300words'
-    'p1211_p300words'
-    'p1811_p300words'
-    'p0212_p300words'
-    'p0512_p300words'
-    'p0812_p300words'
-    };
-    %7
-    %MCS+
-    {
-    'p0710V2_p300words'
-    'p211v2_p300words'
-    'p0912_p300words'
-    'p1012_p300words'
     };
     };
