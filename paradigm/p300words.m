@@ -113,23 +113,23 @@ if ~isfield(hd,'pahandle')
         if ~isempty(audiodevices)
             %DMX audio
             outdevice = strcmp('DMX 6Fire USB ASIO Driver',{audiodevices.DeviceName});
-            hd.outdevice = 2;
+            hd.outdevice = 'dmx';
         else
             %Windows default audio
             audiodevices = PsychPortAudio('GetDevices',2);
             outdevice = strcmp('Microsoft Sound Mapper - Output',{audiodevices.DeviceName});
-            hd.outdevice = 3;
+            hd.outdevice = 'base';
         end
     elseif ismac
         audiodevices = PsychPortAudio('GetDevices');
         %DMX audio
         outdevice = strcmp('TerraTec DMX 6Fire USB',{audiodevices.DeviceName});
-        hd.outdevice = 2;
+        hd.outdevice = 'dmx';
         if sum(outdevice) ~= 1
             %Mac default audio
             audiodevices = PsychPortAudio('GetDevices');
             outdevice = strcmp('Built-in Output',{audiodevices.DeviceName});
-            hd.outdevice = 1;
+            hd.outdevice = 'base';
         end
     else
         error('Unsupported OS platform!');
@@ -277,7 +277,7 @@ while hd.blocknum <= hd.numblocks
                 case -1 %show fix cross
                     PsychPortAudio('FillBuffer',hd.pahandle, cat(2, hd.shortbeep, hd.instraudio));
                     startTime = PsychPortAudio('Start',hd.pahandle,1,0,1);
-                    if hd.outdevice == 3
+                    if strcmp(hd.outdevice,'base')
                         startTime = GetSecs;
                     end
                     NetStation('Event','INST',startTime,0.001,'BNUM',hd.blocknum,'IMOD',hd.instrmode,'INUM',hd.instrorder(hd.blocknum));
@@ -295,7 +295,7 @@ while hd.blocknum <= hd.numblocks
 
                     PsychPortAudio('FillBuffer',hd.pahandle,waudio);
                     startTime = PsychPortAudio('Start',hd.pahandle,1,0,1);
-                    if hd.outdevice == 3
+                    if strcmp(hd.outdevice,'base')
                         startTime = GetSecs;
                     end
                     setClearTrigger(startTime,hd.events(1,hd.curevent),hd.events(3,hd.curevent));
@@ -317,7 +317,7 @@ while hd.blocknum <= hd.numblocks
     %play question beep here
     PsychPortAudio('FillBuffer',hd.pahandle,hd.longbeep);
     stopTime = PsychPortAudio('Start',hd.pahandle,1,0,1);
-    if hd.outdevice == 3
+    if strcmp(hd.outdevice,'base')
         stopTime = GetSecs;
     end
     NetStation('Event','STOP',stopTime,0.001,'BNUM',hd.blocknum);
