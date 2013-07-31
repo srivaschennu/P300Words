@@ -56,24 +56,24 @@ for s = 1:length(subjlist)
     
     
     
-    %             dataimport(basename);
+%                 dataimport(basename);
 %                 epochdata(basename,1);
     
-    %               rejartifacts2([basename '_epochs'],1,4);
+%                   rejartifacts2([basename '_epochs'],1,4);
     
 %     computeic([basename '_epochs']);
     
     
-% rejectic(basename);
+rejectic(basename);
 
 %                     rejectic(basename,'prompt','off');
-%                     rejartifacts2(basename,2,3);
+                    rejartifacts2(basename,2,3);
     
     %                 mergedata({basename,[basename '_base']});
     
 %     calcspectra(basename);
-    specinfo = load([basename '_spec.mat']);
-    batchres{s,2} = specinfo.bandpower;
+%     specinfo = load([basename '_spec.mat']);
+%     batchres{s,2} = specinfo.bandpower;
     
     
     
@@ -177,4 +177,4 @@ end
 % [~,sortidx] = sort(batchres(:,2));
 % batchres(sortidx,:)
 %
-save(sprintf('batch %s.mat',datestr(now)),'batchres');
+% save(sprintf('batch %s.mat',datestr(now)),'batchres');

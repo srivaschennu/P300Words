@@ -43,8 +43,8 @@ for s = 1:numsubj
     EEG = pop_loadset('filename', sprintf('%s.set', subjlist{s}), 'filepath', filepath);
     EEG = sortchan(EEG);
     
-    %rereference
-    EEG = rereference(EEG,1);
+%     %rereference
+%     EEG = rereference(EEG,1);
     
     %     %%%%% baseline correction relative to 5th tone
     %     bcwin = [-200 0];
