@@ -43,8 +43,8 @@ for s = 1:numsubj
     EEG = pop_loadset('filename', sprintf('%s.set', subjlist{s}), 'filepath', filepath);
     EEG = sortchan(EEG);
     
-%     %rereference
-%     EEG = rereference(EEG,1);
+    %rereference
+    EEG = rereference(EEG,1);
     
     %     %%%%% baseline correction relative to 5th tone
     %     bcwin = [-200 0];
@@ -224,11 +224,12 @@ for c = 1:size(erpdata,3)
     end
     box off
     
-%     timtopo(plotdata,chanlocs,...
-%         'limits',[EEG.times(1)-timeshift EEG.times(end)-timeshift, param.ylim],...
-%         'plottimes',plottime-timeshift);
+    figure;
+    timtopo(plotdata,chanlocs,...
+        'limits',[EEG.times(1)-timeshift EEG.times(end)-timeshift, param.ylim],...
+        'plottimes',times(plotpnt(s))-timeshift);
     
-%     saveEEG = EEG;
+%     saveEEG = EEG;robust
 %     saveEEG.data = plotdata;
 %     saveEEG.setname = sprintf('%s_%s_%s',statmode,num2str(subjinfo),condlist{c});
 %     saveEEG.filename = [saveEEG.setname '.set'];
