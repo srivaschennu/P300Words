@@ -44,7 +44,7 @@ for s = 1:numsubj
     EEG = sortchan(EEG);
     
     %rereference
-    EEG = rereference(EEG,1);
+%     EEG = rereference(EEG,1);
     
     %     %%%%% baseline correction relative to 5th tone
     %     bcwin = [-200 0];
@@ -76,20 +76,24 @@ for s = 1:numsubj
         for ep = 1:length(EEG.epoch)
             
             epochtype = EEG.epoch(ep).eventtype;
-            if length(epochtype) > 1
-                epochtype = epochtype{cell2mat(EEG.epoch(ep).eventlatency) == 0};
-            else
-                epochtype = epochtype{1};
+            if iscell(epochtype)
+                if length(epochtype) > 1
+                    epochtype = epochtype{cell2mat(EEG.epoch(ep).eventlatency) == 0};
+                else
+                    epochtype = epochtype{1};
+                end
             end
             if sum(strncmp(epochtype,selectevents,length(selectevents))) > 0
                 typematches(ep) = true;
             end
             
             epochcodes = EEG.epoch(ep).eventcodes;
-            if length(epochcodes) > 1
-                epochcodes = epochcodes{cell2mat(EEG.epoch(ep).eventlatency) == 0};
-            else
-                epochcodes = epochcodes{1};
+            if ~isempty(epochcodes) && iscell(epochcodes{1})
+                if length(epochcodes) > 1
+                    epochcodes = epochcodes{cell2mat(EEG.epoch(ep).eventlatency) == 0};
+                else
+                    epochcodes = epochcodes{1};
+                end
             end
             
             snumidx = strcmp('SNUM',epochcodes(:,1)');
@@ -141,6 +145,7 @@ for s = 1:numsubj
         %pop_saveset(conddata{s,c},'filepath',filepath,'filename',[conddata{s,c}.setname '.set']);
 
         erpdata(:,:,c,s) = mean(conddata{s,c}.data,3);
+%         erpdata(:,:,c,s) = valdasmean(conddata{s,c}.data,3);
     end
 end
 
