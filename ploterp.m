@@ -6,9 +6,10 @@ timeshift = 0; %milliseconds
 
 param = finputcheck(varargin, { 'ylim', 'real', [], [-12 12]; ...
     'subcond', 'string', {'on','off'}, 'off'; ...
-    'topowin', 'real', [], [200 600]; ...
+    'topowin', 'real', [], [400 700]; ...
     'fontsize','integer', [], 28; ...
     'plotinfo', 'string', {'on','off'}, 'on'; ...
+    'caxis', 'real', [], 15; ...
     });
 
 if isempty(param.topowin)
@@ -44,7 +45,7 @@ for s = 1:numsubj
     EEG = sortchan(EEG);
     
     %rereference
-%     EEG = rereference(EEG,1);
+    EEG = rereference(EEG,1);
     
     %     %%%%% baseline correction relative to 5th tone
     %     bcwin = [-200 0];
@@ -163,10 +164,11 @@ erpdata = mean(erpdata,4);
 
 fontname = 'Helvetica';
 linewidth = 2;
+latpnt = find(EEG.times-timeshift >= param.topowin(1) & EEG.times-timeshift <= param.topowin(2));
 
 for c = 1:size(erpdata,3)
     plotdata = erpdata(:,:,c);
-    
+        
     %plot ERP data
     figfile = sprintf('figures/%s_%s_%s_erp',statmode,num2str(subjinfo),condlist{c});
     
@@ -175,14 +177,13 @@ for c = 1:size(erpdata,3)
     set(gcf,'Position',[figpos(1) figpos(2) figpos(3) figpos(3)]);
     
     if size(param.topowin,1) == 1
-        latpnt = find(EEG.times-timeshift >= param.topowin(1) & EEG.times-timeshift <= param.topowin(2));
-        [maxval, maxidx] = max(abs(plotdata(:,latpnt)),[],2);
-        [~, maxmaxidx] = max(maxval);
-        plotpnt = latpnt(1)-1+maxidx(maxmaxidx);
+        [maxval, maxidx] = max(plotdata(:,latpnt),[],2);
+        [~, maxchan] = max(maxval);
+        plotpnt = latpnt(1)-1+maxidx(maxchan);
         
         subplot(2,2,1:2);
         plotvals = plotdata(:,plotpnt);
-        topoplot(plotvals,chanlocs);
+        topoplot(plotvals,chanlocs);%,'emarker2',{maxchan,'o','green',14,1});
         cb_h = colorbar('FontSize',param.fontsize);
         cb_labels = num2cell(get(cb_h,'YTickLabel'),2);
         cb_labels{1} = [cb_labels{1} ' uV'];
@@ -192,9 +193,9 @@ for c = 1:size(erpdata,3)
     else
         for s = 1:size(param.topowin,1)
             latpnt = find(EEG.times-timeshift >= param.topowin(s,1) & EEG.times-timeshift <= param.topowin(s,2));
-            [maxval, maxidx] = max(abs(plotdata(:,latpnt)),[],2);
-            [~, maxmaxidx] = max(maxval);
-            plotpnt(s) = latpnt(1)-1+maxidx(maxmaxidx);
+            [maxval, maxidx] = max(plotdata(:,latpnt),[],2);
+            [~, maxchan] = max(maxval);
+            plotpnt(s) = latpnt(1)-1+maxidx(maxchan);
             
             subplot(2,2,s);
             plotvals = plotdata(:,plotpnt(s));
@@ -229,11 +230,29 @@ for c = 1:size(erpdata,3)
     end
     box off
     
-    figure;
-    timtopo(plotdata,chanlocs,...
-        'limits',[EEG.times(1)-timeshift EEG.times(end)-timeshift, param.ylim],...
-        'plottimes',times(plotpnt(s))-timeshift);
-    
+%     subplot(3,2,5:6);
+% %     imgdata = conddata{c}.data(maxchan,:,:);
+%     imgdata = zeros(conddata{c}.pnts,conddata{c}.trials);
+%     smoothwin = 3;
+%     for t = 1:smoothwin:conddata{c}.trials-smoothwin+1
+%         [~,imgdata(:,t)] = evalc('eeg_gfp(mean(conddata{c}.data(:,:,t:t+smoothwin-1),3)'',0)');
+%         imgdata(:,t+1:t+smoothwin-1) = repmat(imgdata(:,t),1,smoothwin-1);
+%     end
+%     
+%     [~,~,~,~,axhndls] = erpimage(imgdata, ones(1, conddata{c}.trials)*conddata{c}.xmax*1000,...
+%         linspace(conddata{c}.xmin*1000, conddata{c}.xmax*1000, conddata{c}.pnts),...
+%         '', 20, 1 , 'yerplabel', '', 'erp', 'off', 'cbar', 'on','caxis',[0 abs(param.caxis)]);
+%     set(axhndls(1),'FontName',fontname,'FontSize',param.fontsize);
+%     set(get(axhndls(1),'XLabel'),'String','Time (ms)','FontName',fontname,'FontSize',param.fontsize)
+%     set(get(axhndls(1),'YLabel'),'String','Global field power','FontName',fontname,'FontSize',param.fontsize);
+%     set(axhndls(2),'FontName',fontname,'FontSize',param.fontsize);
+%     
+%     close(gcf);
+%     figure;
+%     timtopo(plotdata,chanlocs,...
+%         'limits',[EEG.times(1)-timeshift EEG.times(end)-timeshift, param.ylim],...
+%         'plottimes',times(plotpnt(s))-timeshift);
+%     
 %     saveEEG = EEG;robust
 %     saveEEG.data = plotdata;
 %     saveEEG.setname = sprintf('%s_%s_%s',statmode,num2str(subjinfo),condlist{c});

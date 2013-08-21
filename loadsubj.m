@@ -14,57 +14,27 @@ subjlists = {
     };
     %2
     {
-    'p1611_p300words'
-    'p1511_p300words'
-    'p0112_p300words'
-    'p0213_p300words'
-%     };
-%     %3
-%     {
+    'p1611_p300words'       %VS
     'p0510V2_p300words'
-    'p0710V2_p300words' %weak response
-    'p211v2_p300words' %only distractors get a response
-    'p1211_p300words' % flipped TRG1 AND TRG2
     'p1311_p300words'
     'p1411_p300words'
-    'p1811_p300words' %clean %TRG1
-    'p0212_p300words'
     'p0312_p300words'
-    'p0512_p300words'
-    'p0812_p300words'
-    'p1012_p300words'
     'p0612v2_p300words'
     'p0113_p300words'
     'p0712v2_p300words'
-    'p0413_p300words'
     'p0513_p300words'
-    };
-    %4
-    %VS
-    {
-    'p1611_p300words'
-    'p0510V2_p300words'
-    'p1311_p300words'
-    'p1411_p300words'
-    'p0312_p300words'
-%     };
-%     %5
-%     %MCS
-%     {
-    'p1511_p300words'
+    'p1511_p300words'     %MCS
     'p0112_p300words'
     'p1211_p300words'
     'p1811_p300words'
     'p0212_p300words'
     'p0512_p300words'
     'p0812_p300words'
-%     };
-%     %6
-%     %MCS+
-%     {
-    'p0710V2_p300words'
+    'p0710V2_p300words'     %MCS+
     'p211v2_p300words'
     'p1012_p300words'
+    'p0213_p300words'
+    'p0413_p300words'
     };
     %7
     {
@@ -84,7 +54,7 @@ subjlists = {
     'p1511v2_p300words' %TRG2
     'p1811v2_p300words'
     'p0512v2_p300words'
-
+    
     %INCOMPLETE
     'p0711_p300words' %bad too few trials
     'p2111_p300words' %too few trials
@@ -95,7 +65,7 @@ subjlists = {
     'p0911_p300words' %only 12 blocks
     
     %SEVERELY DISABLED
-    'p0912_p300words' %response for trg2 and distractors    
-    'p1711_p300words' %weak responses to all three    
+    'p0912_p300words' %response for trg2 and distractors
+    'p1711_p300words' %weak responses to all three
     };
     };

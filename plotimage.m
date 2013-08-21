@@ -32,6 +32,8 @@ for s = 1:length(subjlist)
     basename = subjlist{s};
     plotidx = 0;
     
+    fprintf('%s ',basename);
+    plotnext = true;
     for c = 1:size(condlist,1)
         plotidx = plotidx+1;
         
@@ -41,15 +43,32 @@ for s = 1:length(subjlist)
         if s == 1 && c == 1
             plotdata = zeros(length(subjlist),length(stat.times),length(condlist));
         end
-        if strcmp(condlist{c,1},'TRG1')
-            stat2 = load(sprintf('trial_%s_%s-base_%d-%d_gfp.mat',basename,condlist{c,1},timewin{2}(1),timewin{2}(2)));
-            stat.pprob(stat2.stat.times >= stat2.stat.param.latency(1) & stat2.stat.times <= stat2.stat.param.latency(2)) = ...
-                stat2.stat.pprob(stat2.stat.times >= stat2.stat.param.latency(1) & stat2.stat.times <= stat2.stat.param.latency(2));
+        switch condlist{c,1}
+            case 'TRG1'
+                stat2 = load(sprintf('trial_%s_%s-base_%d-%d_gfp.mat',basename,condlist{c,1},timewin{2}(1),timewin{2}(2)));
+                stat2.stat = corrp(stat2.stat,'corrp','cluster');
+                stat.pprob(stat2.stat.times >= stat2.stat.param.latency(1) & stat2.stat.times <= stat2.stat.param.latency(2)) = ...
+                    stat2.stat.pprob(stat2.stat.times >= stat2.stat.param.latency(1) & stat2.stat.times <= stat2.stat.param.latency(2));
+                
+                if isempty(stat.pclust) %&& isempty(stat2.stat.pclust)
+                    stat.pprob(:) = 1;
+                    plotnext = false;
+                else
+                    fprintf('%s ',condlist{c,1});
+                end
+            case {'TRG2' 'DIST'}
+                if plotnext
+                    fprintf('%s ',condlist{c,1});
+                else
+                    stat.pprob(:) = 1;
+                end
         end
+        
         stat.pprob = rankvals(stat.pprob,ranklist);
         plotdata(s,:,plotidx) = 1-stat.pprob;
         plotinfo{plotidx} = sprintf('%s-base',condlist{c,1});
     end
+    fprintf('\n');
 end
 
 for c = 1:size(plotdata,3)
@@ -60,25 +79,25 @@ for c = 1:size(plotdata,3)
     set(gcf,'Position',figpos);
     
     imagesc(stat.times,1:length(subjlist),plotdata(:,:,c));
-    set(gca,'YDir','normal','XLim',[stat.times(1) stat.times(end)]-stat.timeshift,...
-        'XTick',stat.times(1)-stat.timeshift:200:stat.times(end)-stat.timeshift,...
-        'FontSize',param.fontsize,'FontName',fontname);
+%     set(gca,'YDir','normal','XLim',[stat.times(1) stat.times(end)]-stat.timeshift,...
+%         'XTick',stat.times(1)-stat.timeshift:200:stat.times(end)-stat.timeshift,...
+%         'FontSize',param.fontsize,'FontName',fontname);
     
     set(gca,'YDir','normal','XLim',[stat.times(1) stat.times(end)]-stat.timeshift,...
         'XTick',stat.times(1)-stat.timeshift:200:stat.times(end)-stat.timeshift,...
         'XTickLabel',{},'YTickLabel',{},...
         'FontSize',param.fontsize,'FontName',fontname);
     
-   caxis(1-[ranklist(1) ranklist(end)]);
+    caxis(1-[ranklist(1) ranklist(end)]);
     
     line([0 0],ylim,'Color','black','LineStyle',':','LineWidth',linewidth);
-%     if c == 1
-%         xlabel(' ','FontSize',param.fontsize,'FontName',fontname);
-%         ylabel('Patient','FontSize',param.fontsize,'FontName',fontname);
-%     else
-%         xlabel(' ','FontSize',param.fontsize,'FontName',fontname);
-%         ylabel(' ','FontSize',param.fontsize,'FontName',fontname);
-%     end
+%         if c == 1
+%             xlabel(' ','FontSize',param.fontsize,'FontName',fontname);
+%             ylabel('Patient','FontSize',param.fontsize,'FontName',fontname);
+%         else
+%             xlabel(' ','FontSize',param.fontsize,'FontName',fontname);
+%             ylabel(' ','FontSize',param.fontsize,'FontName',fontname);
+%         end
     
     figfile = sprintf('figures/img_%s_%s',num2str(subjinfo),plotinfo{c});
     set(gcf,'Color','white','Name',figfile,'FileName',figfile);
