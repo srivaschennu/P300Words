@@ -14,6 +14,7 @@ stat.nmask(stat.nprob < param.alpha) = 1;
 
 if strcmp(param.corrp,'fdr')
     % fdr correction
+    corrwin = find(stat.times >= stat.param.latency(1) & stat.times <= stat.param.latency(2));
     [~,stat.pmask(corrwin)] = fdr(stat.pprob(corrwin),param.alpha);
     [~,stat.nmask(corrwin)] = fdr(stat.nprob(corrwin),param.alpha);
     

@@ -13,7 +13,7 @@ end
 condlist = {
     {'TRG1' 'base'} {'explicit'}
     {'TRG2' 'base'} {'implicit'}
-%     {'DIST' 'base'} {'distractor'}
+    {'DIST' 'base'} {'distractor'}
 %         {'TRG'  'DIST'} {'explicit' 'distractor'}
 %         {'TRG2'  'DIST'} {'implicit' 'distractor'}
 %     {'DIST'  'DIST'} {'eccentric' 'central'}
@@ -38,6 +38,9 @@ timewin = {
 %         stat = corrp(stat,'corrp','cluster');
 %         stats{t} = stat;
 %         tct(subjinfo,condlist{c,1}(1),'latency',timewin{t});
+%         load(sprintf('%s/cond_%d_%s_%d-%d_tct.mat',filepath,subjinfo,condlist{c,1}{1},timewin{t}(1),timewin{t}(2)));
+%         plottct(stat,'legendstrings',condlist{c,2},'ylim',[-5 20]);
+%         close(gcf);
 %     end
 % 
 %     if strcmp(condlist{c,1}{1},'TRG1')
@@ -99,6 +102,9 @@ for s = 1:length(subjlist)
 %                 stat = corrp(stat,'corrp','cluster');
 %                 stats{t} = stat;
                   tct(basename,condlist{c,1}(1),'latency',timewin{t});
+%                   load(sprintf('%s/trial_%s_%s_%d-%d_tct.mat',filepath,basename,condlist{c,1}{1},timewin{t}(1),timewin{t}(2)));
+%                   plottct(stat,'legendstrings',condlist{c,2},'ylim',[-2 18]);
+%                   close(gcf);
             end
 %     
 %             if strcmp(condlist{c,1}{1},'TRG1')
