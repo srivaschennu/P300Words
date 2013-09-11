@@ -14,7 +14,7 @@ subjlists = {
     };
     %2
     {
-    'p1611_p300words'       %VS
+    'p1611_p300words'       %P3a and P3b
     'p0510V2_p300words'
     'p1311_p300words'
     'p1411_p300words'
@@ -23,18 +23,24 @@ subjlists = {
     'p0113_p300words'
     'p0712v2_p300words'
     'p0513_p300words'
-    'p1511_p300words'     %MCS
-    'p0112_p300words'
+    'p1511_p300words'     %P3a
+    'p0112_p300words'     %P3a
     'p1211_p300words'
     'p1811_p300words'
     'p0212_p300words'
     'p0512_p300words'
     'p0812_p300words'
-    'p0710V2_p300words'     %MCS+
+    'p0710V2_p300words'     
     'p211v2_p300words'
     'p1012_p300words'
-    'p0213_p300words'
+    'p0213_p300words'       %P3a
     'p0413_p300words'
+    };
+    {
+    'p1611_p300words'       %P3a and P3b
+    'p1511_p300words'     %P3a
+    'p0112_p300words'     %P3a
+    'p0213_p300words'       %P3a
     };
     %7
     {

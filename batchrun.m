@@ -11,8 +11,8 @@ else
 end
 
 condlist = {
-%     {'TRG1' 'base'} {'explicit'}
-%     {'TRG2' 'base'} {'implicit'}
+    {'TRG1' 'base'} {'explicit'}
+    {'TRG2' 'base'} {'implicit'}
 %     {'DIST' 'base'} {'distractor'}
 %         {'TRG'  'DIST'} {'explicit' 'distractor'}
 %         {'TRG2'  'DIST'} {'implicit' 'distractor'}
@@ -37,6 +37,7 @@ timewin = {
 %         load(sprintf('cond_%d_%s-%s_%d-%d_gfp.mat',subjinfo,condlist{c,1}{1},condlist{c,1}{2},timewin{t}(1),timewin{t}(2)));
 %         stat = corrp(stat,'corrp','cluster');
 %         stats{t} = stat;
+%         tct(subjinfo,condlist{c,1}(1),'latency',timewin{t});
 %     end
 % 
 %     if strcmp(condlist{c,1}{1},'TRG1')
@@ -77,14 +78,14 @@ for s = 1:length(subjlist)
     
     
     
-%         for c = 1:size(condlist,1)
+        for c = 1:size(condlist,1)
 %             if strcmp(condlist{c,1}{1},'TRG1')
 %                 plotparam = {'plotinfo','on'};
 %             else
 %                 plotparam = {'plotinfo','off'};
 %             end
 %             
-% %             if strcmp(condlist{c,1}{1},'TRG1')
+%             if strcmp(condlist{c,1}{1},'TRG1')
 % % %                 ploterp(basename,condlist{c,1}(1),'ylim',[-4 4],'topowin',[400 700],'caxis',100,plotparam{:});
 % %                 ploterp(basename,condlist{c,1}(1),'ylim',[-4 4],'topowin',[100 400],'caxis',75,plotparam{:});
 % %             else
@@ -92,12 +93,13 @@ for s = 1:length(subjlist)
 % %             end
 % %             close(gcf);
 %             
-%             for t = 1:length(timewin)
+            for t = 1:length(timewin)
 %                 compgfp2(basename,condlist{c,1},'latency',timewin{t},'numrand',numrand);
 %                 load(sprintf('trial_%s_%s-%s_%d-%d_gfp.mat',basename,condlist{c,1}{1},condlist{c,1}{2},timewin{t}(1),timewin{t}(2)));
 %                 stat = corrp(stat,'corrp','cluster');
 %                 stats{t} = stat;
-%             end
+                  tct(basename,condlist{c,1}(1),'latency',timewin{t});
+            end
 %     
 %             if strcmp(condlist{c,1}{1},'TRG1')
 % %                 plotgfp2(stats,'legendstrings',condlist{c,2},plotparam{:},'ylim',[-2 18]);
@@ -107,7 +109,7 @@ for s = 1:length(subjlist)
 %             end
 % 
 %             close(gcf);
-%         end
+        end
 %     
     %        EEG = pop_loadset('filepath',filepath,'filename',[basename '_orig.set'],'loadmode','info');
     %        fprintf('%s: ',basename);
@@ -159,24 +161,24 @@ for s = 1:length(subjlist)
     %         end
     %     end
     
-        EEG = pop_loadset('filepath',filepath,'filename',[basename '.set'],'loadmode','info');
-        if isfield(EEG,'rejchan')
-            batchres{s,2} = length(EEG.rejchan);
-        else
-            batchres{s,2} = 0;
-        end
-    
-        if isfield(EEG,'rejepoch')
-            batchres{s,3} = length(EEG.rejepoch);
-        else
-            batchres{s,3} = 0;
-        end
-    
-        EEG = pop_loadset('filepath',filepath,'filename',[basename '_epochs.set'],'loadmode','info');
-        batchres{s,4} = sum(EEG.reject.gcompreject);
+%         EEG = pop_loadset('filepath',filepath,'filename',[basename '.set'],'loadmode','info');
+%         if isfield(EEG,'rejchan')
+%             batchres{s,2} = length(EEG.rejchan);
+%         else
+%             batchres{s,2} = 0;
+%         end
+%     
+%         if isfield(EEG,'rejepoch')
+%             batchres{s,3} = length(EEG.rejepoch);
+%         else
+%             batchres{s,3} = 0;
+%         end
+%     
+%         EEG = pop_loadset('filepath',filepath,'filename',[basename '_epochs.set'],'loadmode','info');
+%         batchres{s,4} = sum(EEG.reject.gcompreject);
 end
 
 % [~,sortidx] = sort(batchres(:,2));
 % batchres(sortidx,:)
 %
-save(sprintf('batch %s.mat',datestr(now)),'batchres');
+% save(sprintf('batch %s.mat',datestr(now)),'batchres');
