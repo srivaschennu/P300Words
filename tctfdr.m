@@ -1,16 +1,8 @@
-function p_overall = tctfdr(p,gfp)
+function p_overall = tctfdr(gfp)
 
-nDataPoints = length(p);
-nIter = size(gfp,1)-1;
+nIter = size(gfp,1);
+nDataPoints = size(gfp,2);
 
-% False discovery rate
-FDR = 0.05; % This is the FDR that we choose to be acceptable
-p_exp = (1:nDataPoints) / nIter;    % This is the distribution of p-values under
-                                    % the null-hypothesis
-p_corr = p_exp * FDR;               % This is the distribution of the accepted
-                                    % false positives
-p_sorted = sort(p);
-FDR_threshold = p_sorted(max(find(p_sorted <=p_corr)));
 % Count test
 threshold = 0.05;
 for i = 1:nIter

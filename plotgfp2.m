@@ -19,9 +19,14 @@ param = finputcheck(varargin, { 'ylim', 'real', [], [-5 15]; ...
 fontname = 'Helvetica';
 linewidth = 2;
 
-figfile = sprintf('figures/%s_%s_%s-%s_gfp',stats{1}.statmode,num2str(stats{1}.subjinfo),stats{1}.condlist{1},stats{1}.condlist{2});
+if length(stats{1}.condlist) == 2
+    figname = sprintf('%s-%s',stats{1}.condlist{1},stats{1}.condlist{2});
+else
+    figname = sprintf('%s',stats{1}.condlist{1});
+end
+figfile = sprintf('figures/%s_%s_%s_gfp',stats{1}.statmode,num2str(stats{1}.subjinfo),figname);
 
-figure('Name',sprintf('%s-%s',stats{1}.condlist{1},stats{1}.condlist{2}),'Color','white','FileName',[figfile '.fig']);
+figure('Name',figname,'Color','white','FileName',[figfile '.fig']);
 figpos = get(gcf,'Position');
 set(gcf,'Position',[figpos(1) figpos(2) figpos(3) figpos(3)]);
 
@@ -53,7 +58,7 @@ for s = 1:length(stats)
     end
     
     if ~isempty(stats{s}.pclust)
-        text(0,-0.9,sprintf('%dms\nt = %.2f, p = %.2f',round(stats{s}.times(stats{s}.plotpnt)),stats{s}.pclust(1).tstat, stats{s}.pclust(1).prob),...
+        text(0,-0.9,sprintf('%dms\nclust. t = %.1f, p = %.2f',round(stats{s}.times(stats{s}.plotpnt)),stats{s}.pclust(1).tstat, stats{s}.pclust(1).prob),...
             'FontSize',param.fontsize,'FontName',fontname,'HorizontalAlignment','center');
     else
         text(0,-0.9,sprintf('%dms',round(stats{s}.times(stats{s}.plotpnt))),...

@@ -38,7 +38,7 @@ for s = 1:length(subjlist)
         plotidx = plotidx+1;
         
         load(sprintf('trial_%s_%s-base_%d-%d_gfp.mat',basename,condlist{c,1},timewin{1}(1),timewin{1}(2)));
-        stat = corrp(stat,'corrp','cluster');
+        stat = clustcorr(stat);
         
         if s == 1 && c == 1
             plotdata = zeros(length(subjlist),length(stat.times),length(condlist));
@@ -46,11 +46,11 @@ for s = 1:length(subjlist)
         switch condlist{c,1}
             case 'TRG1'
                 stat2 = load(sprintf('trial_%s_%s-base_%d-%d_gfp.mat',basename,condlist{c,1},timewin{2}(1),timewin{2}(2)));
-                stat2.stat = corrp(stat2.stat,'corrp','cluster');
+                stat2.stat = clustcorr(stat2.stat);
                 stat.pprob(stat2.stat.times >= stat2.stat.param.latency(1) & stat2.stat.times <= stat2.stat.param.latency(2)) = ...
                     stat2.stat.pprob(stat2.stat.times >= stat2.stat.param.latency(1) & stat2.stat.times <= stat2.stat.param.latency(2));
                 
-                if isempty(stat.pclust) %&& isempty(stat2.stat.pclust)
+                if isempty(stat.pclust) && isempty(stat2.stat.pclust)
                     stat.pprob(:) = 1;
                     plotnext = false;
                 else
