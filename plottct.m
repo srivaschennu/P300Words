@@ -52,7 +52,7 @@ cb_labels{1} = [cb_labels{1} ' uV'];
 set(cb_h,'YTickLabel',cb_labels);
 
 corrwin = find(stat.times >= stat.param.latency(1) & stat.times <= stat.param.latency(2));
-p_overall = tctfdr(stat.pprob(corrwin),stat.condgfp(:,corrwin));
+p_overall = tctfdr(stat.condgfp(:,corrwin));
 text(0,-0.7,sprintf('%dms\np = %.3f', round(stat.times(plotpnt)), p_overall),...
     'FontSize',param.fontsize,'FontName',fontname,'HorizontalAlignment','center');
 

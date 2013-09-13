@@ -14,6 +14,16 @@ param = finputcheck(varargin, { 'ylim', 'real', [], [-5 15]; ...
     'plotinfo', 'string', {'on','off'}, 'on'; ...
     });
 
+if ~isfield(stats{1},'inddata')
+    stats{1}.inddata{1} = stats{1}.condavg(:,:,1);
+    stats{1}.inddata{2} = stats{1}.condavg(:,:,2);
+end
+
+if ~isfield(stats{2},'inddata')
+    stats{2}.inddata{1} = stats{2}.condavg(:,:,1);
+    stats{2}.inddata{2} = stats{2}.condavg(:,:,2);
+end
+
 %% figure plotting
 
 fontname = 'Helvetica';
@@ -58,7 +68,7 @@ for s = 1:length(stats)
     end
     
     if ~isempty(stats{s}.pclust)
-        text(0,-0.9,sprintf('%dms\nclust. t = %.1f, p = %.2f',round(stats{s}.times(stats{s}.plotpnt)),stats{s}.pclust(1).tstat, stats{s}.pclust(1).prob),...
+        text(0,-0.9,sprintf('%dms\nt = %.1f, p = %.2f',round(stats{s}.times(stats{s}.plotpnt)),stats{s}.pclust(1).tstat, stats{s}.pclust(1).prob),...
             'FontSize',param.fontsize,'FontName',fontname,'HorizontalAlignment','center');
     else
         text(0,-0.9,sprintf('%dms',round(stats{s}.times(stats{s}.plotpnt))),...

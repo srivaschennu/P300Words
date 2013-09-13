@@ -6,6 +6,11 @@ else
     condlist = stat.condlist;
 end
 
+if ~isfield(stat,'inddata')
+    stat.inddata{1} = stat.condavg(:,:,1);
+    stat.inddata{2} = stat.condavg(:,:,2);
+end
+
 colorlist = {
     'explicit'     [0         0    1.0000]
     'implicit'     [0    0.5000         0]
@@ -67,7 +72,7 @@ cb_labels{1} = [cb_labels{1} ' uV'];
 set(cb_h,'YTickLabel',cb_labels);
 
 if ~isempty(stat.pclust)
-    text(0,-0.7,sprintf('%dms\nclust. t = %.1f, p = %.3f', round(stat.times(plotpnt)), stat.pclust(1).tstat, stat.pclust(1).prob),...
+    text(0,-0.7,sprintf('%dms\nt = %.1f, p = %.3f', round(stat.times(plotpnt)), stat.pclust(1).tstat, stat.pclust(1).prob),...
         'FontSize',param.fontsize,'FontName',fontname,'HorizontalAlignment','center');
 else
     text(0,-0.7,sprintf('%dms', round(stat.times(plotpnt))),...

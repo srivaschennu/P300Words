@@ -38,6 +38,11 @@ for s = 1:length(subjlist)
         plotidx = plotidx+1;
         
         load(sprintf('%s/trial_%s_%s_%d-%d_tct.mat',filepath,basename,condlist{c,1},timewin{1}(1),timewin{1}(2)));
+        if ~isempty(stat.pclust)
+            stat.pprob(stat.times < stat.pclust.win(1) & stat.times > stat.pclust.win(2)) = 1;
+        else
+            stat.pprob(:) = 1;
+        end
         
         if s == 1 && c == 1
             plotdata = zeros(length(subjlist),length(stat.times),length(condlist));
@@ -45,6 +50,12 @@ for s = 1:length(subjlist)
         switch condlist{c,1}
             case 'TRG1'
                 stat2 = load(sprintf('%s/trial_%s_%s_%d-%d_tct.mat',filepath,basename,condlist{c,1},timewin{2}(1),timewin{2}(2)));
+                if ~isempty(stat2.stat.pclust)
+                    stat2.stat.pprob(stat2.stat.times < stat2.stat.pclust.win(1) & stat2.stat.times > stat2.stat.pclust.win(2)) = 1;
+                else
+                    stat2.stat.pprob(:) = 1;
+                end
+                
                 stat.pprob(stat2.stat.times >= stat2.stat.param.latency(1) & stat2.stat.times <= stat2.stat.param.latency(2)) = ...
                     stat2.stat.pprob(stat2.stat.times >= stat2.stat.param.latency(1) & stat2.stat.times <= stat2.stat.param.latency(2));
                 
