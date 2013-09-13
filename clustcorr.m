@@ -14,9 +14,9 @@ if ~isfield(stat,'gfpdiff')
 end
 
 
-valu = zeros(size(stat.gfpdiff,2));
-pprob = ones(size(stat.gfpdiff,2));
-nprob = ones(size(stat.gfpdiff,2));
+valu = zeros(1,size(stat.gfpdiff,2));
+pprob = ones(1,size(stat.gfpdiff,2));
+nprob = ones(1,size(stat.gfpdiff,2));
 pmask = zeros(size(pprob));
 nmask = zeros(size(nprob));
 
@@ -25,6 +25,7 @@ corrwin = find(stat.times >= stat.param.latency(1) & stat.times <= stat.param.la
 %% identfy clusters
 h_wait = waitbar(0,'Please wait...');
 set(h_wait,'Name',[mfilename ' progress']);
+
 for n = 1:size(stat.gfpdiff,1)
     if n > 1
         waitbar(n/size(stat.gfpdiff,1),h_wait,sprintf('Permutation %d...',n-1));
@@ -45,6 +46,7 @@ for n = 1:size(stat.gfpdiff,1)
     nmask(nprob < param.alpha) = 1;
     
     if n == 1
+        stat.valu = valu;
         stat.pprob = pprob;
         stat.nprob = nprob;
         stat.pmask = pmask;
@@ -78,6 +80,7 @@ for n = 1:size(stat.gfpdiff,1)
     end
 end
 close(h_wait);
+
 randtstat = cell2mat({stat.pclust(:).tstat});
 stat.pclust(1).prob = sum(randtstat >= stat.pclust(1).tstat)/length(randtstat);
 stat.pclust(1).tstat = (stat.pclust(1).tstat - mean(randtstat)) / (std(randtstat)/sqrt(length(randtstat)));

@@ -41,17 +41,17 @@ for c = 1:size(condlist,1)
 %         calctct(subjinfo,condlist{c,1}(1),'latency',timewin{t});
         load(sprintf('%s/cond_%d_%s_%d-%d_tct.mat',filepath,subjinfo,condlist{c,1}{1},timewin{t}(1),timewin{t}(2)));
         stat = clustcorr(stat);
-%         save(sprintf('%s/cond_%d_%s_%d-%d_tct.mat',filepath,subjinfo,condlist{c,1}{1},timewin{t}(1),timewin{t}(2)),'stat');
-        stats{t} = stat;
+        save(sprintf('%s/cond_%d_%s_%d-%d_tct.mat',filepath,subjinfo,condlist{c,1}{1},timewin{t}(1),timewin{t}(2)),'stat');
+%         stats{t} = stat;
     end
 
-    if strcmp(condlist{c,1}{1},'TRG1')
-%         plotgfp2(stats,'legendstrings',condlist{c,2},'ylim',[-5 20]);
-        plotgfp(stats{1},'legendstrings',condlist{c,2},'plotinfo','on','ylim',[-3 6]);
-    else
-        plotgfp(stats{1},'legendstrings',condlist{c,2},'plotinfo','off','ylim',[-5 20]);
-    end
-    close(gcf);
+%     if strcmp(condlist{c,1}{1},'TRG1')
+% %         plotgfp2(stats,'legendstrings',condlist{c,2},'ylim',[-5 20]);
+%         plotgfp(stats{1},'legendstrings',condlist{c,2},'plotinfo','on','ylim',[-3 6]);
+%     else
+%         plotgfp(stats{1},'legendstrings',condlist{c,2},'plotinfo','off','ylim',[-5 20]);
+%     end
+%     close(gcf);
 end
 
 for s = 1:length(subjlist)
@@ -105,9 +105,9 @@ for s = 1:length(subjlist)
 %                 stats{t} = stat;
 
 %                 calctct(basename,condlist{c,1}(1),'latency',timewin{t});
-                load(sprintf('trial_%s_%s_%d-%d_tct.mat',basename,condlist{c,1}{1},timewin{t}(1),timewin{t}(2)));
+                load(sprintf('%s/trial_%s_%s_%d-%d_tct.mat',filepath,basename,condlist{c,1}{1},timewin{t}(1),timewin{t}(2)));
                 stat = clustcorr(stat);
-                save(sprintf('trial_%s_%s_%d-%d_tct.mat',basename,condlist{c,1}{1},timewin{t}(1),timewin{t}(2)),'stat');
+                save(sprintf('%s/trial_%s_%s_%d-%d_tct.mat',filepath,basename,condlist{c,1}{1},timewin{t}(1),timewin{t}(2)),'stat');
 %                 stats{t} = stat;
             end
 %     
