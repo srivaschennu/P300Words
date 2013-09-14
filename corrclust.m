@@ -3,6 +3,7 @@ function stat = corrclust(stat,varargin)
 param = finputcheck(varargin, {
     'alpha' , 'real' , [], 0.05; ...
     'ttesttail' , 'integer' , [-1 0 1], 1; ...
+    'clustsize', 'integer', [], 10; ...
     });
 
 if param.ttesttail == 0
@@ -64,7 +65,7 @@ for n = 1:size(stat.gfpdiff,1)
         elseif (pmask(p) == 0 || p == length(stat.times)) && pmask(p-1) == 1
             pend = p;
             tstat = sum(valu(pstart:pend-1));
-            if tstat > stat.pclust(n).tstat
+            if tstat > stat.pclust(n).tstat && length(pstart:pend-1) >= param.clustsize
                 stat.pclust(n).tstat = tstat;
                 stat.pclust(n).win = [stat.times(pstart) stat.times(pend-1)]-stat.timeshift;
             end
@@ -75,7 +76,7 @@ for n = 1:size(stat.gfpdiff,1)
         elseif (nmask(p) == 0 || p == length(stat.times)) && nmask(p-1) == 1
             nend = p;
             tstat = sum(valu(nstart:nend-1));
-            if tstat > stat.nclust(n).tstat
+            if tstat > stat.nclust(n).tstat && length(nstart:nend-1) >= param.clustsize
                 stat.nclust(n).tstat = tstat;
                 stat.nclust(n).win = [stat.times(nstart) stat.times(nend-1)]-stat.timeshift;
             end
@@ -93,7 +94,7 @@ if stat.pclust.prob > param.alpha
 end
 
 randtstat = cell2mat({stat.nclust(:).tstat});
-stat.nclust(1).prob = sum(randtstat >= stat.nclust(1).tstat)/length(randtstat);
+stat.nclust(1).prob = sum(randtstat <= stat.nclust(1).tstat)/length(randtstat);
 stat.nclust(1).tstat = (stat.nclust(1).tstat - mean(randtstat)) / (std(randtstat)/sqrt(length(randtstat)));
 stat.nclust = stat.nclust(1);
 if stat.nclust.prob > param.alpha

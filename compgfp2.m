@@ -76,7 +76,7 @@ for s = 1:numsubj
     EEG = rereference(EEG,1);
     
     %%%%% baseline correction relative to whole epoch
-%     EEG = pop_rmbase(EEG,[]);
+    EEG = pop_rmbase(EEG,[]);
     %%%%%
     
     % THIS ASSUMES THAT ALL DATASETS HAVE SAME NUMBER OF ELECTRODES
@@ -293,7 +293,7 @@ stat.chanlocs = chanlocs;
 stat.srate = EEG.srate;
 
 if nargout == 0
-    save2file = sprintf('%s/%s_%s_%s-%s_%d-%d_gfp.mat',filepath,statmode,num2str(subjinfo),...
+    save2file = sprintf('%s/%s_%s_%s-%s_%d-%d_gfp_rmbase.mat',filepath,statmode,num2str(subjinfo),...
         condlist{1},condlist{2},param.latency(1),param.latency(2));
     save(save2file,'stat');
 end

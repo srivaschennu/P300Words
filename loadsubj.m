@@ -37,7 +37,7 @@ subjlists = {
     'p0413_p300words'
     };
     {
-    'p1611_p300words'       %P3a and P3b
+%     'p1611_p300words'       %P3a and P3b
     'p1511_p300words'     %P3a
     'p0112_p300words'     %P3a
     'p0213_p300words'       %P3a
