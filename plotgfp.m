@@ -45,12 +45,12 @@ figure('Name',figname,'Color','white','FileName',[figfile '.fig']);
 figpos = get(gcf,'Position');
 set(gcf,'Position',[figpos(1) figpos(2) figpos(3) figpos(3)]);
 
-% if ~isempty(stat.pclust) && length(stat.pclust.win(1):4:stat.pclust.win(2)) < 10
-%     stat.pclust = struct([]);
-% end
+if ~isempty(stat.pclust) && length(stat.pclust.win(1):4:stat.pclust.win(2)) < 10
+    stat.pclust = struct([]);
+end
 
 if ~isempty(stat.pclust)
-    latpnt = find(stat.times-stat.timeshift >= stat.pclust(1).win(1)+50 & stat.times-stat.timeshift <= stat.pclust(end).win(2));
+    latpnt = find(stat.times-stat.timeshift >= stat.pclust(1).win(1) & stat.times-stat.timeshift <= stat.pclust(end).win(2));
 else
     latpnt = find(stat.times-stat.timeshift >= stat.param.latency(1) & stat.times-stat.timeshift <= stat.param.latency(2));
 end
@@ -77,7 +77,8 @@ cb_labels = num2cell(get(cb_h,'YTickLabel'),2);
 cb_labels{1} = [cb_labels{1} ' uV'];
 set(cb_h,'YTickLabel',cb_labels);
 
-tct = load(sprintf('%s/%s_%s_%s_%d-%d_tct.mat',filepath,stat.statmode,num2str(stat.subjinfo),condlist{1},stat.param.latency));
+% tct = load(sprintf('%s/%s_%s_%s_%d-%d_tct.mat',filepath,stat.statmode,num2str(stat.subjinfo),condlist{1},stat.param.latency));
+tct.stat.pclust = [];
 if ~isempty(stat.pclust)
     if ~isempty(tct.stat.pclust)
         text(0,-0.7,sprintf('%dms, tct p = %.3f\nclust. t = %.1f, p = %.3f', ...
@@ -92,7 +93,7 @@ if ~isempty(stat.pclust)
     end
 else
     if ~isempty(tct.stat.pclust)
-        text(0,-0.7,sprintf('%dms, TCT p = %.3f', round(stat.times(plotpnt)), tct.stat.pclust.prob), ...
+        text(0,-0.7,sprintf('%dms, tct p = %.3f', round(stat.times(plotpnt)), tct.stat.pclust.prob), ...
             'FontSize',param.fontsize,'FontName',fontname,'HorizontalAlignment','center');
     else
         text(0,-0.7,sprintf('%dms', round(stat.times(plotpnt))), ...
@@ -120,6 +121,8 @@ plotdata = squeeze(stat.condgfp(1,:,1:length(condlist)));
 if length(condlist) == 2
     plotdata = plotdata';
 end
+
+plotdata = rmbase(plotdata,[],1:find(stat.times == 0));
 
 %plotdata = stat.gfpdiff(1,:);
 %param.legendstrings{end+1} = 'difference';

@@ -102,9 +102,9 @@ for s = 1:length(subjlist)
 %             
             for t = 1:length(timewin)
 %                 compgfp2(basename,condlist{c,1},'latency',timewin{t},'numrand',numrand);
-                load(sprintf('%s/trial_%s_%s-%s_%d-%d_gfp.mat',filepath,basename,condlist{c,1}{1},condlist{c,1}{2},timewin{t}(1),timewin{t}(2)));
-%                 stat = corrp(stat,'corrp','cluster');
-%                 save(sprintf('%s/trial_%s_%s-%s_%d-%d_gfp.mat',filepath,basename,condlist{c,1}{1},condlist{c,1}{2},timewin{t}(1),timewin{t}(2)),'stat');
+                load(sprintf('%s/trial_%s_%s-%s_%d-%d_gfp_rmbase.mat',filepath,basename,condlist{c,1}{1},condlist{c,1}{2},timewin{t}(1),timewin{t}(2)));
+%                 stat = corrclust(stat);
+%                 save(sprintf('%s/trial_%s_%s-%s_%d-%d_gfp_rmbase.mat',filepath,basename,condlist{c,1}{1},condlist{c,1}{2},timewin{t}(1),timewin{t}(2)),'stat');
                 stats{t} = stat;
 
 %                 calctct(basename,condlist{c,1}(1),'latency',timewin{t});

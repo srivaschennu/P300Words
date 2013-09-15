@@ -9,8 +9,6 @@ if param.ttesttail == 0
     param.alpha = param.alpha / 2;
 end
 
-stat = rmfield(stat,'gfpdiff');
-
 pprob = ones(1,size(stat.condgfp,2));
 nprob = ones(1,size(stat.condgfp,2));
 pmask = zeros(size(pprob));
@@ -58,16 +56,10 @@ close(h_wait);
 stat.pclust(1).prob = sum(phits(1) <= phits)/length(phits);
 stat.pclust(1).tstat = (phits(1) - mean(phits)) / (std(phits)/sqrt(length(phits)));
 stat.pclust(1).win = stat.times([find(stat.pmask,1,'first') find(stat.pmask,1,'last')]);
-if stat.pclust.prob > param.alpha
-    stat.pclust = struct([]);
-end
 
 stat.nclust(1).prob = sum(nhits(1) <= nhits)/length(nhits);
 stat.nclust(1).tstat = (nhits(1) - mean(nhits)) / (std(nhits)/sqrt(length(nhits)));
 stat.nclust(1).win = [find(stat.nmask,1,'first') find(stat.nmask,1,'last')];
-if stat.nclust.prob > param.alpha
-    stat.nclust = struct([]);
-end
 
 paramlist = fieldnames(param);
 for p = 1:length(paramlist)

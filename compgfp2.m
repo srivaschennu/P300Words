@@ -166,6 +166,8 @@ for s = 1:numsubj
         %selectepochs = find(typematches & snummatches & predmatches);
         fprintf('Condition %s: found %d matching epochs.\n',subjcond{s,c},length(selectepochs));
         
+%         EEG = eeg_detrend(EEG);
+        
         conddata{s,c} = pop_select(EEG,'trial',selectepochs);
         
 %         if strcmp(statmode,'trial') && c == numcond
@@ -304,7 +306,7 @@ function gfp = calcgfp(data,times)
 global chanidx
 if isempty(chanidx)
     [~,gfp] = evalc('eeg_gfp(data'',0)''');
-    gfp = rmbase(gfp,[],1:find(times == 0));
+    %gfp = rmbase(gfp,[],1:find(times == 0));
 else
     gfp = mean(data(chanidx,:),1);
 end

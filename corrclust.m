@@ -10,10 +10,6 @@ if param.ttesttail == 0
     param.alpha = param.alpha / 2;
 end
 
-if ~isfield(stat,'gfpdiff')
-    stat.gfpdiff = stat.condgfp;
-end
-
 valu = zeros(1,size(stat.gfpdiff,2));
 pprob = ones(1,size(stat.gfpdiff,2));
 nprob = ones(1,size(stat.gfpdiff,2));
