@@ -50,7 +50,7 @@ if ~isempty(stat.pclust) && length(stat.pclust.win(1):4:stat.pclust.win(2)) < 10
 end
 
 if ~isempty(stat.pclust)
-    latpnt = find(stat.times-stat.timeshift >= stat.pclust(1).win(1) & stat.times-stat.timeshift <= stat.pclust(end).win(2));
+    latpnt = find(stat.times-stat.timeshift >= stat.pclust(1).win(1)+50 & stat.times-stat.timeshift <= stat.pclust(end).win(2));
 else
     latpnt = find(stat.times-stat.timeshift >= stat.param.latency(1) & stat.times-stat.timeshift <= stat.param.latency(2));
 end
@@ -121,8 +121,6 @@ plotdata = squeeze(stat.condgfp(1,:,1:length(condlist)));
 if length(condlist) == 2
     plotdata = plotdata';
 end
-
-plotdata = rmbase(plotdata,[],1:find(stat.times == 0));
 
 %plotdata = stat.gfpdiff(1,:);
 %param.legendstrings{end+1} = 'difference';

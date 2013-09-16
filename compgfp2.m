@@ -76,7 +76,7 @@ for s = 1:numsubj
     EEG = rereference(EEG,1);
     
     %%%%% baseline correction relative to whole epoch
-    EEG = pop_rmbase(EEG,[]);
+%     EEG = pop_rmbase(EEG,[]);
     %%%%%
     
     % THIS ASSUMES THAT ALL DATASETS HAVE SAME NUMBER OF ELECTRODES
@@ -165,8 +165,6 @@ for s = 1:numsubj
         selectepochs = find(typematches & snummatches & predmatches & wnummatches & worimatches);
         %selectepochs = find(typematches & snummatches & predmatches);
         fprintf('Condition %s: found %d matching epochs.\n',subjcond{s,c},length(selectepochs));
-        
-%         EEG = eeg_detrend(EEG);
         
         conddata{s,c} = pop_select(EEG,'trial',selectepochs);
         
@@ -295,7 +293,7 @@ stat.chanlocs = chanlocs;
 stat.srate = EEG.srate;
 
 if nargout == 0
-    save2file = sprintf('%s/%s_%s_%s-%s_%d-%d_gfp_rmbase.mat',filepath,statmode,num2str(subjinfo),...
+    save2file = sprintf('%s/%s_%s_%s-%s_%d-%d_gfp.mat',filepath,statmode,num2str(subjinfo),...
         condlist{1},condlist{2},param.latency(1),param.latency(2));
     save(save2file,'stat');
 end
@@ -306,7 +304,7 @@ function gfp = calcgfp(data,times)
 global chanidx
 if isempty(chanidx)
     [~,gfp] = evalc('eeg_gfp(data'',0)''');
-    %gfp = rmbase(gfp,[],1:find(times == 0));
+    gfp = rmbase(gfp,[],1:find(times == 0));
 else
     gfp = mean(data(chanidx,:),1);
 end
