@@ -50,7 +50,7 @@ if ~isempty(stat.pclust) && length(stat.pclust.win(1):4:stat.pclust.win(2)) < 10
 end
 
 if ~isempty(stat.pclust)
-    latpnt = find(stat.times-stat.timeshift >= stat.pclust(1).win(1)+50 & stat.times-stat.timeshift <= stat.pclust(end).win(2));
+    latpnt = find(stat.times-stat.timeshift >= stat.pclust(1).win(1) & stat.times-stat.timeshift <= stat.pclust(end).win(2));
 else
     latpnt = find(stat.times-stat.timeshift >= stat.param.latency(1) & stat.times-stat.timeshift <= stat.param.latency(2));
 end
@@ -77,7 +77,7 @@ cb_labels = num2cell(get(cb_h,'YTickLabel'),2);
 cb_labels{1} = [cb_labels{1} ' uV'];
 set(cb_h,'YTickLabel',cb_labels);
 
-% tct = load(sprintf('%s/%s_%s_%s_%d-%d_tct.mat',filepath,stat.statmode,num2str(stat.subjinfo),condlist{1},stat.param.latency));
+tct = load(sprintf('%s/%s_%s_%s_%d-%d_tct.mat',filepath,stat.statmode,num2str(stat.subjinfo),condlist{1},stat.param.latency));
 tct.stat.pclust = [];
 if ~isempty(stat.pclust)
     if ~isempty(tct.stat.pclust)
