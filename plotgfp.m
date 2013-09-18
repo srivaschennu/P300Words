@@ -78,7 +78,6 @@ cb_labels{1} = [cb_labels{1} ' uV'];
 set(cb_h,'YTickLabel',cb_labels);
 
 tct = load(sprintf('%s/%s_%s_%s_%d-%d_tct.mat',filepath,stat.statmode,num2str(stat.subjinfo),condlist{1},stat.param.latency));
-tct.stat.pclust = [];
 if ~isempty(stat.pclust)
     if ~isempty(tct.stat.pclust)
         text(0,-0.7,sprintf('%dms, tct p = %.3f\nclust. t = %.1f, p = %.3f', ...

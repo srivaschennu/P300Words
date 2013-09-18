@@ -247,11 +247,11 @@ for c = 1:size(erpdata,3)
 %     set(get(axhndls(1),'YLabel'),'String','Global field power','FontName',fontname,'FontSize',param.fontsize);
 %     set(axhndls(2),'FontName',fontname,'FontSize',param.fontsize);
 %     
-%     close(gcf);
-%     figure;
-%     timtopo(plotdata,chanlocs,...
-%         'limits',[EEG.times(1)-timeshift EEG.times(end)-timeshift, param.ylim],...
-%         'plottimes',times(plotpnt(s))-timeshift);
+    close(gcf);
+    figure;
+    timtopo(plotdata,chanlocs,...
+        'limits',[EEG.times(1)-timeshift EEG.times(end)-timeshift, param.ylim],...
+        'plottimes',times(plotpnt(s))-timeshift);
 %     
 %     saveEEG = EEG;robust
 %     saveEEG.data = plotdata;
