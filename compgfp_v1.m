@@ -1,4 +1,4 @@
-function stat = compgfp2(subjinfo,condlist,varargin)
+function stat = compgfp(subjinfo,condlist,varargin)
 
 loadpaths
 
@@ -12,6 +12,10 @@ param = finputcheck(varargin, {
     'chanlist', 'cell', {}, {}; ...
     'wori', 'cell', {}, cell(1,length(condlist)), ...
     });
+
+if isempty(param.latency)
+    param.latency = [0 EEG.times(end)-timeshift];
+end
 
 if isempty(param.chanlist)
     chanidx = [];
@@ -74,10 +78,12 @@ for s = 1:numsubj
     
     % rereference
     EEG = rereference(EEG,1);
-    
-    %%%%% baseline correction relative to whole epoch
-%     EEG = pop_rmbase(EEG,[]);
-    %%%%%
+    %
+    %     %%%%% baseline correction relative to 5th tone
+    %     bcwin = [-200 0];
+    %     bcwin = bcwin+(timeshift*1000);
+    %     EEG = pop_rmbase(EEG,bcwin);
+    %     %%%%%
     
     % THIS ASSUMES THAT ALL DATASETS HAVE SAME NUMBER OF ELECTRODES
     if s == 1
@@ -186,84 +192,114 @@ for s = 1:numsubj
     end
 end
 
-if isempty(param.latency)
-    param.latency = [0 EEG.times(end)-timeshift];
-end
-
 if strcmp(statmode,'trial')
-    inddata{1} = conddata{1}.data;
-    inddata{2} = conddata{2}.data;
-    indgfp{1} = calcgfp(mean(inddata{1},3),EEG.times);
-    indgfp{2} = calcgfp(mean(inddata{2},3),EEG.times);
+    cond1data = conddata{1}.data;
+    cond2data = conddata{2}.data;
     mergedata = cat(3,conddata{1,1}.data,conddata{1,2}.data);
-    diffcond = mean(inddata{1},3) - mean(inddata{2},3);
+    condavg = cat(3,mean(cond1data,3),mean(cond2data,3));
+    diffcond = mean(cond1data,3) - mean(cond2data,3);
     
 elseif strcmp(statmode,'cond')
-    inddata{1} = zeros(conddata{1,1}.nbchan,conddata{1,1}.pnts,numsubj);
-    inddata{2} = zeros(conddata{1,2}.nbchan,conddata{1,2}.pnts,numsubj);
-    indgfp{1} = zeros(conddata{1,1}.pnts,numsubj);
-    indgfp{2} = zeros(conddata{1,2}.pnts,numsubj);
+    cond1data = zeros(conddata{1,1}.pnts,numsubj);
+    cond2data = zeros(conddata{1,2}.pnts,numsubj);
+    condavg = zeros(conddata{1,1}.nbchan,conddata{1,1}.pnts,numcond,numsubj);
     
     for s = 1:numsubj
-        inddata{1}(:,:,s) = mean(conddata{s,1}.data,3);
-        inddata{2}(:,:,s) = mean(conddata{s,2}.data,3);
+        cond1data(:,s) = calcgfp(mean(conddata{s,1}.data,3),EEG.times);
+        cond2data(:,s) = calcgfp(mean(conddata{s,2}.data,3),EEG.times);
+        condavg(:,:,1,s) = mean(conddata{s,1}.data,3);
+        condavg(:,:,2,s) = mean(conddata{s,2}.data,3);
         
         if size(conddata,2) > 2
-            condsub = mean(conddata{s,3}.data,3);
-            inddata{1}(:,:,s) = inddata{1}(:,:,s) - condsub;
-            inddata{2}(:,:,s) = inddata{2}(:,:,s) - condsub;
+            condsub = calcgfp(mean(conddata{s,3}.data,3),EEG.times);
+            cond1data(:,s) = cond1data(:,s) - condsub';
+            cond2data(:,s) = cond2data(:,s) - condsub';
+            condavg(:,:,1,s) = condavg(:,:,1,s) - mean(conddata{s,3}.data,3);
+            condavg(:,:,2,s) = condavg(:,:,2,s) - mean(conddata{s,3}.data,3);
         end
-        indgfp{1}(:,s) = calcgfp(inddata{1}(:,:,s),EEG.times);
-        indgfp{2}(:,s) = calcgfp(inddata{2}(:,:,s),EEG.times);
     end
-    mergedata = cat(3,inddata{1},inddata{2});
-    diffcond = mean(inddata{1},3) - mean(inddata{2},3);
+    mergedata = cat(2,cond1data,cond2data);
+    diffcond = condavg(:,:,1,:) - condavg(:,:,2,:);
+    condavg = mean(condavg,4);
+    diffcond = mean(diffcond,4);
     
 elseif strcmp(statmode,'subj')
-    inddata{1} = zeros(conddata{1,1}.nbchan,conddata{1,1}.pnts,numsubj1);
-    indgfp{1} = zeros(conddata{1,1}.pnts,numsubj1);
+    condavg = zeros(conddata{1,1}.nbchan,conddata{1,1}.pnts,numsubj);
+    cond1data = zeros(conddata{1,1}.pnts,numsubj1);
     for s = 1:numsubj1
-        inddata{1}(:,:,s) = mean(conddata{s,1}.data,3);
+        cond1data(:,s) = calcgfp(mean(conddata{s,1}.data,3),EEG.times);
+        condavg(:,:,s) = mean(conddata{s,1}.data,3);
+        
         if size(conddata,2) > 1
-            cond1sub = mean(conddata{s,2}.data,3);
-            inddata{1}(:,:,s) = inddata{1}(:,:,s) - cond1sub;
+            cond1sub = calcgfp(mean(conddata{s,2}.data,3),EEG.times);
+            cond1data(:,s) = cond1data(:,s) - cond1sub';
+            condavg(:,:,s) = condavg(:,:,s) - mean(conddata{s,2}.data,3);
         end
-        indgfp{1}(:,s) = calcgfp(inddata{1}(:,:,s),EEG.times);
     end
     
-    inddata{2} = zeros(conddata{numsubj1+1,1}.nbchan,conddata{numsubj1+1,1}.pnts,numsubj2);
-    indgfp{2} = zeros(conddata{numsubj1+1,1}.pnts,numsubj2);
+    cond2data = zeros(conddata{numsubj1+1,1}.pnts,numsubj2);
     for s = 1:numsubj2
-        inddata{2}(:,:,s) = mean(conddata{numsubj1+s,1}.data,3);
+        cond2data(:,s) = calcgfp(mean(conddata{numsubj1+s,1}.data,3),EEG.times);
+        condavg(:,:,numsubj1+s) = mean(conddata{numsubj1+s,1}.data,3);
+        
         if size(conddata,2) > 1
-            cond2sub = mean(conddata{numsubj1+s,2}.data,3);
-            inddata{2}(:,:,s) = inddata{2}(:,:,s) - cond2sub;
+            cond2sub = calcgfp(mean(conddata{numsubj1+s,2}.data,3),EEG.times);
+            cond2data(:,s) = cond2data(:,s) - cond2sub';
+            condavg(:,:,numsubj1+s) = condavg(:,:,numsubj1+s) - mean(conddata{numsubj1+s,2}.data,3);
         end
-        indgfp{2}(:,s) = calcgfp(inddata{2}(:,:,s),EEG.times);
     end
-    mergedata = cat(3,inddata{1},inddata{2});
-    diffcond = mean(inddata{1},3) - mean(inddata{2},3);
+    
+    mergedata = cat(2,cond1data,cond2data);
+    diffcond = mean(condavg(:,:,1:numsubj1),3) - mean(condavg(:,:,numsubj1+1:end),3);
+    condavg = cat(3,mean(condavg(:,:,1:numsubj1),3),mean(condavg(:,:,numsubj1+1:end),3));
 end
 
 gfpdiff = zeros(param.numrand+1,conddata{1,1}.pnts);
 stat.condgfp = zeros(param.numrand+1,conddata{1,1}.pnts,numcond);
-stat.inddata = inddata;
-stat.indgfp = indgfp;
+stat.cond1data = cond1data;
+stat.cond2data = cond2data;
 
 h_wait = waitbar(0,'Please wait...');
 set(h_wait,'Name',[mfilename ' progress']);
 
 for n = 1:param.numrand+1
-    if n > 1
-        waitbar((n-1)/param.numrand,h_wait,sprintf('Permutation %d...',n-1));
-        mergedata = mergedata(:,:,randperm(size(mergedata,3)));
-        inddata{1} = mergedata(:,:,1:size(inddata{1},3));
-        inddata{2} = mergedata(:,:,size(inddata{1},3)+1:end);
-    end
     
-    cond1gfp = calcgfp(mean(inddata{1},3),EEG.times);
-    cond2gfp = calcgfp(mean(inddata{2},3),EEG.times);
-    gfpdiff(n,:) = cond1gfp - cond2gfp;
+    if strcmp(statmode,'trial')
+        if n > 1
+            waitbar((n-1)/param.numrand,h_wait,sprintf('Permutation %d...',n-1));
+            mergedata = mergedata(:,:,randperm(size(mergedata,3)));
+            cond1data = mergedata(:,:,1:size(cond1data,3));
+            cond2data = mergedata(:,:,size(cond1data,3)+1:end);
+        end
+        
+        cond1gfp = calcgfp(mean(cond1data,3),EEG.times);
+        cond2gfp = calcgfp(mean(cond2data,3),EEG.times);
+        gfpdiff(n,:) = cond1gfp - cond2gfp;
+        
+    elseif strcmp(statmode,'cond')
+        if n > 1
+            waitbar((n-1)/param.numrand,h_wait,sprintf('Permutation %d...',n-1));
+            mergedata = mergedata(:,randperm(size(mergedata,2)));
+            cond1data(:,:) = mergedata(:,1:numsubj);
+            cond2data(:,:) = mergedata(:,numsubj+1:end);
+        end
+        
+        cond1gfp = mean(cond1data,2);
+        cond2gfp = mean(cond2data,2);
+        gfpdiff(n,:) = mean(cond1data - cond2data,2);
+        
+    elseif strcmp(statmode,'subj')
+        if n > 1
+            waitbar((n-1)/param.numrand,h_wait,sprintf('Permutation %d...',n-1));
+            mergedata = mergedata(:,randperm(size(mergedata,2)));
+            cond1data(:,:) = mergedata(:,1:numsubj1);
+            cond2data(:,:) = mergedata(:,numsubj1+1:end);
+        end
+        
+        cond1gfp = mean(cond1data,2);
+        cond2gfp = mean(cond2data,2);
+        gfpdiff(n,:) = cond1gfp - cond2gfp;
+    end
     stat.condgfp(n,:,1) = cond1gfp;
     stat.condgfp(n,:,2) = cond2gfp;
 end
@@ -282,6 +318,7 @@ for p = corrwin
 end
 
 stat.gfpdiff = gfpdiff;
+stat.condavg = condavg;
 stat.diffcond = diffcond;
 stat.times = EEG.times;
 stat.condlist = condlist;
@@ -293,7 +330,7 @@ stat.chanlocs = chanlocs;
 stat.srate = EEG.srate;
 
 if nargout == 0
-    save2file = sprintf('%s/%s_%s_%s-%s_%d-%d_gfp.mat',filepath,statmode,num2str(subjinfo),...
+    save2file = sprintf('%s_%s_%s-%s_%d-%d_gfp.mat',statmode,num2str(subjinfo),...
         condlist{1},condlist{2},param.latency(1),param.latency(2));
     save(save2file,'stat');
 end
